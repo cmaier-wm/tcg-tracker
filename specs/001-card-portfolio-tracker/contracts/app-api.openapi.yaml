@@ -1,0 +1,285 @@
+openapi: 3.1.0
+info:
+  title: TCG Tracker App API
+  version: 0.1.0
+  description: >
+    Internal application contract for card browsing, card detail pricing, and
+    personal portfolio management.
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/cards:
+    get:
+      summary: Search and browse card catalog results
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Free-text search term
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Card game category slug
+        - in: query
+          name: set
+          schema:
+            type: string
+          description: Optional set slug
+      responses:
+        '200':
+          description: Catalog search results
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CardListItem'
+  /api/cards/{category}/{cardId}:
+    get:
+      summary: Get card detail with variations and latest pricing
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: cardId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDetail'
+        '404':
+          description: Card not found
+  /api/cards/{category}/{cardId}/history:
+    get:
+      summary: Get historical pricing for a specific card variation
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: cardId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: variationId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Historical price series
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [points]
+                properties:
+                  points:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PricePoint'
+  /api/portfolio:
+    get:
+      summary: Get current portfolio holdings and total value
+      responses:
+        '200':
+          description: Portfolio summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioSummary'
+    post:
+      summary: Add a card variation to the portfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHoldingRequest'
+      responses:
+        '201':
+          description: Holding created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Holding'
+  /api/portfolio/{holdingId}:
+    patch:
+      summary: Update a portfolio holding
+      parameters:
+        - in: path
+          name: holdingId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHoldingRequest'
+      responses:
+        '200':
+          description: Holding updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Holding'
+    delete:
+      summary: Remove a portfolio holding
+      parameters:
+        - in: path
+          name: holdingId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Holding removed
+  /api/portfolio/history:
+    get:
+      summary: Get historical total portfolio value
+      responses:
+        '200':
+          description: Historical valuation series
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [points]
+                properties:
+                  points:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PortfolioValuePoint'
+
+components:
+  schemas:
+    CardListItem:
+      type: object
+      required: [id, category, setName, name]
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        setName:
+          type: string
+        name:
+          type: string
+        collectorNumber:
+          type: string
+        rarity:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+    CardDetail:
+      type: object
+      required: [id, name, variations]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        setName:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        variations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardVariation'
+    CardVariation:
+      type: object
+      required: [id, label]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        languageCode:
+          type: string
+        finish:
+          type: string
+        conditionCode:
+          type: string
+        currentPrice:
+          type: number
+        lastUpdatedAt:
+          type: string
+          format: date-time
+    PricePoint:
+      type: object
+      required: [capturedAt, marketPrice]
+      properties:
+        capturedAt:
+          type: string
+          format: date-time
+        marketPrice:
+          type: number
+    Holding:
+      type: object
+      required: [id, cardVariationId, quantity]
+      properties:
+        id:
+          type: string
+        cardVariationId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        estimatedValue:
+          type: number
+    CreateHoldingRequest:
+      type: object
+      required: [cardVariationId, quantity]
+      properties:
+        cardVariationId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+    UpdateHoldingRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+    PortfolioSummary:
+      type: object
+      required: [holdings, totalEstimatedValue]
+      properties:
+        holdings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+        totalEstimatedValue:
+          type: number
+    PortfolioValuePoint:
+      type: object
+      required: [capturedAt, totalValue]
+      properties:
+        capturedAt:
+          type: string
+          format: date-time
+        totalValue:
+          type: number

@@ -1,9 +1,12 @@
 # Project Context
 
 ## Tech Stack
-- Not selected yet at repo level. Every feature plan MUST record concrete
-  language/runtime, dependencies, storage, and test approach before
-  implementation starts.
+- TypeScript 5.9 on Node.js 22 LTS
+- Next.js 16 with React 19
+- Prisma ORM with PostgreSQL 17
+- Docker Compose for local PostgreSQL
+- TanStack Query, Recharts, and Zod
+- Vitest, React Testing Library, and Playwright
 
 ## Conventions
 - Follow the constitution in `.specify/memory/constitution.md`.
@@ -15,8 +18,24 @@
   if not practical, define explicit manual verification in `quickstart.md`.
 - Keep repo guidance in sync with accepted plans when stack, structure, or
   commands change.
+- Prefer Docker only for local infrastructure services unless a later plan
+  explicitly justifies containerizing the app itself.
 
 ## Commands
-- No project runtime/build commands are defined yet.
+- `npm install`
+- `npm run db:up`
+- `npm run dev`
+- `npm run db:migrate`
+- `npm run test:unit`
+- `npm run test:integration`
+- `npm run test:e2e`
+- `npm run db:down`
 - Use the `.specify/scripts/bash/` helpers for spec-kit workflow maintenance as
   needed.
+
+## Active Technologies
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod (001-card-portfolio-tracker)
+- PostgreSQL 17 for application data and time-series snapshots (001-card-portfolio-tracker)
+
+## Recent Changes
+- 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod

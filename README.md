@@ -1,8 +1,8 @@
 # tcg-tracker
 
-This repository is currently in its specification-first bootstrap phase. The
-working rules for the project live in
-`.specify/memory/constitution.md`.
+This repository is currently in a specification-driven build phase for a TCG
+card and portfolio tracking web application. The working rules for the project
+live in `.specify/memory/constitution.md`.
 
 ## Workflow
 
@@ -15,6 +15,27 @@ All non-trivial work follows this path:
 
 ## Current Status
 
-No application stack or runtime commands are adopted at the repository level
-yet. Each feature plan must define the concrete language, dependencies, storage,
-test approach, and operating constraints before implementation begins.
+The current implementation plan adopts this stack:
+
+- TypeScript 5.9 on Node.js 22 LTS
+- Next.js 16 with React 19
+- PostgreSQL 17 with Prisma ORM
+- Docker Compose for local PostgreSQL
+- TanStack Query, Recharts, and Zod
+- Vitest, React Testing Library, and Playwright
+
+The first planned feature is documented under
+[`specs/001-card-portfolio-tracker/`](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker).
+
+## Expected Commands
+
+```bash
+npm install
+npm run db:up
+npm run dev
+npm run db:migrate
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+npm run db:down
+```
