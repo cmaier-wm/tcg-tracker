@@ -27,10 +27,10 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 **Purpose**: Project initialization and baseline tooling
 
-- [ ] T001 Initialize the Next.js and TypeScript workspace in `package.json`, `tsconfig.json`, `next.config.ts`, and `app/layout.tsx`
-- [ ] T002 [P] Configure local PostgreSQL and app environment scaffolding in `docker/postgres/compose.yml`, `.env.example`, and `.gitignore`
-- [ ] T003 [P] Configure linting, formatting, and shared package scripts in `eslint.config.mjs`, `prettier.config.mjs`, and `package.json`
-- [ ] T004 [P] Configure Vitest and Playwright test runners in `vitest.config.ts`, `playwright.config.ts`, and `tests/`
+- [x] T001 Initialize the Next.js and TypeScript workspace in `package.json`, `tsconfig.json`, `next.config.ts`, and `app/layout.tsx`
+- [x] T002 [P] Configure local PostgreSQL and app environment scaffolding in `docker/postgres/compose.yml`, `.env.example`, and `.gitignore`
+- [x] T003 [P] Configure linting, formatting, and shared package scripts in `eslint.config.mjs`, `prettier.config.mjs`, and `package.json`
+- [x] T004 [P] Configure Vitest and Playwright test runners in `vitest.config.ts`, `playwright.config.ts`, and `tests/`
 
 ---
 
@@ -40,13 +40,13 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create the Prisma data model and initial migration in `prisma/schema.prisma` and `prisma/migrations/`
-- [ ] T006 [P] Implement the Prisma client and database helpers in `lib/db/prisma.ts` and `lib/db/env.ts`
-- [ ] T007 [P] Implement upstream API client, payload validation, and sync mapping in `lib/tcgtracking/client.ts`, `lib/tcgtracking/schemas.ts`, and `lib/tcgtracking/mappers.ts`
-- [ ] T008 Implement catalog sync and price snapshot ingestion services in `lib/tcgtracking/sync-catalog.ts` and `lib/pricing/sync-price-snapshots.ts`
-- [ ] T009 Implement portfolio valuation calculation and snapshot services in `lib/portfolio/value-portfolio.ts` and `lib/portfolio/save-valuation-snapshot.ts`
-- [ ] T010 Implement app-wide data fetching and error utilities in `lib/api/http-errors.ts`, `lib/api/route-handler.ts`, and `lib/api/serializers.ts`
-- [ ] T011 Implement development database lifecycle scripts in `package.json` and `scripts/db-up.mjs`
+- [x] T005 Create the Prisma data model and initial migration in `prisma/schema.prisma` and `prisma/migrations/`
+- [x] T006 [P] Implement the Prisma client and database helpers in `lib/db/prisma.ts` and `lib/db/env.ts`
+- [x] T007 [P] Implement upstream API client, payload validation, and sync mapping in `lib/tcgtracking/client.ts`, `lib/tcgtracking/schemas.ts`, and `lib/tcgtracking/mappers.ts`
+- [x] T008 Implement catalog sync and price snapshot ingestion services in `lib/tcgtracking/sync-catalog.ts` and `lib/pricing/sync-price-snapshots.ts`
+- [x] T009 Implement portfolio valuation calculation and snapshot services in `lib/portfolio/value-portfolio.ts` and `lib/portfolio/save-valuation-snapshot.ts`
+- [x] T010 Implement app-wide data fetching and error utilities in `lib/api/http-errors.ts`, `lib/api/route-handler.ts`, and `lib/api/serializers.ts`
+- [x] T011 Implement development database lifecycle scripts in `package.json` and `scripts/db-up.mjs`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -60,18 +60,18 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 ### Verification for User Story 1
 
-- [ ] T012 [P] [US1] Add contract tests for catalog and card detail endpoints in `tests/contract/cards-search.contract.test.ts` and `tests/contract/card-detail.contract.test.ts`
-- [ ] T013 [P] [US1] Add integration tests for catalog browse and card detail flows in `tests/integration/cards-browse.test.tsx` and `tests/integration/card-detail.test.tsx`
-- [ ] T014 [US1] Add Playwright coverage for browsing and variant selection in `tests/e2e/cards-browse.spec.ts`
+- [x] T012 [P] [US1] Add contract tests for catalog and card detail endpoints in `tests/contract/cards-search.contract.test.ts` and `tests/contract/card-detail.contract.test.ts`
+- [x] T013 [P] [US1] Add integration tests for catalog browse and card detail flows in `tests/integration/cards-browse.test.tsx` and `tests/integration/card-detail.test.tsx`
+- [x] T014 [US1] Add Playwright coverage for browsing and variant selection in `tests/e2e/cards-browse.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Implement catalog query and card detail services in `lib/tcgtracking/get-card-catalog.ts` and `lib/tcgtracking/get-card-detail.ts`
-- [ ] T016 [P] [US1] Implement catalog and card detail API routes in `app/api/cards/route.ts` and `app/api/cards/[category]/[cardId]/route.ts`
-- [ ] T017 [P] [US1] Build shared card list, card detail, and variant selector components in `components/cards/card-list.tsx`, `components/cards/card-detail.tsx`, and `components/cards/variant-selector.tsx`
-- [ ] T018 [US1] Implement the catalog page in `app/cards/page.tsx`
-- [ ] T019 [US1] Implement the card detail page in `app/cards/[category]/[cardId]/page.tsx`
-- [ ] T020 [US1] Add empty states and missing-image handling in `components/cards/card-empty-state.tsx` and `components/cards/card-image.tsx`
+- [x] T015 [P] [US1] Implement catalog query and card detail services in `lib/tcgtracking/get-card-catalog.ts` and `lib/tcgtracking/get-card-detail.ts`
+- [x] T016 [P] [US1] Implement catalog and card detail API routes in `app/api/cards/route.ts` and `app/api/cards/[category]/[cardId]/route.ts`
+- [x] T017 [P] [US1] Build shared card list, card detail, and variant selector components in `components/cards/card-list.tsx`, `components/cards/card-detail.tsx`, and `components/cards/variant-selector.tsx`
+- [x] T018 [US1] Implement the catalog page in `app/cards/page.tsx`
+- [x] T019 [US1] Implement the card detail page in `app/cards/[category]/[cardId]/page.tsx`
+- [x] T020 [US1] Add empty states and missing-image handling in `components/cards/card-empty-state.tsx` and `components/cards/card-image.tsx`
 
 **Checkpoint**: User Story 1 should be fully functional and testable independently
 
@@ -85,17 +85,17 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 ### Verification for User Story 2
 
-- [ ] T021 [P] [US2] Add contract tests for price history responses in `tests/contract/card-history.contract.test.ts`
-- [ ] T022 [P] [US2] Add integration tests for card pricing sections in `tests/integration/card-pricing.test.tsx`
-- [ ] T023 [US2] Add Playwright coverage for current price and history chart display in `tests/e2e/card-pricing.spec.ts`
+- [x] T021 [P] [US2] Add contract tests for price history responses in `tests/contract/card-history.contract.test.ts`
+- [x] T022 [P] [US2] Add integration tests for card pricing sections in `tests/integration/card-pricing.test.tsx`
+- [x] T023 [US2] Add Playwright coverage for current price and history chart display in `tests/e2e/card-pricing.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T024 [P] [US2] Implement price history query and chart shaping services in `lib/pricing/get-current-price.ts` and `lib/pricing/get-price-history.ts`
-- [ ] T025 [P] [US2] Implement the price history API route in `app/api/cards/[category]/[cardId]/history/route.ts`
-- [ ] T026 [P] [US2] Build price summary and chart components in `components/charts/price-history-chart.tsx` and `components/cards/card-price-summary.tsx`
-- [ ] T027 [US2] Integrate current price and history UI into `app/cards/[category]/[cardId]/page.tsx`
-- [ ] T028 [US2] Add no-price and no-history empty states in `components/cards/card-price-empty-state.tsx`
+- [x] T024 [P] [US2] Implement price history query and chart shaping services in `lib/pricing/get-current-price.ts` and `lib/pricing/get-price-history.ts`
+- [x] T025 [P] [US2] Implement the price history API route in `app/api/cards/[category]/[cardId]/history/route.ts`
+- [x] T026 [P] [US2] Build price summary and chart components in `components/charts/price-history-chart.tsx` and `components/cards/card-price-summary.tsx`
+- [x] T027 [US2] Integrate current price and history UI into `app/cards/[category]/[cardId]/page.tsx`
+- [x] T028 [US2] Add no-price and no-history empty states in `components/cards/card-price-empty-state.tsx`
 
 **Checkpoint**: User Stories 1 and 2 should both work independently
 
@@ -109,18 +109,18 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 ### Verification for User Story 3
 
-- [ ] T029 [P] [US3] Add contract tests for portfolio endpoints in `tests/contract/portfolio.contract.test.ts` and `tests/contract/portfolio-history.contract.test.ts`
-- [ ] T030 [P] [US3] Add integration tests for portfolio CRUD and valuation updates in `tests/integration/portfolio-page.test.tsx` and `tests/integration/portfolio-service.test.ts`
-- [ ] T031 [US3] Add Playwright coverage for add-to-portfolio and portfolio history flows in `tests/e2e/portfolio.spec.ts`
+- [x] T029 [P] [US3] Add contract tests for portfolio endpoints in `tests/contract/portfolio.contract.test.ts` and `tests/contract/portfolio-history.contract.test.ts`
+- [x] T030 [P] [US3] Add integration tests for portfolio CRUD and valuation updates in `tests/integration/portfolio-page.test.tsx` and `tests/integration/portfolio-service.test.ts`
+- [x] T031 [US3] Add Playwright coverage for add-to-portfolio and portfolio history flows in `tests/e2e/portfolio.spec.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T032 [P] [US3] Implement portfolio query and mutation services in `lib/portfolio/get-portfolio.ts`, `lib/portfolio/add-holding.ts`, `lib/portfolio/update-holding.ts`, and `lib/portfolio/remove-holding.ts`
-- [ ] T033 [P] [US3] Implement portfolio API routes in `app/api/portfolio/route.ts`, `app/api/portfolio/[holdingId]/route.ts`, and `app/api/portfolio/history/route.ts`
-- [ ] T034 [P] [US3] Build portfolio list, holding form, and valuation chart components in `components/portfolio/portfolio-list.tsx`, `components/portfolio/holding-form.tsx`, and `components/charts/portfolio-value-chart.tsx`
-- [ ] T035 [US3] Implement add-to-portfolio UI on the card detail page in `components/portfolio/add-to-portfolio-button.tsx` and `app/cards/[category]/[cardId]/page.tsx`
-- [ ] T036 [US3] Implement the portfolio page in `app/portfolio/page.tsx`
-- [ ] T037 [US3] Save a portfolio valuation snapshot after holding add, update, and delete operations in `lib/portfolio/add-holding.ts`, `lib/portfolio/update-holding.ts`, and `lib/portfolio/remove-holding.ts`
+- [x] T032 [P] [US3] Implement portfolio query and mutation services in `lib/portfolio/get-portfolio.ts`, `lib/portfolio/add-holding.ts`, `lib/portfolio/update-holding.ts`, and `lib/portfolio/remove-holding.ts`
+- [x] T033 [P] [US3] Implement portfolio API routes in `app/api/portfolio/route.ts`, `app/api/portfolio/[holdingId]/route.ts`, and `app/api/portfolio/history/route.ts`
+- [x] T034 [P] [US3] Build portfolio list, holding form, and valuation chart components in `components/portfolio/portfolio-list.tsx`, `components/portfolio/holding-form.tsx`, and `components/charts/portfolio-value-chart.tsx`
+- [x] T035 [US3] Implement add-to-portfolio UI on the card detail page in `components/portfolio/add-to-portfolio-button.tsx` and `app/cards/[category]/[cardId]/page.tsx`
+- [x] T036 [US3] Implement the portfolio page in `app/portfolio/page.tsx`
+- [x] T037 [US3] Save a portfolio valuation snapshot after holding add, update, and delete operations in `lib/portfolio/add-holding.ts`, `lib/portfolio/update-holding.ts`, and `lib/portfolio/remove-holding.ts`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -130,11 +130,11 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T038 [P] Document setup, sync behavior, and verification steps in `README.md` and `specs/001-card-portfolio-tracker/quickstart.md`
-- [ ] T039 Add a scheduled price and portfolio snapshot runner in `scripts/run-snapshots.mjs` and `app/api/snapshots/route.ts`
-- [ ] T040 [P] Add unit tests for pricing and portfolio calculations in `tests/unit/value-portfolio.test.ts` and `tests/unit/get-price-history.test.ts`
-- [ ] T041 Harden validation and route error handling across app APIs in `lib/api/route-handler.ts` and `lib/tcgtracking/schemas.ts`
-- [ ] T042 Run quickstart validation and capture any follow-up fixes in `specs/001-card-portfolio-tracker/quickstart.md`
+- [x] T038 [P] Document setup, sync behavior, and verification steps in `README.md` and `specs/001-card-portfolio-tracker/quickstart.md`
+- [x] T039 Add a scheduled price and portfolio snapshot runner in `scripts/run-snapshots.mjs` and `app/api/snapshots/route.ts`
+- [x] T040 [P] Add unit tests for pricing and portfolio calculations in `tests/unit/value-portfolio.test.ts` and `tests/unit/get-price-history.test.ts`
+- [x] T041 Harden validation and route error handling across app APIs in `lib/api/route-handler.ts` and `lib/tcgtracking/schemas.ts`
+- [x] T042 Run quickstart validation and capture any follow-up fixes in `specs/001-card-portfolio-tracker/quickstart.md`
 
 ---
 

@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CardCategory {
+  id               String    @id @default(cuid())
+  sourceCategoryId String    @unique
+  name             String
+  slug             String    @unique
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  sets             CardSet[]
+}
+
+model CardSet {
+  id            String   @id @default(cuid())
+  categoryId    String
+  sourceSetId   String   @unique
+  name          String
+  abbreviation  String?
+  releasedOn    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  category      CardCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  cards         Card[]
+}
+
+model Card {
+  id                 String          @id @default(cuid())
+  setId              String
+  sourceProductId    String          @unique
+  name               String
+  cleanName          String
+  collectorNumber    String?
+  rarity             String?
+  imageUrl           String?
+  externalProductUrl String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  set                CardSet         @relation(fields: [setId], references: [id], onDelete: Cascade)
+  variations         CardVariation[]
+}
+
+model CardVariation {
+  id             String            @id @default(cuid())
+  cardId         String
+  sourceSkuId    String?           @unique
+  languageCode   String?
+  finish         String?
+  conditionCode  String?
+  variantLabel   String
+  isDefault      Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  card           Card              @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  priceSnapshots PriceSnapshot[]
+  holdings       PortfolioHolding[]
+
+  @@unique([cardId, languageCode, finish, conditionCode, variantLabel])
+}
+
+model PriceSnapshot {
+  id              String        @id @default(cuid())
+  cardVariationId String
+  capturedAt      DateTime
+  marketPrice     Float?
+  lowPrice        Float?
+  highPrice       Float?
+  listingCount    Int?
+  sourceName      String
+  createdAt       DateTime      @default(now())
+  variation       CardVariation @relation(fields: [cardVariationId], references: [id], onDelete: Cascade)
+
+  @@unique([cardVariationId, sourceName, capturedAt])
+}
+
+model UserAccount {
+  id                 String                     @id @default(cuid())
+  email              String                     @unique
+  displayName        String
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  holdings           PortfolioHolding[]
+  valuationSnapshots PortfolioValuationSnapshot[]
+}
+
+model PortfolioHolding {
+  id              String        @id @default(cuid())
+  userId          String
+  cardVariationId String
+  quantity        Int
+  notes           String?
+  acquiredAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  user            UserAccount   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variation       CardVariation @relation(fields: [cardVariationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardVariationId])
+}
+
+model PortfolioValuationSnapshot {
+  id                String      @id @default(cuid())
+  userId            String
+  capturedAt        DateTime
+  totalValue        Float
+  holdingCount      Int
+  pricedHoldingCount Int
+  createdAt         DateTime    @default(now())
+  user              UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, capturedAt])
+}
+

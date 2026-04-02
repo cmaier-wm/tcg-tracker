@@ -24,11 +24,13 @@
 ## Commands
 - `npm install`
 - `npm run db:up`
+- `npm run db:generate`
 - `npm run dev`
 - `npm run db:migrate`
 - `npm run test:unit`
 - `npm run test:integration`
 - `npm run test:e2e`
+- `npm run snapshots:run`
 - `npm run db:down`
 - Use the `.specify/scripts/bash/` helpers for spec-kit workflow maintenance as
   needed.

@@ -11,14 +11,16 @@
 1. Install dependencies.
 2. Start the local PostgreSQL service with Docker Compose.
 3. Create a `.env` file with database connection values.
-4. Run database migrations.
-5. Start the development server.
+4. Generate the Prisma client.
+5. Run database migrations.
+6. Start the development server.
 
 ## Expected Commands
 
 ```bash
 npm install
 npm run db:up
+npm run db:generate
 npm run db:migrate
 npm run dev
 ```
@@ -47,6 +49,7 @@ npm run dev
 npm run test:unit
 npm run test:integration
 npm run test:e2e
+npm run snapshots:run
 npm run db:down
 ```
 
@@ -54,6 +57,8 @@ npm run db:down
 
 - Historical charts depend on stored snapshot data, so fresh environments may
   require seed or sync data before chart views become meaningful.
+- The current implementation ships with demo card, price, and portfolio data so
+  the browse, pricing, and portfolio flows are testable immediately.
 - Missing external image or pricing data is expected for some card variations
   and must render as a supported empty state rather than an application error.
 - The app is expected to run natively during development; Docker is used for
