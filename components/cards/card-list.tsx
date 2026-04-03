@@ -30,9 +30,7 @@ export function CardList({ items }: { items: CardListItem[] }) {
             <strong>
               {card.currentPrice != null ? `$${card.currentPrice.toFixed(2)}` : "No price"}
             </strong>
-            <span className="muted">
-              {card.variationCount} variation{card.variationCount === 1 ? "" : "s"}
-            </span>
+            <span className="muted">English</span>
           </div>
         </Link>
       ))}

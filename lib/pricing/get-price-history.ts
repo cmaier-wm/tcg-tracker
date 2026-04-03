@@ -8,10 +8,6 @@ export async function getPriceHistory(variationId: string) {
     async () => {
       const snapshots = await getDatabaseVariationHistory(variationId);
 
-      if (!snapshots.length) {
-        throw notFound("Card variation not found");
-      }
-
       return {
         variationId,
         points: snapshots

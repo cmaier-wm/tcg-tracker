@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { Toaster } from "sonner";
 import { SiteNav } from "@/components/site-nav";
 import "./globals.css";
 
@@ -37,6 +38,18 @@ export default function RootLayout({
             <p>TCG Tracker</p>
             <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
           </footer>
+          <Toaster
+            position="bottom-right"
+            richColors
+            toastOptions={{
+              classNames: {
+                toast: "app-toast",
+                success: "app-toast-success",
+                error: "app-toast-error",
+                title: "app-toast-title"
+              }
+            }}
+          />
         </div>
       </body>
     </html>

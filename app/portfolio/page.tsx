@@ -15,7 +15,6 @@ export default async function PortfolioPage() {
     <div className="page-grid">
       <section className="page-hero">
         <div className="stack">
-          <p className="eyebrow">Personal collection</p>
           <h1>My Portfolio</h1>
           <p className="hero-copy">
             Track your collection value over time and update holdings without leaving the
@@ -45,7 +44,7 @@ export default async function PortfolioPage() {
           <div className="section-heading">
             <div>
               <h2>Your Cards</h2>
-              <p className="muted">Manage tracked variations and estimated values.</p>
+              <p className="muted">Manage tracked cards and estimated values.</p>
             </div>
           </div>
           {portfolio.holdings.length ? (
@@ -53,7 +52,7 @@ export default async function PortfolioPage() {
           ) : (
             <CardEmptyState
               title="Your portfolio is empty"
-              body="Add a card variation from a detail page to start tracking your collection."
+              body="Add a card from a detail page to start tracking your collection."
             />
           )}
         </section>

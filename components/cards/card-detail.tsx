@@ -1,6 +1,5 @@
 import React from "react";
 import { CardImage } from "@/components/cards/card-image";
-import { VariantSelector } from "@/components/cards/variant-selector";
 
 type CardDetailProps = {
   card: {
@@ -42,15 +41,10 @@ export function CardDetail({ card, selectedVariationId }: CardDetailProps) {
         </div>
         <div className="badge-row">
           {card.rarity ? <span className="badge">{card.rarity}</span> : null}
-          {selectedVariation?.languageCode ? (
-            <span className="badge subtle">{selectedVariation.languageCode.toUpperCase()}</span>
-          ) : null}
+          <span className="badge subtle">
+            {selectedVariation?.languageCode?.toUpperCase() ?? "EN"}
+          </span>
         </div>
-        <VariantSelector
-          variations={card.variations}
-          selectedVariationId={selectedVariationId}
-          hrefBase={`/cards/${card.category}/${card.id}`}
-        />
       </div>
     </div>
   );

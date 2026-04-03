@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function HoldingForm({
   holdingId,
@@ -19,27 +20,64 @@ export function HoldingForm({
 }) {
   const router = useRouter();
   const [nextQuantity, setNextQuantity] = useState(quantity);
-  const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const lastSavedQuantityRef = useRef(quantity);
 
-  async function submit(method: "PATCH" | "DELETE") {
+  useEffect(() => {
+    setNextQuantity(quantity);
+    lastSavedQuantityRef.current = quantity;
+  }, [quantity]);
+
+  useEffect(() => {
+    if (nextQuantity < 1 || nextQuantity === lastSavedQuantityRef.current) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      void submitQuantity(nextQuantity);
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [nextQuantity]);
+
+  async function submitQuantity(quantityToSave: number) {
     setIsSaving(true);
     const response = await fetch(`/api/portfolio/${holdingId}`, {
-      method,
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json"
       },
-      body: method === "PATCH" ? JSON.stringify({ quantity: nextQuantity }) : undefined
+      body: JSON.stringify({ quantity: quantityToSave })
     });
 
     if (response.ok) {
-      setMessage(method === "DELETE" ? "Holding removed" : "Saved");
+      lastSavedQuantityRef.current = quantityToSave;
+      toast.success("Quantity updated");
       router.refresh();
     } else {
-      setMessage("Unable to update holding");
+      toast.error("Unable to complete action");
+      setNextQuantity(lastSavedQuantityRef.current);
     }
 
     setIsSaving(false);
+  }
+
+  async function removeHolding() {
+    setIsSaving(true);
+    const response = await fetch(`/api/portfolio/${holdingId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (response.ok) {
+      toast.success("Card removed from portfolio");
+      router.refresh();
+    } else {
+      toast.error("Unable to complete action");
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -60,29 +98,28 @@ export function HoldingForm({
             min={1}
             value={nextQuantity}
             disabled={isSaving}
-            onChange={(event) => setNextQuantity(Number(event.target.value))}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+
+              if (Number.isNaN(value)) {
+                return;
+              }
+
+              setNextQuantity(value);
+            }}
           />
         </label>
         <div className="button-row">
           <button
             type="button"
-            className="button"
-            disabled={isSaving}
-            onClick={() => submit("PATCH")}
-          >
-            {isSaving ? "Saving..." : "Update quantity"}
-          </button>
-          <button
-            type="button"
             className="button secondary"
             disabled={isSaving}
-            onClick={() => submit("DELETE")}
+            onClick={() => void removeHolding()}
           >
             Remove holding
           </button>
         </div>
       </div>
-      {message ? <p className="muted">{message}</p> : null}
     </div>
   );
 }

@@ -31,11 +31,9 @@ export function CardsBrowserPage({
     <div className="page-grid">
       <section className="page-hero">
         <div className="stack">
-          <p className="eyebrow">Pokemon Trading Card Database</p>
           <h1>Pokemon Card Browser</h1>
           <p className="hero-copy">
-            Search and explore Pokemon cards with current pricing,
-            variant-aware detail pages, and portfolio tracking.
+            Search and explore English Pokemon cards with current pricing and portfolio tracking.
           </p>
         </div>
       </section>

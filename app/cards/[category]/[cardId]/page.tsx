@@ -7,21 +7,16 @@ import { PriceHistoryChart } from "@/components/charts/price-history-chart";
 import { AddToPortfolioButton } from "@/components/portfolio/add-to-portfolio-button";
 import { getPriceHistory } from "@/lib/pricing/get-price-history";
 import { getCardDetail } from "@/lib/tcgtracking/get-card-detail";
+import { selectPreferredVariation } from "@/lib/tcgtracking/select-preferred-variation";
 
 export default async function CardDetailPage({
-  params,
-  searchParams
+  params
 }: {
   params: Promise<{ category: string; cardId: string }>;
-  searchParams?: Promise<{ variationId?: string }>;
 }) {
   const resolvedParams = await params;
-  const resolvedSearchParams = searchParams ? await searchParams : {};
   const card = await getCardDetail(resolvedParams.category, resolvedParams.cardId);
-  const selectedVariation =
-    card.variations.find(
-      (variation) => variation.id === resolvedSearchParams.variationId
-    ) ?? card.variations[0];
+  const selectedVariation = selectPreferredVariation(card.variations);
   const history = selectedVariation ? await getPriceHistory(selectedVariation.id) : { points: [] };
 
   return (
@@ -51,13 +46,13 @@ export default async function CardDetailPage({
           <div className="section-heading">
             <div>
               <h2>Add to Portfolio</h2>
-              <p className="muted">Save the selected variation to your tracked holdings.</p>
+              <p className="muted">Save this English card to your tracked holdings.</p>
             </div>
           </div>
           {selectedVariation ? (
             <AddToPortfolioButton
               variationId={selectedVariation.id}
-              variationLabel={selectedVariation.label}
+              variationLabel="English"
             />
           ) : null}
         </section>

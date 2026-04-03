@@ -2,6 +2,7 @@ import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoCards } from "@/lib/db/demo-store";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
 import { toCardListItem } from "@/lib/tcgtracking/mappers";
+import { selectPreferredVariation } from "@/lib/tcgtracking/select-preferred-variation";
 
 type CatalogOptions = {
   q?: string | null;
@@ -34,6 +35,14 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
       });
 
       return cards.map((card) => ({
+        const preferredVariation = selectPreferredVariation(
+          card.variations.map((variation) => ({
+            languageCode: variation.languageCode,
+            currentPrice: variation.priceSnapshots[0]?.marketPrice ?? null
+          }))
+        );
+
+        return {
         id: card.id,
         category: card.set.category.slug,
         categoryName: card.set.category.name,
@@ -42,9 +51,10 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
         collectorNumber: card.collectorNumber ?? undefined,
         rarity: card.rarity ?? undefined,
         imageUrl: card.imageUrl ?? undefined,
-        currentPrice: card.variations[0]?.priceSnapshots[0]?.marketPrice ?? undefined,
+        currentPrice: preferredVariation?.currentPrice ?? undefined,
         variationCount: card.variations.length
-      }));
+        };
+      });
     },
     async () =>
       getDemoCards()

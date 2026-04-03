@@ -39,7 +39,7 @@ export function PortfolioList({ holdings }: { holdings: Holding[] }) {
               ) : (
                 <h3>{holding.cardName}</h3>
               )}
-              <p className="muted">{holding.variationLabel}</p>
+              <p className="muted">English</p>
             </div>
             <div className="badge-row">
               <span className="badge">Qty {holding.quantity}</span>
@@ -48,7 +48,7 @@ export function PortfolioList({ holdings }: { holdings: Holding[] }) {
               holdingId={holding.id}
               quantity={holding.quantity}
               cardName={holding.cardName}
-              variationLabel={holding.variationLabel}
+              variationLabel="English"
               compact
             />
           </div>

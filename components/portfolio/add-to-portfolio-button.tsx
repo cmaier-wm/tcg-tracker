@@ -3,6 +3,7 @@
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function AddToPortfolioButton({
   variationId,
@@ -13,13 +14,11 @@ export function AddToPortfolioButton({
 }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
-  const [status, setStatus] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSaving(true);
-    setStatus("Saving...");
 
     const response = await fetch("/api/portfolio", {
       method: "POST",
@@ -30,11 +29,11 @@ export function AddToPortfolioButton({
     });
 
     if (response.ok) {
-      setStatus("Added to portfolio");
+      toast.success("Card added to portfolio");
       router.push("/portfolio");
       router.refresh();
     } else {
-      setStatus("Unable to save holding");
+      toast.error("Unable to complete action");
     }
 
     setIsSaving(false);
@@ -57,7 +56,6 @@ export function AddToPortfolioButton({
       <button className="button" type="submit" disabled={isSaving}>
         {isSaving ? "Saving..." : "Save holding"}
       </button>
-      {status ? <p className="muted">{status}</p> : null}
     </form>
   );
 }
