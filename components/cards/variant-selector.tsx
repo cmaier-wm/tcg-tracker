@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 type Variation = {
   id: string;
@@ -6,33 +7,37 @@ type Variation = {
   languageCode?: string | null;
   finish?: string | null;
   conditionCode?: string | null;
+  currentPrice?: number | null;
 };
 
 type VariantSelectorProps = {
   variations: Variation[];
   selectedVariationId?: string;
+  hrefBase: string;
 };
 
 export function VariantSelector({
   variations,
-  selectedVariationId
+  selectedVariationId,
+  hrefBase
 }: VariantSelectorProps) {
   return (
     <div className="stack">
-      <h3>Available variants</h3>
-      <div className="badge-row">
+      <h3>Language Variations</h3>
+      <div className="variant-list">
         {variations.map((variation) => (
-          <span
+          <Link
             key={variation.id}
-            className="badge"
-            style={
-              variation.id === selectedVariationId
-                ? { border: "1px solid var(--accent)", background: "white" }
-                : undefined
-            }
+            className={variation.id === selectedVariationId ? "variant-link active" : "variant-link"}
+            href={`${hrefBase}?variationId=${variation.id}`}
           >
-            {variation.label}
-          </span>
+            <span>{variation.label}</span>
+            {variation.currentPrice != null ? (
+              <strong>${variation.currentPrice.toFixed(2)}</strong>
+            ) : (
+              <span className="muted">No price</span>
+            )}
+          </Link>
         ))}
       </div>
     </div>

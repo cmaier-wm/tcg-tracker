@@ -1,4 +1,4 @@
-# Quickstart: TCG Card Portfolio Tracker
+# Quickstart: Pokemon Card Portfolio Tracker
 
 ## Prerequisites
 
@@ -13,7 +13,10 @@
 3. Create a `.env` file with database connection values.
 4. Generate the Prisma client.
 5. Run database migrations.
-6. Start the development server.
+6. Seed the starter dataset if you want Prisma-backed card and portfolio data.
+7. Start the development server.
+8. Run a catalog sync if you want search to cover the synchronized upstream
+   catalog instead of only the starter dataset.
 
 ## Expected Commands
 
@@ -22,12 +25,15 @@ npm install
 npm run db:up
 npm run db:generate
 npm run db:migrate
+npm run db:seed
 npm run dev
+npm run catalog:sync
 ```
 
 ## Verification Flow
 
-1. Open the app in a browser.
+1. Open `http://localhost:3000` in a browser and verify the home page renders
+   visible content rather than a blank page or browser error.
 2. Browse or search for a card in a supported category.
 3. Open a card detail page and verify:
    - The card image is visible when available.
@@ -59,6 +65,11 @@ npm run db:down
   require seed or sync data before chart views become meaningful.
 - The current implementation ships with demo card, price, and portfolio data so
   the browse, pricing, and portfolio flows are testable immediately.
+- Full catalog search depends on importing upstream Pokemon card metadata into
+  PostgreSQL. `npm run catalog:sync` is the normal sync path for the first
+  release.
+- `npm run snapshots:run` refreshes pricing and portfolio valuation for the
+  Pokemon scope while keeping upstream request volume bounded.
 - Missing external image or pricing data is expected for some card variations
   and must render as a supported empty state rather than an application error.
 - The app is expected to run natively during development; Docker is used for

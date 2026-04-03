@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { SiteNav } from "@/components/site-nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,18 +19,24 @@ export default function RootLayout({
       <body>
         <div className="app-shell">
           <header className="site-header">
-            <div>
-              <p className="eyebrow">Portfolio + Pricing</p>
-              <Link href="/" className="brand">
-                TCG Tracker
+            <div className="brand-lockup">
+              <Link href="/" className="brand-mark" aria-label="Go to home page">
+                <span className="brand-mark-dot" />
               </Link>
+              <div>
+                <Link href="/" className="brand">
+                  TCG Tracker
+                </Link>
+                <p className="eyebrow">Pokemon Card Database</p>
+              </div>
             </div>
-            <nav className="site-nav">
-              <Link href="/cards">Cards</Link>
-              <Link href="/portfolio">Portfolio</Link>
-            </nav>
+            <SiteNav />
           </header>
           <main className="page-shell">{children}</main>
+          <footer className="site-footer">
+            <p>TCG Tracker</p>
+            <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
+          </footer>
         </div>
       </body>
     </html>

@@ -9,6 +9,8 @@ export type CardListItem = {
   collectorNumber?: string;
   rarity?: string;
   imageUrl?: string;
+  currentPrice?: number;
+  variationCount: number;
 };
 
 export function toCardListItem(card: DemoCard): CardListItem {
@@ -20,7 +22,8 @@ export function toCardListItem(card: DemoCard): CardListItem {
     name: card.name,
     collectorNumber: card.collectorNumber,
     rarity: card.rarity,
-    imageUrl: card.imageUrl
+    imageUrl: card.imageUrl,
+    currentPrice: card.variations[0]?.currentPrice,
+    variationCount: card.variations.length
   };
 }
-

@@ -9,7 +9,7 @@ export function CardImage({ name, imageUrl }: CardImageProps) {
   if (!imageUrl) {
     return (
       <div className="image-box" aria-label={`${name} image unavailable`}>
-        <div className="empty-state" style={{ height: "100%" }}>
+        <div className="image-placeholder">
           Image unavailable
         </div>
       </div>

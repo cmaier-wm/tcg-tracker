@@ -1,6 +1,6 @@
 # tcg-tracker
 
-This repository contains a TCG card and portfolio tracking web application
+This repository contains a Pokemon card and portfolio tracking web application
 built with Next.js. The working rules for the project live in
 `.specify/memory/constitution.md`.
 
@@ -27,22 +27,38 @@ The current application uses:
 The primary feature specification and delivery artifacts live under
 [`specs/001-card-portfolio-tracker/`](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker).
 
+## Development Tooling
+
+MCP usage for this repository is documented in
+[`docs/development/mcps.md`](/Users/cmaier/Source/tcg-tracker/docs/development/mcps.md).
+The current documented MCPs are Figma MCP and a local Postgres MCP for
+development workflows only; neither is a runtime dependency of the application.
+
 ## Running Locally
 
 ```bash
 npm install
 npm run db:up
 npm run db:generate
-npm run dev
 npm run db:migrate
+npm run db:seed
+npm run dev
 ```
 
 ## Verification
+
+Manual smoke check:
+
+- Open `http://localhost:3000` after `npm run dev` and confirm the home page
+  renders visible content instead of a blank page or browser error.
+
+Automated checks:
 
 ```bash
 npm run test:unit
 npm run test:integration
 npm run test:e2e
+npm run catalog:sync -- 3
 npm run snapshots:run
 npm run db:down
 ```
@@ -51,5 +67,19 @@ npm run db:down
 
 - The current implementation includes demo catalog and portfolio data so the UI
   remains usable before a live upstream sync is configured.
+- If PostgreSQL is configured and migrated, `npm run db:seed` loads the same
+  starter card dataset into Prisma-backed storage.
+- To search beyond the starter dataset, run `npm run catalog:sync` while the
+  app server is running. That imports the upstream Pokemon catalog into
+  PostgreSQL so `/cards` search covers the synchronized catalog instead of only
+  demo data.
+- The first release is Pokemon-only. Full multi-category sync is intentionally
+  not part of the normal workflow.
+- Static product data is refreshed only when a set is older than 7 days.
+- Pricing and SKU data are refreshed at most once per 24 hours per set and are
+  merged back to products by product ID.
+- Upstream requests are intentionally throttled with a small delay between
+  calls. Tune this with `TCGTRACKING_REQUEST_DELAY_MS` if you want to be even
+  gentler.
 - Snapshot history can be refreshed through the scheduled snapshot route or
   `npm run snapshots:run` while the app server is running.

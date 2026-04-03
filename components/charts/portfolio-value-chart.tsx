@@ -4,6 +4,7 @@ import React from "react";
 import {
   Area,
   AreaChart,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -21,6 +22,7 @@ export function PortfolioValueChart({ points }: { points: PortfolioPoint[] }) {
     <div className="chart-shell">
       <ResponsiveContainer width="100%" height={280}>
         <AreaChart data={points}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis dataKey="capturedAt" tickFormatter={toCompactDate} />
           <YAxis tickFormatter={(value) => `$${value}`} />
           <Tooltip
@@ -30,9 +32,9 @@ export function PortfolioValueChart({ points }: { points: PortfolioPoint[] }) {
           <Area
             type="monotone"
             dataKey="totalValue"
-            stroke="#9d2a1d"
-            fill="#f7ddd5"
-            strokeWidth={3}
+            stroke="#2563eb"
+            fill="#dbeafe"
+            strokeWidth={2}
           />
         </AreaChart>
       </ResponsiveContainer>

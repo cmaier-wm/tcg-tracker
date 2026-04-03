@@ -1,13 +1,13 @@
-# Implementation Plan: TCG Card Portfolio Tracker
+# Implementation Plan: Pokemon Card Portfolio Tracker
 
 **Branch**: `001-card-portfolio-tracker` | **Date**: 2026-04-02 | **Spec**: [/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker/spec.md](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker/spec.md)
 **Input**: Feature specification from `/specs/001-card-portfolio-tracker/spec.md`
 
 ## Summary
 
-Build a full-stack web application that lets collectors browse TCG cards and
-their variations, inspect current and historical pricing, and track a personal
-portfolio with current and historical valuation. The recommended stack is a
+Build a full-stack web application that lets collectors browse Pokemon cards
+and their variations, inspect current and historical pricing, and track a
+personal portfolio with current and historical valuation. The recommended stack is a
 single TypeScript web app using Next.js for UI and server routes, PostgreSQL
 for relational portfolio and snapshot storage, Prisma ORM for data access, and
 Vitest plus Playwright for verification.
@@ -31,8 +31,8 @@ snapshot ingestion without manual intervention, must remain simple enough to
 ship as a single deployable web app, and must not require manual local database
 installation for development  
 **Scale/Scope**: Initial release targets a single collector account model,
-supports multiple TCG categories from the external source, and stores daily
-price and portfolio snapshots for tracked items
+supports only Pokemon from the external source, and stores daily price and
+portfolio snapshots for tracked items
 
 ## Constitution Check
 

@@ -2,6 +2,7 @@
 
 import React from "react";
 import {
+  CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -21,6 +22,7 @@ export function PriceHistoryChart({ points }: { points: PricePoint[] }) {
     <div className="chart-shell">
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={points}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis dataKey="capturedAt" tickFormatter={toCompactDate} />
           <YAxis tickFormatter={(value) => `$${value}`} />
           <Tooltip
@@ -30,9 +32,9 @@ export function PriceHistoryChart({ points }: { points: PricePoint[] }) {
           <Line
             type="monotone"
             dataKey="marketPrice"
-            stroke="#9d2a1d"
-            strokeWidth={3}
-            dot={{ r: 4 }}
+            stroke="#2563eb"
+            strokeWidth={2}
+            dot={false}
           />
         </LineChart>
       </ResponsiveContainer>

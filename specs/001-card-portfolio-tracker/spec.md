@@ -1,15 +1,15 @@
-# Feature Specification: TCG Card Portfolio Tracker
+# Feature Specification: Pokemon Card Portfolio Tracker
 
 **Feature Branch**: `001-card-portfolio-tracker`  
 **Created**: 2026-04-02  
 **Status**: Draft  
-**Input**: User description: "Build an application leveraging this API https://tcgtracking.com/tcgapi/?tab=docs to track TCG cards. I want to be able to view cards (including variations in different languages), see their current price and historical price graph, and see an image of the card. I also want to track my own portfolio of cards, including total value and historical value graph."
+**Input**: User description: "Build an application leveraging this API https://tcgtracking.com/tcgapi/?tab=docs to track TCG cards. I want to be able to view cards (including variations in different languages), see their current price and historical price graph, and see an image of the card. I also want to track my own portfolio of cards, including total value and historical value graph." Updated scope: first release is Pokemon only.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Browse Cards and Variants (Priority: P1)
 
-As a collector, I want to browse supported trading card game cards and inspect
+As a collector, I want to browse supported Pokemon cards and inspect
 their available variants so I can quickly understand what printings, languages,
 and images exist for a card before deciding whether to track it.
 
@@ -106,7 +106,7 @@ value and a historical portfolio graph based on recorded valuations.
 ### Functional Requirements
 
 - **FR-001**: The system MUST let users browse and search a catalog of supported
-  TCG cards.
+  Pokemon cards.
 - **FR-002**: The system MUST show identifying card details for each catalog
   result, including enough information to distinguish cards with the same or
   similar names.
@@ -141,8 +141,8 @@ value and a historical portfolio graph based on recorded valuations.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Card**: A collectible product users can browse, identified by game, set,
-  name, collector identifier, rarity, and image metadata.
+- **Card**: A Pokemon card product users can browse, identified by set, name,
+  collector identifier, rarity, and image metadata.
 - **Card Variation**: A distinct market-trackable version of a card, defined by
   attributes such as language, finish, condition grouping, or other source
   variation data that affects pricing.
@@ -172,9 +172,11 @@ value and a historical portfolio graph based on recorded valuations.
 
 - The first release is for a single collector's personal portfolio; multi-user
   sharing, social features, and marketplace transactions are out of scope.
-- The external card data source provides supported games, product identifiers,
-  images, and current market pricing for at least a meaningful subset of the
-  cards users want to track.
+- The first release only supports Pokemon from the external card data source;
+  other TCG categories are out of scope unless requirements change later.
+- The external card data source provides Pokemon product identifiers, images,
+  and current market pricing for at least a meaningful subset of the cards
+  users want to track.
 - Historical graphs are built from price and valuation snapshots collected after
   the app begins tracking a card or portfolio; full historical backfill is out
   of scope unless the source already exposes it.

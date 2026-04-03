@@ -1,8 +1,9 @@
-# Data Model: TCG Card Portfolio Tracker
+# Data Model: Pokemon Card Portfolio Tracker
 
 ## CardCategory
 
-Represents a supported game or category from the upstream card data source.
+Represents an upstream category record. For the first release, only the Pokemon
+category is expected to be active.
 
 ### Fields
 

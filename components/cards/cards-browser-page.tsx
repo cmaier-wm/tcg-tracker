@@ -1,0 +1,65 @@
+import React from "react";
+import { CatalogFilters } from "@/components/cards/catalog-filters";
+import { CardEmptyState } from "@/components/cards/card-empty-state";
+import { InfiniteCardList } from "@/components/cards/infinite-card-list";
+import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
+import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
+import type { CardListItem } from "@/lib/tcgtracking/mappers";
+
+const PAGE_SIZE = 20;
+
+type CardsBrowserPageProps = {
+  query?: string;
+  selectedCategory?: string;
+  selectedSet?: string;
+  items: CardListItem[];
+  categories: CatalogCategory[];
+  sets: CatalogSet[];
+  resetHref: string;
+};
+
+export function CardsBrowserPage({
+  query,
+  selectedCategory,
+  selectedSet,
+  items,
+  categories,
+  sets,
+  resetHref
+}: CardsBrowserPageProps) {
+  return (
+    <div className="page-grid">
+      <section className="page-hero">
+        <div className="stack">
+          <p className="eyebrow">Pokemon Trading Card Database</p>
+          <h1>Pokemon Card Browser</h1>
+          <p className="hero-copy">
+            Search and explore Pokemon cards with current pricing,
+            variant-aware detail pages, and portfolio tracking.
+          </p>
+        </div>
+      </section>
+      <CatalogFilters
+        query={query}
+        selectedSet={selectedSet}
+        categories={categories}
+        sets={sets}
+        resetHref={resetHref}
+      />
+      {items.length ? (
+        <InfiniteCardList
+          initialItems={items}
+          query={query}
+          selectedCategory={selectedCategory}
+          selectedSet={selectedSet}
+          pageSize={PAGE_SIZE}
+        />
+      ) : (
+        <CardEmptyState
+          title="No cards found"
+          body="Try a different search term or adjust the category and set filters."
+        />
+      )}
+    </div>
+  );
+}

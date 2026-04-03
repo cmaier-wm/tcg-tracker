@@ -12,6 +12,8 @@
     "db:down": "node scripts/db-up.mjs down",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
+    "db:seed": "node scripts/seed-demo-data.mjs",
+    "catalog:sync": "node scripts/sync-catalog.mjs",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration tests/contract",
     "test:e2e": "playwright test",
@@ -43,4 +45,3 @@
     "vitest": "^2.1.8"
   }
 }
-

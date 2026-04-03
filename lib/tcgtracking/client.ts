@@ -6,12 +6,29 @@ type FetchJsonOptions = {
 };
 
 export class TcgTrackingClient {
+  private lastRequestAt = 0;
+
   constructor(
     private readonly baseUrl = getOptionalEnv("TCGTRACKING_API_BASE_URL") ??
-      "https://tcgtracking.com/tcgapi"
+      "https://tcgtracking.com/tcgapi",
+    private readonly requestDelayMs =
+      Number.parseInt(getOptionalEnv("TCGTRACKING_REQUEST_DELAY_MS") ?? "", 10) || 250
   ) {}
 
+  private async waitForTurn() {
+    const elapsed = Date.now() - this.lastRequestAt;
+    const waitMs = this.requestDelayMs - elapsed;
+
+    if (waitMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+    }
+
+    this.lastRequestAt = Date.now();
+  }
+
   async fetchJson<T>({ path, query }: FetchJsonOptions): Promise<T> {
+    await this.waitForTurn();
+
     const url = new URL(path, this.baseUrl.endsWith("/") ? this.baseUrl : `${this.baseUrl}/`);
 
     if (query) {
@@ -26,7 +43,7 @@ export class TcgTrackingClient {
       headers: {
         Accept: "application/json"
       },
-      next: { revalidate: 3600 }
+      cache: "no-store"
     });
 
     if (!response.ok) {
@@ -38,4 +55,3 @@ export class TcgTrackingClient {
 }
 
 export const tcgTrackingClient = new TcgTrackingClient();
-

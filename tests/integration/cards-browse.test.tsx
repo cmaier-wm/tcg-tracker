@@ -7,7 +7,9 @@ describe("cards page", () => {
     const page = await CardsPage({ searchParams: Promise.resolve({}) });
     render(page);
 
-    expect(screen.getByText("Cards and variants")).toBeInTheDocument();
+    expect(screen.getByText("TCG Card Browser")).toBeInTheDocument();
+    expect(screen.getByLabelText("Search cards")).toBeInTheDocument();
+    expect(screen.getByLabelText("Game category")).toBeInTheDocument();
+    expect(screen.getByLabelText("Set")).toBeInTheDocument();
   });
 });
-

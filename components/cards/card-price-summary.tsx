@@ -18,7 +18,7 @@ export function CardPriceSummary({
   }
 
   return (
-    <div className="panel">
+    <div className="stat-card stat-card-primary">
       <p className="eyebrow">Current price</p>
       <h2>{toCurrency(currentPrice)}</h2>
       <p className="muted">

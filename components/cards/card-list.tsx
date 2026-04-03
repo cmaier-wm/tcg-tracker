@@ -5,25 +5,35 @@ import { CardImage } from "@/components/cards/card-image";
 
 export function CardList({ items }: { items: CardListItem[] }) {
   return (
-    <div className="card-list">
+    <div className="card-grid">
       {items.map((card) => (
         <Link
           key={card.id}
           href={`/cards/${card.category}/${card.id}`}
-          className="card-row"
+          className="catalog-card"
         >
-          <CardImage name={card.name} imageUrl={card.imageUrl} />
-          <div>
+          <div className="catalog-card-media">
+            <CardImage name={card.name} imageUrl={card.imageUrl} />
+          </div>
+          <div className="catalog-card-body">
             <h3>{card.name}</h3>
             <p className="muted">
-              {card.categoryName} · {card.setName}
+              {card.setName}
+              {card.collectorNumber ? ` · ${card.collectorNumber}` : ""}
             </p>
             <div className="badge-row">
-              {card.collectorNumber ? <span className="badge">#{card.collectorNumber}</span> : null}
               {card.rarity ? <span className="badge">{card.rarity}</span> : null}
+              <span className="badge subtle">{card.categoryName}</span>
             </div>
           </div>
-          <div className="muted">View card</div>
+          <div className="catalog-card-footer">
+            <strong>
+              {card.currentPrice != null ? `$${card.currentPrice.toFixed(2)}` : "No price"}
+            </strong>
+            <span className="muted">
+              {card.variationCount} variation{card.variationCount === 1 ? "" : "s"}
+            </span>
+          </div>
         </Link>
       ))}
     </div>

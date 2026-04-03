@@ -18,6 +18,8 @@
   if not practical, define explicit manual verification in `quickstart.md`.
 - Keep repo guidance in sync with accepted plans when stack, structure, or
   commands change.
+- Keep MCP workflow documentation in `docs/development/mcps.md` in sync when
+  development tooling changes.
 - Prefer Docker only for local infrastructure services unless a later plan
   explicitly justifies containerizing the app itself.
 

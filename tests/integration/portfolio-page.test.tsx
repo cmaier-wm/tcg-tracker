@@ -7,7 +7,6 @@ describe("portfolio page", () => {
     const page = await PortfolioPage();
     render(page);
 
-    expect(screen.getByText("Portfolio value")).toBeInTheDocument();
+    expect(screen.getByText("My Portfolio")).toBeInTheDocument();
   });
 });
-

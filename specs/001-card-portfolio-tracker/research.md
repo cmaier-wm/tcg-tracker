@@ -1,4 +1,4 @@
-# Research: TCG Card Portfolio Tracker
+# Research: Pokemon Card Portfolio Tracker
 
 ## Decision: Use a single Next.js web application with App Router
 
@@ -74,7 +74,7 @@ development.
 - On-demand current-price only charts: rejected because it cannot satisfy the
   historical graph requirement.
 - Full external historical import: rejected because the source documentation
-  does not promise a complete historical backfill mechanism for all games and
+  does not promise a complete historical backfill mechanism for Pokemon and
   variations.
 
 ## Decision: Use TanStack Query, Recharts, and Zod

@@ -5,13 +5,13 @@ import CardDetailPage from "@/app/cards/[category]/[cardId]/page";
 describe("card pricing section", () => {
   it("shows current pricing content", async () => {
     const page = await CardDetailPage({
-      params: Promise.resolve({ category: "pokemon", cardId: "sv1-charizard-ex" })
+      params: Promise.resolve({ category: "pokemon", cardId: "sv1-charizard-ex" }),
+      searchParams: Promise.resolve({})
     });
 
     render(page);
 
     expect(screen.getByText("Current price")).toBeInTheDocument();
-    expect(screen.getByText("Price history")).toBeInTheDocument();
+    expect(screen.getByText("Price History")).toBeInTheDocument();
   });
 });
-
