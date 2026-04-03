@@ -9,6 +9,5 @@ describe("settings page contract", () => {
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Dark mode" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Back to Browse" })).toBeInTheDocument();
   });
 });

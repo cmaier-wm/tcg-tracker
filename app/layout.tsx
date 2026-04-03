@@ -22,23 +22,27 @@ export default function RootLayout({
       <body>
         <div className="app-shell">
           <header className="site-header">
-            <div className="brand-lockup">
-              <Link href="/" className="brand-mark" aria-label="Go to home page">
-                <span className="brand-mark-dot" />
-              </Link>
-              <div>
-                <Link href="/" className="brand">
-                  TCG Tracker
+            <div className="site-header-inner">
+              <div className="brand-lockup">
+                <Link href="/" className="brand-mark" aria-label="Go to home page">
+                  <span className="brand-mark-dot" />
                 </Link>
-                <p className="eyebrow">Pokemon Card Database</p>
+                <div>
+                  <Link href="/" className="brand">
+                    TCG Tracker
+                  </Link>
+                  <p className="eyebrow">Trading Card Database</p>
+                </div>
               </div>
+              <SiteNav />
             </div>
-            <SiteNav />
           </header>
           <main className="page-shell">{children}</main>
           <footer className="site-footer">
-            <p>TCG Tracker</p>
-            <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
+            <div className="site-footer-inner">
+              <p>TCG Tracker</p>
+              <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
+            </div>
           </footer>
           <Toaster
             position="bottom-right"

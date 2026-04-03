@@ -1,19 +1,11 @@
 import React from "react";
-import dynamic from "next/dynamic";
 import { CardEmptyState } from "@/components/cards/card-empty-state";
+import { PortfolioValueChart } from "@/components/charts/portfolio-value-chart";
 import { PortfolioList } from "@/components/portfolio/portfolio-list";
 import { toCurrency, toSignedCurrency } from "@/lib/api/serializers";
 import { calculateTodayProfitLoss } from "@/lib/portfolio/calculate-today-profit-loss";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 import { getPortfolioHistory } from "@/lib/portfolio/get-portfolio-history";
-
-const PortfolioValueChart = dynamic(
-  () => import("@/components/charts/portfolio-value-chart").then((module) => module.PortfolioValueChart),
-  {
-    ssr: false,
-    loading: () => <div className="chart-loading">Loading chart...</div>
-  }
-);
 
 export default async function PortfolioPage() {
   const portfolio = await getPortfolio();
@@ -34,7 +26,7 @@ export default async function PortfolioPage() {
 
   return (
     <div className="page-grid">
-      <section className="page-hero">
+      <section className="page-intro stack">
         <div className="stack">
           <h1>My Portfolio</h1>
           <p className="hero-copy">
@@ -50,14 +42,14 @@ export default async function PortfolioPage() {
           <p className="muted">Live estimate across all saved holdings.</p>
         </article>
         <article className="stat-card">
-          <p className="eyebrow">Total cards</p>
-          <h2>{totalCards}</h2>
-          <p className="muted">{portfolio.holdingCount} unique tracked entries.</p>
-        </article>
-        <article className="stat-card">
           <p className="eyebrow">Profit / loss</p>
           <h2 className={todayProfitLossClass}>{toSignedCurrency(todayProfitLoss)}</h2>
           <p className="muted">Compared with your first valuation snapshot today.</p>
+        </article>
+        <article className="stat-card">
+          <p className="eyebrow">Total cards</p>
+          <h2>{totalCards}</h2>
+          <p className="muted">{portfolio.holdingCount} unique tracked entries.</p>
         </article>
       </section>
       <div className="dashboard-grid">

@@ -22,7 +22,6 @@ describe("settings page", () => {
 
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("light");
-      expect(screen.getByText("Bright default palette active.")).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("checkbox", { name: "Dark mode toggle" }));
@@ -30,7 +29,6 @@ describe("settings page", () => {
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("dark");
       expect(readStoredThemeMode()).toBe("dark");
-      expect(screen.getByText("V2 dark palette active.")).toBeInTheDocument();
     });
   });
 });

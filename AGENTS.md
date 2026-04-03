@@ -12,6 +12,8 @@
 - Follow the constitution in `.specify/memory/constitution.md`.
 - Use the spec-driven workflow: `spec.md -> plan.md -> supporting design docs ->
   tasks.md -> implementation`.
+- Use the current Figma Make file as the default UI reference for visual
+  alignment work: `https://www.figma.com/make/6ao1OMigGMRBj68UqBEOWA/TCG-Card-Tracker-App?p=f&t=XknWAY1aATbX7RHT-0`
 - Organize work as independently valuable user stories with exact file-path
   tasks.
 - Verification is mandatory for every behavior change. Prefer automated tests;

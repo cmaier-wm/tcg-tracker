@@ -29,7 +29,7 @@ export function CardsBrowserPage({
 }: CardsBrowserPageProps) {
   return (
     <div className="page-grid">
-      <section className="page-hero">
+      <section className="page-intro stack">
         <div className="stack">
           <h1>Pokemon Card Browser</h1>
           <p className="hero-copy">

@@ -15,6 +15,11 @@ Scope matters here:
 
 Status: Available for development workflows. Not required for local app runtime.
 
+Current design reference:
+
+- TCG Card Tracker App (Figma Make):
+  https://www.figma.com/make/6ao1OMigGMRBj68UqBEOWA/TCG-Card-Tracker-App?p=f&t=XknWAY1aATbX7RHT-0
+
 Docs:
 
 - https://help.figma.com/hc/en-us/articles/39166810751895
@@ -47,6 +52,8 @@ Repository impact:
 - Using this MCP should produce or update normal repo artifacts such as specs,
   screenshots, design notes, or implementation changes, not hidden workflow
   state.
+- UI refinement work should use the current Figma Make file above as the
+  canonical design reference unless a newer design link is explicitly adopted.
 
 ### Postgres MCP
 

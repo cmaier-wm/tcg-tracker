@@ -34,6 +34,10 @@ MCP usage for this repository is documented in
 The current documented MCPs are Figma MCP and a local Postgres MCP for
 development workflows only; neither is a runtime dependency of the application.
 
+Current UI design reference:
+
+- Figma Make: https://www.figma.com/make/6ao1OMigGMRBj68UqBEOWA/TCG-Card-Tracker-App?p=f&t=XknWAY1aATbX7RHT-0
+
 ## Running Locally
 
 ```bash
