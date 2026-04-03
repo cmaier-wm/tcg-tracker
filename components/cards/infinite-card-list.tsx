@@ -3,12 +3,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CardList } from "@/components/cards/card-list";
 import type { CardListItem } from "@/lib/tcgtracking/mappers";
+import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
 
 type InfiniteCardListProps = {
   initialItems: CardListItem[];
   query?: string;
   selectedCategory?: string;
   selectedSet?: string;
+  selectedSort: CatalogSortValue;
   pageSize: number;
 };
 
@@ -17,6 +19,7 @@ export function InfiniteCardList({
   query,
   selectedCategory,
   selectedSet,
+  selectedSort,
   pageSize
 }: InfiniteCardListProps) {
   const [items, setItems] = useState(initialItems);
@@ -30,7 +33,7 @@ export function InfiniteCardList({
     setIsLoading(false);
     setHasMore(initialItems.length === pageSize);
     requestInFlightRef.current = false;
-  }, [initialItems, pageSize, query, selectedCategory, selectedSet]);
+  }, [initialItems, pageSize, query, selectedCategory, selectedSet, selectedSort]);
 
   useEffect(() => {
     const node = loaderRef.current;
@@ -51,7 +54,8 @@ export function InfiniteCardList({
 
         const params = new URLSearchParams({
           offset: String(items.length),
-          limit: String(pageSize)
+          limit: String(pageSize),
+          sort: selectedSort
         });
 
         if (query) {
@@ -96,7 +100,7 @@ export function InfiniteCardList({
     return () => {
       observer.disconnect();
     };
-  }, [hasMore, items.length, pageSize, query, selectedCategory, selectedSet]);
+  }, [hasMore, items.length, pageSize, query, selectedCategory, selectedSet, selectedSort]);
 
   return (
     <>

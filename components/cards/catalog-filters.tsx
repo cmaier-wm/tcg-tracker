@@ -2,10 +2,12 @@ import React from "react";
 import Link from "next/link";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
+import { getCatalogSortOptions, type CatalogSortValue } from "@/lib/tcgtracking/search-query";
 
 type CatalogFiltersProps = {
   query?: string;
   selectedSet?: string;
+  selectedSort: CatalogSortValue;
   categories: CatalogCategory[];
   sets: CatalogSet[];
   resetHref: string;
@@ -14,6 +16,7 @@ type CatalogFiltersProps = {
 export function CatalogFilters({
   query,
   selectedSet,
+  selectedSort,
   categories: _categories,
   sets,
   resetHref
@@ -37,6 +40,16 @@ export function CatalogFilters({
           {sets.map((set) => (
             <option key={`${set.categorySlug}:${set.slug}`} value={set.slug}>
               {set.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="field">
+        <label htmlFor="sort-filter">Sort</label>
+        <select id="sort-filter" name="sort" defaultValue={selectedSort}>
+          {getCatalogSortOptions().map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>

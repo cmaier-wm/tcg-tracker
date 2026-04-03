@@ -44,6 +44,7 @@
 - PostgreSQL 17 for application data and time-series snapshots (001-card-portfolio-tracker)
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL 17, Vitest, React Testing Library, Playwright (002-user-settings)
 - Browser-local persisted user preference; no new server-side storage required for v1 (002-user-settings)
+- Existing PostgreSQL catalog plus demo-store fallback; no new persisted storage required (003-results-sorting)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod

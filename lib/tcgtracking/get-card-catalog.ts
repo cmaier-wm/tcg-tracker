@@ -3,12 +3,18 @@ import { getDemoCards } from "@/lib/db/demo-store";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
 import { toCardListItem } from "@/lib/tcgtracking/mappers";
 import { selectPreferredVariation } from "@/lib/tcgtracking/select-preferred-variation";
-import { matchesSearchTokens, tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
+import {
+  matchesSearchTokens,
+  normalizeCatalogSort,
+  sortCardListItems,
+  tokenizeSearchQuery
+} from "@/lib/tcgtracking/search-query";
 
 type CatalogOptions = {
   q?: string | null;
   category?: string | null;
   set?: string | null;
+  sort?: string | null;
   limit?: number;
   offset?: number;
 };
@@ -22,6 +28,7 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
   const searchTokens = tokenizeSearchQuery(options.q);
   const category = normalizeFilter(options.category);
   const set = normalizeFilter(options.set);
+  const sort = normalizeCatalogSort(options.sort);
   const limit = options.limit;
   const offset = options.offset ?? 0;
 
@@ -31,62 +38,67 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
         q: options.q,
         category,
         set,
-        limit,
-        offset
+        sort
       });
 
-      return cards.map((card) => {
-        const preferredVariation = selectPreferredVariation(
-          card.variations.map((variation) => ({
-            languageCode: variation.languageCode,
-            currentPrice: variation.priceSnapshots[0]?.marketPrice ?? null
-          }))
-        );
+      return sortCardListItems(
+        cards.map((card) => {
+          const preferredVariation = selectPreferredVariation(
+            card.variations.map((variation) => ({
+              languageCode: variation.languageCode,
+              currentPrice: variation.priceSnapshots[0]?.marketPrice ?? null
+            }))
+          );
 
-        return {
-          id: card.id,
-          category: card.set.category.slug,
-          categoryName: card.set.category.name,
-          setName: card.set.name,
-          name: card.name,
-          collectorNumber: card.collectorNumber ?? undefined,
-          rarity: card.rarity ?? undefined,
-          imageUrl: card.imageUrl ?? undefined,
-          currentPrice: preferredVariation?.currentPrice ?? undefined,
-          variationCount: card.variations.length
-        };
-      });
+          return {
+            id: card.id,
+            category: card.set.category.slug,
+            categoryName: card.set.category.name,
+            setName: card.set.name,
+            name: card.name,
+            collectorNumber: card.collectorNumber ?? undefined,
+            rarity: card.rarity ?? undefined,
+            imageUrl: card.imageUrl ?? undefined,
+            currentPrice: preferredVariation?.currentPrice ?? undefined,
+            variationCount: card.variations.length
+          };
+        }),
+        sort
+      ).slice(offset, limit ? offset + limit : undefined);
     },
     async () =>
-      getDemoCards()
-        .filter((card) => {
-          if (
-            searchTokens.length &&
-            !matchesSearchTokens(
-              [card.name, card.setName, card.collectorNumber ?? ""],
-              searchTokens
-            )
-          ) {
-            return false;
-          }
+      sortCardListItems(
+        getDemoCards()
+          .filter((card) => {
+            if (
+              searchTokens.length &&
+              !matchesSearchTokens(
+                [card.name, card.setName, card.collectorNumber ?? ""],
+                searchTokens
+              )
+            ) {
+              return false;
+            }
 
-          if (category && card.category !== category) {
-            return false;
-          }
+            if (category && card.category !== category) {
+              return false;
+            }
 
-          if (
-            set &&
-            card.setName
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "-")
-              .replace(/^-+|-+$/g, "") !== set
-          ) {
-            return false;
-          }
+            if (
+              set &&
+              card.setName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "") !== set
+            ) {
+              return false;
+            }
 
-          return true;
-        })
-        .map(toCardListItem)
+            return true;
+          })
+          .map(toCardListItem),
+        sort
+      )
         .slice(offset, limit ? offset + limit : undefined)
   );
 }

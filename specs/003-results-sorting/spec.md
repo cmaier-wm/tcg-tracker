@@ -3,14 +3,14 @@
 **Feature Branch**: `003-results-sorting`  
 **Created**: 2026-04-03  
 **Status**: Draft  
-**Input**: User description: "Add sorting to the results page. The default on the home page should be to sort by price from high to low"
+**Input**: User description: "Add sorting to the results page. The default on the home page should be to sort by price from high to low" plus follow-up scope: "also allow sorting by number, set, and rarity. all sort options should allow descending or ascending"
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Change Result Order (Priority: P1)
 
-As a collector, I want to sort card results by different orders so I can scan
-the catalog in the order that best matches what I am looking for.
+As a collector, I want to sort card results by different fields and directions
+so I can scan the catalog in the order that best matches what I am looking for.
 
 **Why this priority**: Result ordering directly affects whether users can find
 expensive, cheap, or alphabetically grouped cards without manually scanning a
@@ -23,8 +23,8 @@ order without changing the current filters.
 **Acceptance Scenarios**:
 
 1. **Given** a user is viewing card results, **When** they open the sorting
-   control, **Then** the system shows the available sort options in a way the
-   user can select.
+   control, **Then** the system shows the available sort fields and ascending or
+   descending directions in a way the user can select.
 2. **Given** a user is viewing filtered or searched results, **When** they
    select a different sort order, **Then** the system reorders the existing
    result set without clearing the active search or filters.
@@ -85,11 +85,15 @@ prices is applied consistently.
 
 - A search result set mixes priced and unpriced cards.
 - Multiple cards share the same price and require a stable tie-break order.
+- Multiple cards share the same collector number, rarity, or set name and still
+  require deterministic output.
 - A user changes sort order after applying a search term or set filter.
 - A user lands directly on a results URL that already includes a sort
   selection.
 - The home page has fewer visible results than a full page but must still honor
   the default sort order.
+- Some cards do not have a rarity or collector number and must still sort
+  consistently for those fields.
 
 ## Requirements *(mandatory)*
 
@@ -99,9 +103,10 @@ prices is applied consistently.
   card results are shown.
 - **FR-002**: The system MUST let users reorder the current result set without
   clearing the active search term or filters.
-- **FR-003**: The system MUST support sorting by price from highest to lowest.
-- **FR-004**: The system MUST support at least one non-price sort option so
-  users can choose an alternate browsing order.
+- **FR-003**: The system MUST support sorting by price in both ascending and
+  descending order.
+- **FR-004**: The system MUST support sorting by name, collector number, set,
+  and rarity in both ascending and descending order.
 - **FR-005**: The system MUST apply highest-price-first sorting by default on
   the home page when no explicit sort has been selected.
 - **FR-006**: The system MUST preserve an explicitly selected sort order while
@@ -116,7 +121,8 @@ prices is applied consistently.
 ### Key Entities *(include if feature involves data)*
 
 - **Sort Option**: A user-selectable ordering choice applied to a card result
-  set, such as highest-price-first or an alternate browsing order.
+  set, combining a supported sort field and direction such as highest-price-first,
+  lowest-price-first, set descending, or rarity ascending.
 - **Result Set**: The current collection of cards returned for the active
   browse, search, and filter state.
 
@@ -138,8 +144,9 @@ prices is applied consistently.
 
 - The home page and results browsing flow share the same sorting behavior and
   control design.
-- Existing available card attributes are sufficient to support at least one
-  alternate non-price sort option without introducing new data collection.
+- Existing available card attributes are sufficient to support sorting by
+  name, collector number, set, and rarity without introducing new data
+  collection.
 - The current catalog already exposes enough pricing coverage for price-based
   sorting to be useful, even if some cards remain unpriced.
 - Sorting changes are in scope only for card result lists, not for portfolio

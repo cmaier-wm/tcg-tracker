@@ -5,8 +5,7 @@ export async function getDatabaseCardCatalog(options: {
   q?: string | null;
   category?: string | null;
   set?: string | null;
-  limit?: number;
-  offset?: number;
+  sort?: string | null;
 }) {
   const searchTokens = tokenizeSearchQuery(options.q);
 
@@ -79,9 +78,13 @@ export async function getDatabaseCardCatalog(options: {
         }
       }
     },
-    skip: options.offset,
-    take: options.limit,
-    orderBy: [{ set: { category: { name: "asc" } } }, { set: { name: "asc" } }, { name: "asc" }]
+    orderBy: [
+      { set: { category: { name: "asc" } } },
+      { set: { name: "asc" } },
+      { name: "asc" },
+      { collectorNumber: "asc" },
+      { id: "asc" }
+    ]
   });
 }
 

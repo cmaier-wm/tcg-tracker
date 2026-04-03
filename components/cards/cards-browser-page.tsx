@@ -5,6 +5,7 @@ import { InfiniteCardList } from "@/components/cards/infinite-card-list";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
 import type { CardListItem } from "@/lib/tcgtracking/mappers";
+import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
 
 const PAGE_SIZE = 20;
 
@@ -12,6 +13,7 @@ type CardsBrowserPageProps = {
   query?: string;
   selectedCategory?: string;
   selectedSet?: string;
+  selectedSort: CatalogSortValue;
   items: CardListItem[];
   categories: CatalogCategory[];
   sets: CatalogSet[];
@@ -22,6 +24,7 @@ export function CardsBrowserPage({
   query,
   selectedCategory,
   selectedSet,
+  selectedSort,
   items,
   categories,
   sets,
@@ -40,6 +43,7 @@ export function CardsBrowserPage({
       <CatalogFilters
         query={query}
         selectedSet={selectedSet}
+        selectedSort={selectedSort}
         categories={categories}
         sets={sets}
         resetHref={resetHref}
@@ -50,6 +54,7 @@ export function CardsBrowserPage({
           query={query}
           selectedCategory={selectedCategory}
           selectedSet={selectedSet}
+          selectedSort={selectedSort}
           pageSize={PAGE_SIZE}
         />
       ) : (
