@@ -31,8 +31,9 @@ The primary feature specification and delivery artifacts live under
 
 MCP usage for this repository is documented in
 [`docs/development/mcps.md`](/Users/cmaier/Source/tcg-tracker/docs/development/mcps.md).
-The current documented MCPs are Figma MCP and a local Postgres MCP for
-development workflows only; neither is a runtime dependency of the application.
+The current documented MCPs are Azure MCP, Figma MCP, a local Postgres MCP,
+and Playwright MCP for development workflows only; none is a runtime dependency
+of the application.
 
 Current UI design reference:
 

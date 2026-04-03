@@ -22,6 +22,8 @@
   commands change.
 - Keep MCP workflow documentation in `docs/development/mcps.md` in sync when
   development tooling changes.
+- Azure infrastructure and hosting work may use Azure MCP when cloud resource
+  context is needed; prefer that over ad hoc assumptions about Azure state.
 - Prefer Docker only for local infrastructure services unless a later plan
   explicitly justifies containerizing the app itself.
 

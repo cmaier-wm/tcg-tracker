@@ -11,6 +11,44 @@ Scope matters here:
 
 ## Current MCP Inventory
 
+### Azure MCP
+
+Status: Available for Azure deployment and infrastructure workflows. Not
+required for local app runtime or normal local feature development.
+
+Docs:
+
+- https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/
+- https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/get-started/tools/visual-studio-code
+
+Configured transport:
+
+- Codex global config uses `npx -y @azure/mcp@latest server start`
+- Azure authentication is expected to come from local Azure developer tooling
+  such as Azure CLI, Azure Developer CLI, or an authenticated IDE session
+- The simplest local prerequisite is `az login`
+
+Primary uses:
+
+- Inspect Azure resources when preparing production hosting or deployment work
+  for this application
+- Help agents reason about Azure App Service, Static Web Apps, Container Apps,
+  resource groups, and related deployment choices
+- Support future infrastructure changes without baking Azure credentials or
+  cloud-specific runtime logic into the repository itself
+
+Typical tool families exposed by this MCP:
+
+- Azure resource inspection, best-practice guidance, and service-specific tools
+  exposed by the Azure MCP Server
+
+Repository impact:
+
+- No application code in this repository depends on Azure MCP at runtime.
+- This MCP is a development and operations convenience for Azure hosting work.
+- If Azure deployment becomes part of the normal contributor workflow, document
+  the exact hosting target and commands in this file and the main README.
+
 ### Figma MCP
 
 Status: Available for development workflows. Not required for local app runtime.
