@@ -1,15 +1,36 @@
 import React from "react";
+import dynamic from "next/dynamic";
 import { CardEmptyState } from "@/components/cards/card-empty-state";
-import { PortfolioValueChart } from "@/components/charts/portfolio-value-chart";
 import { PortfolioList } from "@/components/portfolio/portfolio-list";
-import { toCurrency } from "@/lib/api/serializers";
+import { toCurrency, toSignedCurrency } from "@/lib/api/serializers";
+import { calculateTodayProfitLoss } from "@/lib/portfolio/calculate-today-profit-loss";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 import { getPortfolioHistory } from "@/lib/portfolio/get-portfolio-history";
+
+const PortfolioValueChart = dynamic(
+  () => import("@/components/charts/portfolio-value-chart").then((module) => module.PortfolioValueChart),
+  {
+    ssr: false,
+    loading: () => <div className="chart-loading">Loading chart...</div>
+  }
+);
 
 export default async function PortfolioPage() {
   const portfolio = await getPortfolio();
   const history = await getPortfolioHistory();
+  const todayProfitLoss = calculateTodayProfitLoss(
+    history.points.map((point) => ({
+      capturedAt: point.capturedAt,
+      totalValue: point.totalValue
+    }))
+  );
   const totalCards = portfolio.holdings.reduce((sum, holding) => sum + holding.quantity, 0);
+  const todayProfitLossClass =
+    todayProfitLoss > 0
+      ? "stat-value-positive"
+      : todayProfitLoss < 0
+        ? "stat-value-negative"
+        : "stat-value-neutral";
 
   return (
     <div className="page-grid">
@@ -34,9 +55,9 @@ export default async function PortfolioPage() {
           <p className="muted">{portfolio.holdingCount} unique tracked entries.</p>
         </article>
         <article className="stat-card">
-          <p className="eyebrow">Portfolio status</p>
-          <h2>{portfolio.holdings.length ? "Active" : "Empty"}</h2>
-          <p className="muted">Update quantity or remove holdings inline below.</p>
+          <p className="eyebrow">Profit / loss</p>
+          <h2 className={todayProfitLossClass}>{toSignedCurrency(todayProfitLoss)}</h2>
+          <p className="muted">Compared with your first valuation snapshot today.</p>
         </article>
       </section>
       <div className="dashboard-grid">

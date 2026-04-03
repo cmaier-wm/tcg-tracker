@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: "/", label: "Browse" },
-  { href: "/portfolio", label: "Portfolio" }
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/settings", label: "Settings" }
 ];
 
 export function SiteNav() {

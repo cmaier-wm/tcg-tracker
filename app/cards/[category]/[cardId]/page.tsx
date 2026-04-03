@@ -1,13 +1,23 @@
 import React from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { CardDetail } from "@/components/cards/card-detail";
 import { CardPriceEmptyState } from "@/components/cards/card-price-empty-state";
 import { CardPriceSummary } from "@/components/cards/card-price-summary";
-import { PriceHistoryChart } from "@/components/charts/price-history-chart";
 import { AddToPortfolioButton } from "@/components/portfolio/add-to-portfolio-button";
+import { HoldingForm } from "@/components/portfolio/holding-form";
+import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 import { getPriceHistory } from "@/lib/pricing/get-price-history";
 import { getCardDetail } from "@/lib/tcgtracking/get-card-detail";
 import { selectPreferredVariation } from "@/lib/tcgtracking/select-preferred-variation";
+
+const PriceHistoryChart = dynamic(
+  () => import("@/components/charts/price-history-chart").then((module) => module.PriceHistoryChart),
+  {
+    ssr: false,
+    loading: () => <div className="chart-loading">Loading chart...</div>
+  }
+);
 
 export default async function CardDetailPage({
   params
@@ -16,7 +26,11 @@ export default async function CardDetailPage({
 }) {
   const resolvedParams = await params;
   const card = await getCardDetail(resolvedParams.category, resolvedParams.cardId);
+  const portfolio = await getPortfolio();
   const selectedVariation = selectPreferredVariation(card.variations);
+  const holding = portfolio.holdings.find(
+    (item) => item.cardVariationId === selectedVariation?.id
+  );
   const history = selectedVariation ? await getPriceHistory(selectedVariation.id) : { points: [] };
 
   return (
@@ -49,7 +63,14 @@ export default async function CardDetailPage({
               <p className="muted">Save this English card to your tracked holdings.</p>
             </div>
           </div>
-          {selectedVariation ? (
+          {selectedVariation && holding ? (
+            <HoldingForm
+              holdingId={holding.id}
+              quantity={holding.quantity}
+              cardName={card.name}
+              variationLabel="English"
+            />
+          ) : selectedVariation ? (
             <AddToPortfolioButton
               variationId={selectedVariation.id}
               variationLabel="English"

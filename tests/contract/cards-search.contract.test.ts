@@ -12,5 +12,16 @@ describe("cards search contract", () => {
       name: expect.any(String)
     });
   });
-});
 
+  it("matches card names and collector numbers together", async () => {
+    const items = await getCardCatalog({ q: "charizard 125" });
+
+    expect(
+      items.some(
+        (item) =>
+          item.name.toLowerCase().includes("charizard") &&
+          item.collectorNumber?.includes("125")
+      )
+    ).toBe(true);
+  });
+});

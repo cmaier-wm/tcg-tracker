@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
+import { tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
 
 export async function getDatabaseCardCatalog(options: {
   q?: string | null;
@@ -7,13 +8,35 @@ export async function getDatabaseCardCatalog(options: {
   limit?: number;
   offset?: number;
 }) {
+  const searchTokens = tokenizeSearchQuery(options.q);
+
   return prisma.card.findMany({
     where: {
-      name: options.q
-        ? {
-            contains: options.q,
-            mode: "insensitive"
-          }
+      AND: searchTokens.length
+        ? searchTokens.map((token) => ({
+            OR: [
+              {
+                name: {
+                  contains: token,
+                  mode: "insensitive"
+                }
+              },
+              {
+                collectorNumber: {
+                  contains: token,
+                  mode: "insensitive"
+                }
+              },
+              {
+                set: {
+                  name: {
+                    contains: token,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          }))
         : undefined,
       set: {
         ...(options.set

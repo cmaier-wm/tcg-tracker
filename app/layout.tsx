@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import Script from "next/script";
 import { Toaster } from "sonner";
 import { SiteNav } from "@/components/site-nav";
+import { themeStorageKey } from "@/lib/settings/theme-storage";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +18,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <div className="app-shell">
           <header className="site-header">
@@ -51,6 +53,19 @@ export default function RootLayout({
             }}
           />
         </div>
+        <Script id="theme-init" strategy="beforeInteractive">{`
+          (function () {
+            try {
+              var stored = localStorage.getItem(${JSON.stringify(themeStorageKey)});
+              var theme = stored === "dark" ? "dark" : "light";
+              document.documentElement.dataset.theme = theme;
+              document.documentElement.style.colorScheme = theme;
+            } catch (error) {
+              document.documentElement.dataset.theme = "light";
+              document.documentElement.style.colorScheme = "light";
+            }
+          })();
+        `}</Script>
       </body>
     </html>
   );

@@ -40,6 +40,9 @@
 ## Active Technologies
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod (001-card-portfolio-tracker)
 - PostgreSQL 17 for application data and time-series snapshots (001-card-portfolio-tracker)
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL 17, Vitest, React Testing Library, Playwright (002-user-settings)
+- Browser-local persisted user preference; no new server-side storage required for v1 (002-user-settings)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod
+- 002-user-settings: Added a browser-local settings surface with dark mode support and persistent theme selection

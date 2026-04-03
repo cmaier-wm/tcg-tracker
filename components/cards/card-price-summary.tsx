@@ -1,5 +1,5 @@
 import React from "react";
-import { toCurrency } from "@/lib/api/serializers";
+import { toCurrency, toFullDateTime } from "@/lib/api/serializers";
 
 export function CardPriceSummary({
   currentPrice,
@@ -22,7 +22,7 @@ export function CardPriceSummary({
       <p className="eyebrow">Current price</p>
       <h2>{toCurrency(currentPrice)}</h2>
       <p className="muted">
-        Last updated {lastUpdatedAt ? new Date(lastUpdatedAt).toLocaleString() : "unknown"}
+        Last updated {lastUpdatedAt ? toFullDateTime(lastUpdatedAt) : "unknown"}
       </p>
     </div>
   );

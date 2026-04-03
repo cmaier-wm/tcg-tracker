@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { toCompactDate, toCurrency } from "@/lib/api/serializers";
+import { toCompactDate, toCurrency, toFullDateTime } from "@/lib/api/serializers";
 
 type PricePoint = {
   capturedAt: string;
@@ -27,7 +27,7 @@ export function PriceHistoryChart({ points }: { points: PricePoint[] }) {
           <YAxis tickFormatter={(value) => `$${value}`} />
           <Tooltip
             formatter={(value: number) => toCurrency(value)}
-            labelFormatter={(value: string) => new Date(value).toLocaleString()}
+            labelFormatter={(value: string) => toFullDateTime(value)}
           />
           <Line
             type="monotone"

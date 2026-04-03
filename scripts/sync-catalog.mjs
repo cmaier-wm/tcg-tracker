@@ -1,12 +1,18 @@
 function parseArgs(argv) {
   const categoryIds = [];
   let syncAll = false;
+  let catalogOnly = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
 
     if (value === "--all") {
       syncAll = true;
+      continue;
+    }
+
+    if (value === "--catalog-only") {
+      catalogOnly = true;
       continue;
     }
 
@@ -28,17 +34,20 @@ function parseArgs(argv) {
 
   return {
     categoryIds,
-    syncAll
+    syncAll,
+    catalogOnly
   };
 }
 
 const POKEMON_CATEGORY_ID = "3";
-const { categoryIds, syncAll } = parseArgs(process.argv.slice(2));
+const { categoryIds, syncAll, catalogOnly } = parseArgs(process.argv.slice(2));
 const selectedCategoryIds = !syncAll && categoryIds.length === 0 ? [POKEMON_CATEGORY_ID] : categoryIds;
 
-const searchParams = new URLSearchParams({
-  catalogOnly: "true"
-});
+const searchParams = new URLSearchParams();
+
+if (catalogOnly) {
+  searchParams.set("catalogOnly", "true");
+}
 
 for (const categoryId of selectedCategoryIds) {
   searchParams.append("categoryId", categoryId);

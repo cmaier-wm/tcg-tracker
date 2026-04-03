@@ -5,14 +5,13 @@ import CardDetailPage from "@/app/cards/[category]/[cardId]/page";
 describe("card detail page", () => {
   it("renders a selected card", async () => {
     const page = await CardDetailPage({
-      params: Promise.resolve({ category: "pokemon", cardId: "sv1-charizard-ex" }),
-      searchParams: Promise.resolve({})
+      params: Promise.resolve({ category: "pokemon", cardId: "sv1-charizard-ex" })
     });
 
     render(page);
 
-    expect(screen.getByText("Charizard ex")).toBeInTheDocument();
-    expect(screen.getByText("Add to portfolio")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /English \/ Holo \/ NM/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Charizard ex" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Quantity")).toHaveValue(2);
+    expect(screen.getByRole("button", { name: "Remove holding" })).toBeInTheDocument();
   });
 });
