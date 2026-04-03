@@ -1,6 +1,7 @@
 import { defaultThemeMode, isThemeMode, type ThemeMode } from "@/lib/settings/theme-preference";
 
 export const themeStorageKey = "tcg-tracker-theme";
+export const themeCookieName = "tcg-tracker-theme";
 const memoryStorage = new Map<string, string>();
 
 function getThemeStorage() {
@@ -32,8 +33,16 @@ export function readStoredThemeMode(): ThemeMode {
 
 export function writeStoredThemeMode(mode: ThemeMode) {
   getThemeStorage().setItem(themeStorageKey, mode);
+
+  if (typeof document !== "undefined") {
+    document.cookie = `${themeCookieName}=${mode}; path=/; max-age=31536000; samesite=lax`;
+  }
 }
 
 export function clearStoredThemeMode() {
   getThemeStorage().removeItem(themeStorageKey);
+
+  if (typeof document !== "undefined") {
+    document.cookie = `${themeCookieName}=; path=/; max-age=0; samesite=lax`;
+  }
 }

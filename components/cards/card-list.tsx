@@ -21,10 +21,11 @@ export function CardList({ items }: { items: CardListItem[] }) {
               {card.setName}
               {card.collectorNumber ? ` · ${card.collectorNumber}` : ""}
             </p>
-            <div className="badge-row">
-              {card.rarity ? <span className="badge">{card.rarity}</span> : null}
-              <span className="badge subtle">{card.categoryName}</span>
-            </div>
+            {card.rarity ? (
+              <div className="badge-row">
+                <span className="badge">{card.rarity}</span>
+              </div>
+            ) : null}
           </div>
           <div className="catalog-card-footer">
             <strong>

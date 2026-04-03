@@ -8,18 +8,21 @@ const pagesToCheck = [
   "/cards/pokemon/sv1-charizard-ex"
 ];
 
-test("all primary pages load without console errors", async ({ page }) => {
+test("all primary pages load without console errors", async ({ browser }) => {
   const consoleErrors: string[] = [];
 
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      consoleErrors.push(message.text());
-    }
-  });
-
   for (const path of pagesToCheck) {
-    await page.goto(path);
+    const page = await browser.newPage();
+
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        consoleErrors.push(`${path}: ${message.text()}`);
+      }
+    });
+
+    await page.goto(path, { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle");
+    await page.close();
   }
 
   expect(consoleErrors).toEqual([]);

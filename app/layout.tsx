@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { cookies } from "next/headers";
 import Link from "next/link";
-import Script from "next/script";
 import { Toaster } from "sonner";
+import { DevOriginRedirect } from "@/components/dev-origin-redirect";
 import { SiteNav } from "@/components/site-nav";
-import { themeStorageKey } from "@/lib/settings/theme-storage";
+import { normalizeThemeMode } from "@/lib/settings/theme-preference";
+import { themeCookieName } from "@/lib/settings/theme-storage";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,14 +14,18 @@ export const metadata: Metadata = {
   description: "Track TCG cards, price history, and portfolio value."
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const theme = normalizeThemeMode(cookieStore.get(themeCookieName)?.value);
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme={theme} suppressHydrationWarning>
       <body>
+        <DevOriginRedirect />
         <div className="app-shell">
           <header className="site-header">
             <div className="site-header-inner">
@@ -57,19 +63,6 @@ export default function RootLayout({
             }}
           />
         </div>
-        <Script id="theme-init" strategy="beforeInteractive">{`
-          (function () {
-            try {
-              var stored = localStorage.getItem(${JSON.stringify(themeStorageKey)});
-              var theme = stored === "dark" ? "dark" : "light";
-              document.documentElement.dataset.theme = theme;
-              document.documentElement.style.colorScheme = theme;
-            } catch (error) {
-              document.documentElement.dataset.theme = "light";
-              document.documentElement.style.colorScheme = "light";
-            }
-          })();
-        `}</Script>
       </body>
     </html>
   );

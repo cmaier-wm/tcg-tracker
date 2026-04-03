@@ -246,6 +246,15 @@ textarea:focus {
   gap: 20px;
 }
 
+.route-loading {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 14px;
+  min-height: min(52vh, 420px);
+  text-align: center;
+}
+
 .page-hero,
 .surface-card,
 .stat-card,
