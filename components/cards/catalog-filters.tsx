@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
 import { getCatalogSortOptions, type CatalogSortValue } from "@/lib/tcgtracking/search-query";
@@ -24,22 +24,77 @@ export function CatalogFilters({
   resetHref
 }: CatalogFiltersProps) {
   const formRef = useRef<HTMLFormElement | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname, query, selectedSet, selectedSort]);
+
+  function navigateWithForm() {
+    const form = formRef.current;
+
+    if (!form) {
+      return;
+    }
+
+    const formData = new FormData(form);
+    const params = new URLSearchParams();
+
+    const nextQuery = formData.get("q")?.toString().trim();
+    const nextSet = formData.get("set")?.toString().trim();
+    const nextSort = formData.get("sort")?.toString().trim();
+
+    if (nextQuery) {
+      params.set("q", nextQuery);
+    }
+
+    if (nextSet) {
+      params.set("set", nextSet);
+    }
+
+    if (nextSort) {
+      params.set("sort", nextSort);
+    }
+
+    setIsNavigating(true);
+    router.replace(params.size ? `${pathname}?${params.toString()}` : pathname);
+  }
 
   function submitFilters() {
-    formRef.current?.requestSubmit();
+    navigateWithForm();
+  }
+
+  function resetFilters() {
+    setIsNavigating(true);
+    router.replace(resetHref);
   }
 
   return (
-    <form ref={formRef} className="surface-card filter-grid" method="GET">
-      <div className="field">
+    <form
+      ref={formRef}
+      className="surface-card filter-grid"
+      method="GET"
+      onSubmit={(event) => {
+        event.preventDefault();
+        navigateWithForm();
+      }}
+    >
+      <div className="field search-field">
         <label htmlFor="card-search">Search cards</label>
-        <input
-          id="card-search"
-          name="q"
-          type="search"
-          defaultValue={query}
-          placeholder="Charizard, Pikachu, Gengar..."
-        />
+        <div className="search-input-row">
+          <input
+            id="card-search"
+            name="q"
+            type="search"
+            defaultValue={query}
+            placeholder="Search by card name, set, or collector number"
+          />
+          <button className="button" type="submit" disabled={isNavigating}>
+            Search
+          </button>
+        </div>
       </div>
       <div className="field">
         <label htmlFor="set-filter">Set</label>
@@ -72,13 +127,20 @@ export function CatalogFilters({
           ))}
         </select>
       </div>
-      <div className="button-row">
-        <button className="button" type="submit">
-          Search
-        </button>
-        <Link className="button secondary" href={resetHref}>
+      <div className="button-row filter-actions">
+        <button
+          className="button secondary"
+          type="button"
+          onClick={resetFilters}
+          disabled={isNavigating}
+        >
           Reset
-        </Link>
+        </button>
+        {isNavigating ? (
+          <div className="catalog-filter-loading" role="status" aria-label="Applying filters">
+            <div className="catalog-spinner" aria-hidden="true" />
+          </div>
+        ) : null}
       </div>
     </form>
   );

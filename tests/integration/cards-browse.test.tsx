@@ -5,11 +5,15 @@ import type { CardListItem } from "@/lib/tcgtracking/mappers";
 const {
   mockGetCardCatalog,
   mockGetCatalogCategories,
-  mockGetCatalogSets
+  mockGetCatalogSets,
+  mockReplace,
+  mockPathname
 } = vi.hoisted(() => ({
   mockGetCardCatalog: vi.fn(),
   mockGetCatalogCategories: vi.fn(),
-  mockGetCatalogSets: vi.fn()
+  mockGetCatalogSets: vi.fn(),
+  mockReplace: vi.fn(),
+  mockPathname: vi.fn()
 }));
 
 vi.mock("@/lib/tcgtracking/get-card-catalog", () => ({
@@ -23,6 +27,18 @@ vi.mock("@/lib/tcgtracking/get-categories", () => ({
 vi.mock("@/lib/tcgtracking/get-sets", () => ({
   getCatalogSets: mockGetCatalogSets
 }));
+
+vi.mock("next/navigation", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/navigation")>();
+
+  return {
+    ...actual,
+    useRouter: () => ({
+      replace: mockReplace
+    }),
+    usePathname: () => mockPathname()
+  };
+});
 
 import HomePage from "@/app/page";
 import CardsPage from "@/app/cards/page";
@@ -56,8 +72,11 @@ beforeEach(() => {
   mockGetCardCatalog.mockReset();
   mockGetCatalogCategories.mockReset();
   mockGetCatalogSets.mockReset();
+  mockReplace.mockReset();
+  mockPathname.mockReset();
 
   mockGetCardCatalog.mockResolvedValue(mockItems);
+  mockPathname.mockReturnValue("/cards");
   mockGetCatalogCategories.mockResolvedValue([
     {
       id: "pokemon",

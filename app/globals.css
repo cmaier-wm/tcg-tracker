@@ -366,17 +366,44 @@ textarea:focus {
   border-color: var(--border);
 }
 
+.button.is-disabled,
+.button[aria-disabled="true"],
+.button:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .field {
   display: grid;
   gap: 8px;
   font-weight: 600;
 }
 
+.search-field {
+  min-width: 0;
+}
+
+.search-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-input-row input {
+  min-width: 0;
+}
+
 .filter-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(180px, 1fr)) auto;
+  grid-template-columns: minmax(0, 2.4fr) repeat(2, minmax(180px, 1fr)) auto;
   align-items: end;
+}
+
+.filter-actions {
+  justify-content: flex-end;
+  align-self: end;
 }
 
 .card-grid {
@@ -390,6 +417,14 @@ textarea:focus {
   display: grid;
   justify-items: center;
   min-height: 24px;
+}
+
+.catalog-filter-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 36px;
 }
 
 .catalog-spinner {
@@ -796,6 +831,14 @@ textarea:focus {
   .portfolio-metric {
     grid-column: 2;
     text-align: left;
+  }
+
+  .search-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    justify-content: start;
   }
 }
 
