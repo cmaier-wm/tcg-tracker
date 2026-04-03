@@ -386,6 +386,27 @@ textarea:focus {
   justify-content: start;
 }
 
+.catalog-load-state {
+  display: grid;
+  justify-items: center;
+  min-height: 24px;
+}
+
+.catalog-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--accent-soft);
+  border-top-color: var(--text);
+  border-radius: 999px;
+  animation: catalog-spin 0.75s linear infinite;
+}
+
+@keyframes catalog-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .catalog-card {
   display: grid;
   grid-template-rows: 280px auto auto;

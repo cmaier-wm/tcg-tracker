@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import Link from "next/link";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
@@ -21,8 +23,14 @@ export function CatalogFilters({
   sets,
   resetHref
 }: CatalogFiltersProps) {
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  function submitFilters() {
+    formRef.current?.requestSubmit();
+  }
+
   return (
-    <form className="surface-card filter-grid" method="GET">
+    <form ref={formRef} className="surface-card filter-grid" method="GET">
       <div className="field">
         <label htmlFor="card-search">Search cards</label>
         <input
@@ -35,7 +43,12 @@ export function CatalogFilters({
       </div>
       <div className="field">
         <label htmlFor="set-filter">Set</label>
-        <select id="set-filter" name="set" defaultValue={selectedSet ?? ""}>
+        <select
+          id="set-filter"
+          name="set"
+          defaultValue={selectedSet ?? ""}
+          onChange={submitFilters}
+        >
           <option value="">All sets</option>
           {sets.map((set) => (
             <option key={`${set.categorySlug}:${set.slug}`} value={set.slug}>
@@ -46,7 +59,12 @@ export function CatalogFilters({
       </div>
       <div className="field">
         <label htmlFor="sort-filter">Sort</label>
-        <select id="sort-filter" name="sort" defaultValue={selectedSort}>
+        <select
+          id="sort-filter"
+          name="sort"
+          defaultValue={selectedSort}
+          onChange={submitFilters}
+        >
           {getCatalogSortOptions().map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

@@ -106,7 +106,9 @@ export function InfiniteCardList({
     <>
       <CardList items={items} />
       <div className="catalog-load-state" aria-live="polite">
-        {isLoading ? <p>Loading more cards...</p> : null}
+        {isLoading ? (
+          <div className="catalog-spinner" role="status" aria-label="Loading more cards" />
+        ) : null}
         {!hasMore ? <p>All matching cards loaded.</p> : null}
       </div>
       {hasMore ? (
