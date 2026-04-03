@@ -107,7 +107,9 @@ export function InfiniteCardList({
       <CardList items={items} />
       <div className="catalog-load-state" aria-live="polite">
         {isLoading ? (
-          <div className="catalog-spinner" role="status" aria-label="Loading more cards" />
+          <div className="catalog-spinner pokeball-spinner" role="status" aria-label="Loading more cards">
+            <span className="pokeball-spinner-button" aria-hidden="true" />
+          </div>
         ) : null}
         {!hasMore ? <p>All matching cards loaded.</p> : null}
       </div>

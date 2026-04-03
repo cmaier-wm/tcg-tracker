@@ -11,7 +11,7 @@ describe("card detail page", () => {
     render(page);
 
     expect(screen.getByRole("heading", { level: 1, name: "Charizard ex" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Quantity")).toHaveValue(2);
-    expect(screen.getByRole("button", { name: "Remove holding" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Quantity")).toHaveValue(1);
+    expect(screen.getByRole("button", { name: "Save holding" })).toBeInTheDocument();
   });
 });

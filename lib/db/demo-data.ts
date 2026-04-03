@@ -126,22 +126,14 @@ export const demoCards: DemoCard[] = [
   }
 ];
 
-export const demoPortfolio = [
-  {
-    id: "holding-charizard",
-    cardVariationId: "sv1-charizard-ex-en-nm-holo",
-    quantity: 2
-  },
-  {
-    id: "holding-belle",
-    cardVariationId: "lorcana-belle-en-coldfoil",
-    quantity: 1
-  }
-];
+export const demoPortfolio: Array<{
+  id: string;
+  cardVariationId: string;
+  quantity: number;
+}> = [];
 
 export const demoPortfolioHistory: DemoPricePoint[] = [
   { capturedAt: "2026-03-28T08:00:00.000Z", marketPrice: 78.8 },
   { capturedAt: "2026-03-30T08:00:00.000Z", marketPrice: 81.1 },
   { capturedAt: "2026-04-02T08:00:00.000Z", marketPrice: 86.9 }
 ];
-

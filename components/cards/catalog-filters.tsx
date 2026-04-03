@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
 import { getCatalogSortOptions, type CatalogSortValue } from "@/lib/tcgtracking/search-query";
@@ -15,6 +15,8 @@ type CatalogFiltersProps = {
   resetHref: string;
 };
 
+const defaultCatalogSortValue: CatalogSortValue = "price-desc";
+
 export function CatalogFilters({
   query,
   selectedSet,
@@ -26,11 +28,12 @@ export function CatalogFilters({
   const formRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
     setIsNavigating(false);
-  }, [pathname, query, selectedSet, selectedSort]);
+  }, [pathname, searchParams]);
 
   function navigateWithForm() {
     const form = formRef.current;
@@ -58,8 +61,16 @@ export function CatalogFilters({
       params.set("sort", nextSort);
     }
 
+    const nextUrl = params.size ? `${pathname}?${params.toString()}` : pathname;
+    const currentUrl = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
+
+    if (nextUrl === currentUrl) {
+      setIsNavigating(false);
+      return;
+    }
+
     setIsNavigating(true);
-    router.replace(params.size ? `${pathname}?${params.toString()}` : pathname);
+    router.replace(nextUrl);
   }
 
   function submitFilters() {
@@ -67,6 +78,33 @@ export function CatalogFilters({
   }
 
   function resetFilters() {
+    const form = formRef.current;
+
+    if (form) {
+      const queryInput = form.elements.namedItem("q");
+      const setSelect = form.elements.namedItem("set");
+      const sortSelect = form.elements.namedItem("sort");
+
+      if (queryInput instanceof HTMLInputElement) {
+        queryInput.value = "";
+      }
+
+      if (setSelect instanceof HTMLSelectElement) {
+        setSelect.value = "";
+      }
+
+      if (sortSelect instanceof HTMLSelectElement) {
+        sortSelect.value = defaultCatalogSortValue;
+      }
+    }
+
+    const currentUrl = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
+
+    if (resetHref === currentUrl) {
+      setIsNavigating(false);
+      return;
+    }
+
     setIsNavigating(true);
     router.replace(resetHref);
   }
@@ -138,7 +176,9 @@ export function CatalogFilters({
         </button>
         {isNavigating ? (
           <div className="catalog-filter-loading" role="status" aria-label="Applying filters">
-            <div className="catalog-spinner" aria-hidden="true" />
+            <div className="catalog-spinner pokeball-spinner" aria-hidden="true">
+              <span className="pokeball-spinner-button" />
+            </div>
           </div>
         ) : null}
       </div>

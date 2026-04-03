@@ -9,7 +9,9 @@ export type ValuedHolding = {
   estimatedValue: number;
 };
 
-export function valuePortfolio(holdings = demoPortfolio) {
+export function valuePortfolio(
+  holdings: Array<{ id: string; cardVariationId: string; quantity: number }> = demoPortfolio
+) {
   const allVariations = demoCards.flatMap((card) =>
     card.variations.map((variation) => ({
       ...variation,
@@ -44,4 +46,3 @@ export function valuePortfolio(holdings = demoPortfolio) {
     pricedHoldingCount: valuedHoldings.filter((holding) => holding.estimatedValue > 0).length
   };
 }
-

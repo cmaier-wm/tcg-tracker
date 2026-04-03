@@ -34,3 +34,7 @@ export function getDemoStore() {
 export function getDemoCards() {
   return demoCards;
 }
+
+export function resetDemoStore() {
+  global.__demoStore = undefined;
+}

@@ -23,16 +23,14 @@ export function ThemeToggle() {
     setIsHydrated(true);
   }, []);
 
-  useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-
-    writeStoredThemeMode(themeMode);
-    applyThemeMode(themeMode);
-  }, [isHydrated, themeMode]);
-
   const isDarkMode = themeMode === "dark";
+
+  function handleThemeChange() {
+    const nextThemeMode = toggleThemeMode(themeMode);
+    writeStoredThemeMode(nextThemeMode);
+    applyThemeMode(nextThemeMode);
+    setThemeMode(nextThemeMode);
+  }
 
   return (
     <div className="theme-toggle-card">
@@ -50,7 +48,7 @@ export function ThemeToggle() {
           checked={isDarkMode}
           aria-label="Dark mode toggle"
           disabled={!isHydrated}
-          onChange={() => setThemeMode(toggleThemeMode(themeMode))}
+          onChange={handleThemeChange}
         />
         <span className="theme-toggle-switch-track" aria-hidden="true">
           <span className="theme-toggle-switch-track-label">☼</span>
