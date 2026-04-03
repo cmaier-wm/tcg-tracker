@@ -17,10 +17,12 @@ describe("settings page", () => {
     render(<SettingsPage />);
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Dark mode" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("light");
+      expect(screen.getByText("Bright default palette active.")).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("checkbox", { name: "Dark mode toggle" }));
@@ -28,6 +30,7 @@ describe("settings page", () => {
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("dark");
       expect(readStoredThemeMode()).toBe("dark");
+      expect(screen.getByText("V2 dark palette active.")).toBeInTheDocument();
     });
   });
 });

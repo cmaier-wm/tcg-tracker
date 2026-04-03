@@ -37,12 +37,22 @@ export function ThemeToggle() {
   return (
     <div className="theme-toggle-card">
       <div className="theme-toggle-copy">
+        <p className="eyebrow">Theme</p>
         <h3>Dark mode</h3>
-        <p className="muted">Use a darker color palette for low-light browsing.</p>
+        <p className="muted">
+          Switch to a deeper low-light palette with brighter accent color and stronger
+          contrast across the app.
+        </p>
+        <div className="theme-toggle-pill-row" aria-hidden="true">
+          <span className={isDarkMode ? "theme-toggle-pill" : "theme-toggle-pill active"}>
+            Light
+          </span>
+          <span className={isDarkMode ? "theme-toggle-pill active" : "theme-toggle-pill"}>
+            Dark
+          </span>
+        </div>
       </div>
       <label className={isDarkMode ? "theme-toggle-switch active" : "theme-toggle-switch"}>
-        <span className="theme-toggle-switch-label">Dark mode</span>
-        <span className="theme-toggle-switch-state">{isDarkMode ? "On" : "Off"}</span>
         <input
           type="checkbox"
           checked={isDarkMode}
@@ -51,7 +61,18 @@ export function ThemeToggle() {
           onChange={() => setThemeMode(toggleThemeMode(themeMode))}
         />
         <span className="theme-toggle-switch-track" aria-hidden="true">
-          <span className="theme-toggle-switch-thumb" />
+          <span className="theme-toggle-switch-track-label">Light</span>
+          <span className="theme-toggle-switch-thumb">{isDarkMode ? "☾" : "☼"}</span>
+          <span className="theme-toggle-switch-track-label">Dark</span>
+        </span>
+        <span className="theme-toggle-switch-copy">
+          <span className="theme-toggle-switch-label">Dark mode</span>
+          <span className="theme-toggle-switch-state">
+            {isDarkMode ? "Enabled" : "Disabled"}
+          </span>
+        </span>
+        <span className="theme-toggle-switch-caption">
+          {isDarkMode ? "V2 dark palette active." : "Bright default palette active."}
         </span>
       </label>
       {!isHydrated ? <p className="muted">Loading saved preference...</p> : null}

@@ -626,7 +626,7 @@ textarea:focus {
   display: grid;
   align-content: start;
   gap: 12px;
-  min-width: 280px;
+  min-width: 0;
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -651,6 +651,11 @@ textarea:focus {
   box-shadow: 0 16px 40px rgba(37, 99, 235, 0.16);
 }
 
+.theme-toggle-switch:focus-within {
+  outline: 2px solid rgba(56, 189, 248, 0.28);
+  outline-offset: 2px;
+}
+
 .theme-toggle-switch-label {
   font-size: 0.98rem;
 }
@@ -671,9 +676,9 @@ textarea:focus {
 }
 
 .theme-toggle-switch-track {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   min-height: 64px;
   padding: 8px 10px;
@@ -683,6 +688,7 @@ textarea:focus {
 }
 
 .theme-toggle-switch-thumb {
+  justify-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -703,6 +709,10 @@ textarea:focus {
   color: var(--muted);
   font-size: 0.88rem;
   font-weight: 600;
+}
+
+.theme-toggle-switch-track-label:last-child {
+  justify-self: end;
 }
 
 .theme-toggle-switch.active .theme-toggle-switch-track {

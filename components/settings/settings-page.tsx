@@ -10,7 +10,8 @@ export function SettingsPage() {
           <p className="eyebrow">Preferences</p>
           <h1>Settings</h1>
           <p className="hero-copy">
-            Choose the appearance you want for long browsing sessions.
+            Choose the appearance you want for long browsing sessions and keep it applied
+            everywhere in the app.
           </p>
         </div>
       </section>
