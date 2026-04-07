@@ -12,6 +12,7 @@ build/
 !.azure/hooks/
 !.azure/hooks/**
 .azuredist/
+.azuredist.zip
 prisma/dev.db
 playwright-report/
 test-results/
