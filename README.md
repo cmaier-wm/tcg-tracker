@@ -50,6 +50,32 @@ npm run db:seed
 npm run dev
 ```
 
+## Deploying To Azure
+
+The repository now includes an `azd` + Bicep deployment path for a production
+environment in Azure App Service with Azure Database for PostgreSQL Flexible
+Server and Azure Key Vault.
+
+Core commands:
+
+```bash
+env AZD_CONFIG_DIR=/tmp/.azd azd env new prod
+env AZD_CONFIG_DIR=/tmp/.azd azd env set AZURE_LOCATION centralus
+env AZD_CONFIG_DIR=/tmp/.azd azd env set AZURE_SUBSCRIPTION_ID a94e41d4-5686-46fc-8390-e18bbbbb27cc
+env AZD_CONFIG_DIR=/tmp/.azd azd env set POSTGRES_ADMIN_USERNAME tcgtrackeradmin
+env AZD_CONFIG_DIR=/tmp/.azd azd env set POSTGRES_ADMIN_PASSWORD <url-safe-password>
+env AZD_CONFIG_DIR=/tmp/.azd azd provision --preview
+env AZD_CONFIG_DIR=/tmp/.azd azd up
+```
+
+Post-deploy verification:
+
+```bash
+npm run build
+env AZD_CONFIG_DIR=/tmp/.azd azd env get-value SERVICE_WEB_URI
+npm run azure:verify -- "$(env AZD_CONFIG_DIR=/tmp/.azd azd env get-value SERVICE_WEB_URI)"
+```
+
 ## Verification
 
 Manual smoke check:
@@ -88,3 +114,6 @@ npm run db:down
   gentler.
 - Snapshot history can be refreshed through the scheduled snapshot route or
   `npm run snapshots:run` while the app server is running.
+- Production Azure hosting targets Azure App Service on Linux in `centralus`
+  with Azure Database for PostgreSQL Flexible Server 17 and Key Vault-backed
+  secrets.

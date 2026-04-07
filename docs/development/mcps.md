@@ -46,8 +46,12 @@ Repository impact:
 
 - No application code in this repository depends on Azure MCP at runtime.
 - This MCP is a development and operations convenience for Azure hosting work.
-- If Azure deployment becomes part of the normal contributor workflow, document
-  the exact hosting target and commands in this file and the main README.
+- Azure deployment is now part of the repository workflow through `azd` and the
+  `infra/` Bicep files.
+- Current hosting target: Azure App Service on Linux in `centralus` with Azure
+  Database for PostgreSQL Flexible Server 17 and Azure Key Vault.
+- Normal deployment commands live in `README.md` and use:
+  `azd env new`, `azd env set`, `azd provision --preview`, and `azd up`.
 
 ### Figma MCP
 
