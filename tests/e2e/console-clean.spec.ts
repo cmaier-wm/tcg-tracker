@@ -21,7 +21,7 @@ test("all primary pages load without console errors", async ({ browser }) => {
     });
 
     await page.goto(path, { waitUntil: "domcontentloaded" });
-    await page.waitForLoadState("networkidle");
+    await expect(page.locator("main")).toBeVisible();
     await page.close();
   }
 

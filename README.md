@@ -76,6 +76,19 @@ env AZD_CONFIG_DIR=/tmp/.azd azd env get-value SERVICE_WEB_URI
 npm run azure:verify -- "$(env AZD_CONFIG_DIR=/tmp/.azd azd env get-value SERVICE_WEB_URI)"
 ```
 
+Azure packaging note:
+
+- Azure App Service runs this app on Linux. Keep
+  `prisma/schema.prisma` configured with
+  `binaryTargets = ["native", "debian-openssl-3.0.x"]` so the packaged
+  standalone build includes Prisma's Linux query engine.
+- After changing Prisma versions or generator settings, rerun
+  `npm run db:generate` before `npm run build` and `npm run azure:package`.
+- If Azure serves demo fallback data while the database is populated, verify the
+  deployment artifact contains
+  `libquery_engine-debian-openssl-3.0.x.so.node` under
+  `.next/standalone/node_modules/.prisma/client/`.
+
 ## Verification
 
 Manual smoke check:
