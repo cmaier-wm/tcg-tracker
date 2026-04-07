@@ -3,8 +3,6 @@ import { prisma } from "@/lib/db/prisma";
 
 const DEFAULT_DATABASE_CONNECT_TIMEOUT_MS = 3000;
 
-let cachedDatabaseAvailability: boolean | undefined;
-let databaseAvailabilityPromise: Promise<boolean> | null = null;
 let hasLoggedFallbackWarning = false;
 
 export function isDatabaseConfigured() {
@@ -64,31 +62,11 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   }
 }
 
-async function isDatabaseAvailable() {
-  if (!isDatabaseConfigured()) {
-    return false;
-  }
-
-  if (cachedDatabaseAvailability !== undefined) {
-    return cachedDatabaseAvailability;
-  }
-
-  if (!databaseAvailabilityPromise) {
-    databaseAvailabilityPromise = ensureDatabaseConnection().then((available) => {
-      cachedDatabaseAvailability = available;
-      databaseAvailabilityPromise = null;
-      return available;
-    });
-  }
-
-  return databaseAvailabilityPromise;
-}
-
 export async function withDatabaseFallback<T>(
   run: () => Promise<T>,
   fallback: () => Promise<T> | T
 ) {
-  if (!(await isDatabaseAvailable())) {
+  if (!isDatabaseConfigured()) {
     return fallback();
   }
 
@@ -98,8 +76,6 @@ export async function withDatabaseFallback<T>(
     if (!isDatabaseConnectionError(error)) {
       throw error;
     }
-
-    cachedDatabaseAvailability = false;
 
     if (process.env.NODE_ENV !== "production" && !hasLoggedFallbackWarning) {
       hasLoggedFallbackWarning = true;
@@ -129,7 +105,5 @@ export async function ensureDatabaseConnection() {
 }
 
 export function resetDatabaseAvailabilityCache() {
-  cachedDatabaseAvailability = undefined;
-  databaseAvailabilityPromise = null;
   hasLoggedFallbackWarning = false;
 }

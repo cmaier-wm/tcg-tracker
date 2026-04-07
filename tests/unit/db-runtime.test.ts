@@ -10,19 +10,18 @@ vi.mock("@/lib/db/prisma", () => ({
 
 const runtimeModule = await import("@/lib/db/runtime");
 
-const {
-  ensureDatabaseConnection,
-  resetDatabaseAvailabilityCache,
-  withDatabaseFallback
-} = runtimeModule;
+const { ensureDatabaseConnection, resetDatabaseAvailabilityCache, withDatabaseFallback } =
+  runtimeModule;
 
 describe("database runtime fallback", () => {
   const originalDatabaseUrl = process.env.DATABASE_URL;
   const originalTimeout = process.env.DATABASE_CONNECT_TIMEOUT_MS;
+  const originalUseTestDatabase = process.env.USE_TEST_DATABASE;
 
   beforeEach(() => {
     process.env.DATABASE_URL = "postgresql://example";
     process.env.DATABASE_CONNECT_TIMEOUT_MS = "25";
+    process.env.USE_TEST_DATABASE = "true";
     queryRawMock.mockReset();
     resetDatabaseAvailabilityCache();
   });
@@ -30,6 +29,7 @@ describe("database runtime fallback", () => {
   afterEach(() => {
     process.env.DATABASE_URL = originalDatabaseUrl;
     process.env.DATABASE_CONNECT_TIMEOUT_MS = originalTimeout;
+    process.env.USE_TEST_DATABASE = originalUseTestDatabase;
     queryRawMock.mockReset();
     resetDatabaseAvailabilityCache();
   });
@@ -42,16 +42,12 @@ describe("database runtime fallback", () => {
     await expect(ensureDatabaseConnection()).resolves.toBe(false);
   });
 
-  it("falls back without running the database query after a timed out probe", async () => {
-    queryRawMock.mockImplementation(
-      () => new Promise(() => undefined)
-    );
-
+  it("runs the database query when a database URL is configured", async () => {
     const run = vi.fn(async () => "database");
     const fallback = vi.fn(async () => "fallback");
 
-    await expect(withDatabaseFallback(run, fallback)).resolves.toBe("fallback");
-    expect(run).not.toHaveBeenCalled();
-    expect(fallback).toHaveBeenCalledOnce();
+    await expect(withDatabaseFallback(run, fallback)).resolves.toBe("database");
+    expect(run).toHaveBeenCalledOnce();
+    expect(fallback).not.toHaveBeenCalled();
   });
 });

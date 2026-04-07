@@ -2,6 +2,8 @@ import { withRouteHandler } from "@/lib/api/route-handler";
 import { getCardCatalog } from "@/lib/tcgtracking/get-card-catalog";
 import { normalizeCatalogSort } from "@/lib/tcgtracking/search-query";
 
+export const dynamic = "force-dynamic";
+
 const POKEMON_CATEGORY = "pokemon";
 
 export async function GET(request: Request) {

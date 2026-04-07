@@ -5,6 +5,8 @@ import { getCatalogCategories } from "@/lib/tcgtracking/get-categories";
 import { getCatalogSets } from "@/lib/tcgtracking/get-sets";
 import { normalizeCatalogSort } from "@/lib/tcgtracking/search-query";
 
+export const dynamic = "force-dynamic";
+
 const INITIAL_PAGE_SIZE = 20;
 const POKEMON_CATEGORY = "pokemon";
 
