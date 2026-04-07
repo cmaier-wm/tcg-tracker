@@ -26,6 +26,9 @@
   context is needed; prefer that over ad hoc assumptions about Azure state.
 - Prefer Docker only for local infrastructure services unless a later plan
   explicitly justifies containerizing the app itself.
+- The accepted Azure hosting target for this repository is Azure App Service on
+  Linux with Azure Database for PostgreSQL Flexible Server, Azure Key Vault,
+  and Azure Developer CLI (`azd`) using Bicep in `infra/`.
 
 ## Commands
 - `npm install`
@@ -38,6 +41,11 @@
 - `npm run test:e2e`
 - `npm run snapshots:run`
 - `npm run db:down`
+- `npm run azure:prepare`
+- `npm run azure:verify -- <deployed-url>`
+- `env AZD_CONFIG_DIR=/tmp/.azd azd env set POSTGRES_ADMIN_PASSWORD <url-safe-password>`
+- `env AZD_CONFIG_DIR=/tmp/.azd azd provision --preview`
+- `env AZD_CONFIG_DIR=/tmp/.azd azd up`
 - Use the `.specify/scripts/bash/` helpers for spec-kit workflow maintenance as
   needed.
 
@@ -47,7 +55,10 @@
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL 17, Vitest, React Testing Library, Playwright (002-user-settings)
 - Browser-local persisted user preference; no new server-side storage required for v1 (002-user-settings)
 - Existing PostgreSQL catalog plus demo-store fallback; no new persisted storage required (003-results-sorting)
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Azure Developer CLI, Bicep (004-azure-deploy)
+- Azure Database for PostgreSQL Flexible Server 17 (004-azure-deploy)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod
 - 002-user-settings: Added a browser-local settings surface with dark mode support and persistent theme selection
+- 004-azure-deploy: Added Azure App Service + PostgreSQL Flexible Server deployment scaffolding with Azure Developer CLI and Bicep

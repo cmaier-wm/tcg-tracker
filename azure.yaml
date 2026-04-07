@@ -1,0 +1,29 @@
+name: tcg-tracker
+resourceGroup: rg-prod
+metadata:
+  template: tcg-tracker-azure@0.0.1-beta
+requiredVersions:
+  azd: ">= 1.23.0"
+infra:
+  provider: bicep
+  path: infra
+  module: main
+services:
+  web:
+    project: .
+    dist: .azuredist
+    language: js
+    host: appservice
+workflows:
+  up:
+    steps:
+      - azd: provision
+      - azd: package
+      - azd: deploy --all
+hooks:
+  preprovision:
+    shell: sh
+    run: ./.azure/hooks/preprovision.sh
+  postdeploy:
+    shell: sh
+    run: ./.azure/hooks/postdeploy.sh

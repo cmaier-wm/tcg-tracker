@@ -8,10 +8,16 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.azure/*
+!.azure/hooks/
+!.azure/hooks/**
+.azuredist/
+.azuredist.zip
 prisma/dev.db
 playwright-report/
 test-results/
 .playwright-mcp/
+.azd/
 .DS_Store
 Thumbs.db
 *.log

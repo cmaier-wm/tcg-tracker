@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 
+const DEFAULT_DATABASE_CONNECT_TIMEOUT_MS = 3000;
+
 let cachedDatabaseAvailability: boolean | undefined;
 let databaseAvailabilityPromise: Promise<boolean> | null = null;
 let hasLoggedFallbackWarning = false;
@@ -28,6 +30,38 @@ function isDatabaseConnectionError(error: unknown) {
       error.message
     )
   );
+}
+
+function getDatabaseConnectTimeoutMs() {
+  const configuredTimeout = Number.parseInt(
+    process.env.DATABASE_CONNECT_TIMEOUT_MS ?? "",
+    10
+  );
+
+  if (Number.isFinite(configuredTimeout) && configuredTimeout > 0) {
+    return configuredTimeout;
+  }
+
+  return DEFAULT_DATABASE_CONNECT_TIMEOUT_MS;
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
+  let timeoutId: NodeJS.Timeout | undefined;
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(`Database connection timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
 }
 
 async function isDatabaseAvailable() {
@@ -84,7 +118,10 @@ export async function ensureDatabaseConnection() {
   }
 
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await withTimeout(
+      prisma.$queryRaw`SELECT 1`,
+      getDatabaseConnectTimeoutMs()
+    );
     return true;
   } catch {
     return false;
