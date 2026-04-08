@@ -3,27 +3,34 @@
 import React, { useEffect, useState } from "react";
 import {
   applyThemeMode,
-  defaultThemeMode,
   toggleThemeMode,
   type ThemeMode
 } from "@/lib/settings/theme-preference";
 import {
-  readStoredThemeMode,
+  readStoredThemeModeSnapshot,
   writeStoredThemeMode
 } from "@/lib/settings/theme-storage";
 
-export function ThemeToggle() {
-  const [themeMode, setThemeMode] = useState<ThemeMode>(defaultThemeMode);
-  const [isHydrated, setIsHydrated] = useState(false);
+type ThemeToggleProps = {
+  initialThemeMode: ThemeMode;
+};
 
-  useEffect(() => {
-    const storedTheme = readStoredThemeMode();
-    setThemeMode(storedTheme);
-    applyThemeMode(storedTheme);
-    setIsHydrated(true);
-  }, []);
+export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const storedThemeMode = readStoredThemeModeSnapshot();
+    return storedThemeMode ?? initialThemeMode;
+  });
 
   const isDarkMode = themeMode === "dark";
+
+  useEffect(() => {
+    applyThemeMode(themeMode);
+    const storedThemeMode = readStoredThemeModeSnapshot();
+
+    if (storedThemeMode === null) {
+      writeStoredThemeMode(themeMode);
+    }
+  }, [themeMode]);
 
   function handleThemeChange() {
     const nextThemeMode = toggleThemeMode(themeMode);
@@ -47,7 +54,6 @@ export function ThemeToggle() {
           type="checkbox"
           checked={isDarkMode}
           aria-label="Dark mode toggle"
-          disabled={!isHydrated}
           onChange={handleThemeChange}
         />
         <span className="theme-toggle-switch-track" aria-hidden="true">
@@ -62,7 +68,6 @@ export function ThemeToggle() {
           </span>
         </span>
       </label>
-      {!isHydrated ? <p className="muted">Loading saved preference...</p> : null}
     </div>
   );
 }

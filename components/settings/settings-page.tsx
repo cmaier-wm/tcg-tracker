@@ -1,8 +1,15 @@
 import React from "react";
+import Link from "next/link";
 import { ThemeToggle } from "@/components/settings/theme-toggle";
 import { TeamsAlertSettings } from "@/components/settings/teams-alert-settings";
+import type { ThemeMode } from "@/lib/settings/theme-preference";
 
-export function SettingsPage() {
+type SettingsPageProps = {
+  initialThemeMode: ThemeMode;
+  isAuthenticated: boolean;
+};
+
+export function SettingsPage({ initialThemeMode, isAuthenticated }: SettingsPageProps) {
   return (
     <div className="page-grid">
       <section className="page-intro stack">
@@ -21,7 +28,7 @@ export function SettingsPage() {
             <p className="muted">Control how the app looks on this browser and device.</p>
           </div>
         </div>
-        <ThemeToggle />
+        <ThemeToggle initialThemeMode={initialThemeMode} />
       </section>
       <section className="surface-card stack">
         <div className="section-heading">
@@ -33,7 +40,21 @@ export function SettingsPage() {
             </p>
           </div>
         </div>
-        <TeamsAlertSettings />
+        {isAuthenticated ? (
+          <TeamsAlertSettings />
+        ) : (
+          <div className="stack">
+            <p className="muted">
+              Sign in to manage account-backed Teams alerts. Theme preferences stay
+              available on this device even when signed out.
+            </p>
+            <div className="button-row">
+              <Link href="/login" className="button secondary">
+                Sign In To Manage Alerts
+              </Link>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

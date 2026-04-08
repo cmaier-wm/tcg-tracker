@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toast } from "sonner";
-import SettingsPage from "@/app/settings/page";
+import { SettingsPage } from "@/components/settings/settings-page";
 import { clearStoredThemeMode, readStoredThemeMode } from "@/lib/settings/theme-storage";
 
 const originalFetch = global.fetch;
@@ -76,12 +76,12 @@ describe("settings page", () => {
   it("renders the settings area and toggles dark mode", async () => {
     const user = userEvent.setup();
 
-    render(<SettingsPage />);
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={false} />);
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Dark mode" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Appearance" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Portfolio Gain Alerts" })).toBeInTheDocument();
+    expect(screen.getByText("Sign in to manage account-backed Teams alerts. Theme preferences stay available on this device even when signed out.")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("light");
@@ -146,7 +146,7 @@ describe("settings page", () => {
 
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<SettingsPage />);
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={true} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText("Teams Workflow Webhook URL")).toHaveValue("");
@@ -220,7 +220,7 @@ describe("settings page", () => {
 
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<SettingsPage />);
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={true} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText("Teams Workflow Webhook URL")).toHaveValue(

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import SettingsPage from "@/app/settings/page";
+import { SettingsPage } from "@/components/settings/settings-page";
 
 describe("settings page contract", () => {
   beforeEach(() => {
@@ -48,15 +48,15 @@ describe("settings page contract", () => {
   });
 
   it("exposes the settings surface and dark mode toggle", async () => {
-    render(<SettingsPage />);
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={false} />);
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Dark mode" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Appearance" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Alerts" })).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Portfolio Gain Alerts" })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Sign In To Manage Alerts" })).toBeInTheDocument();
     });
   });
 });

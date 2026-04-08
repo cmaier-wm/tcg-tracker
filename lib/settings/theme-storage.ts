@@ -31,6 +31,11 @@ export function readStoredThemeMode(): ThemeMode {
   return isThemeMode(storedValue) ? storedValue : defaultThemeMode;
 }
 
+export function readStoredThemeModeSnapshot(): ThemeMode | null {
+  const storedValue = getThemeStorage().getItem(themeStorageKey);
+  return isThemeMode(storedValue) ? storedValue : null;
+}
+
 export function writeStoredThemeMode(mode: ThemeMode) {
   getThemeStorage().setItem(themeStorageKey, mode);
 

@@ -6,6 +6,7 @@ import {
 } from "@/lib/settings/theme-preference";
 import {
   clearStoredThemeMode,
+  readStoredThemeModeSnapshot,
   readStoredThemeMode,
   writeStoredThemeMode
 } from "@/lib/settings/theme-storage";
@@ -32,5 +33,9 @@ describe("theme preference helpers", () => {
     writeStoredThemeMode("dark");
 
     expect(readStoredThemeMode()).toBe("dark");
+  });
+
+  it("returns null when no explicit preference is stored", () => {
+    expect(readStoredThemeModeSnapshot()).toBeNull();
   });
 });
