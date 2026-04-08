@@ -16,6 +16,7 @@ type CardDetailProps = {
       languageCode?: string | null;
       finish?: string | null;
       conditionCode?: string | null;
+      isDefault?: boolean | null;
       currentPrice?: number | null;
     }>;
   };

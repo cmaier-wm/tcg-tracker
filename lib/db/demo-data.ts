@@ -9,6 +9,7 @@ export type DemoVariation = {
   languageCode?: string;
   finish?: string;
   conditionCode?: string;
+  isDefault?: boolean;
   currentPrice?: number;
   lastUpdatedAt?: string;
   history: DemoPricePoint[];

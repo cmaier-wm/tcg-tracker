@@ -27,6 +27,7 @@ export async function getCardDetail(category: string, cardId: string) {
           languageCode: variation.languageCode,
           finish: variation.finish,
           conditionCode: variation.conditionCode,
+          isDefault: variation.isDefault,
           currentPrice: variation.priceSnapshots[0]?.marketPrice ?? null,
           lastUpdatedAt: variation.priceSnapshots[0]?.capturedAt.toISOString() ?? null
         }))
@@ -56,6 +57,7 @@ export async function getCardDetail(category: string, cardId: string) {
           languageCode: variation.languageCode ?? null,
           finish: variation.finish ?? null,
           conditionCode: variation.conditionCode ?? null,
+          isDefault: variation.isDefault ?? false,
           currentPrice: variation.currentPrice ?? null,
           lastUpdatedAt: variation.lastUpdatedAt ?? null
         }))

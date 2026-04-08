@@ -90,10 +90,24 @@ export async function getDatabaseCardCatalog(options: {
               CASE
                 WHEN LOWER(COALESCE(cv."languageCode", '')) = 'en'
                   AND ls."marketPrice" IS NOT NULL THEN 0
-                WHEN LOWER(COALESCE(cv."languageCode", '')) = 'en' THEN 1
+                WHEN COALESCE(cv."languageCode", '') = ''
+                  AND ls."marketPrice" IS NOT NULL THEN 1
                 WHEN ls."marketPrice" IS NOT NULL THEN 2
-                ELSE 3
+                WHEN LOWER(COALESCE(cv."languageCode", '')) = 'en' THEN 3
+                WHEN COALESCE(cv."languageCode", '') = '' THEN 4
+                ELSE 5
               END,
+              CASE
+                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'NM' THEN 0
+                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'LP' THEN 1
+                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'MP' THEN 2
+                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'HP' THEN 3
+                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'DMG' THEN 4
+                WHEN cv."conditionCode" IS NULL THEN 5
+                ELSE 6
+              END,
+              CASE WHEN cv."isDefault" THEN 0 ELSE 1 END,
+              ls."marketPrice" DESC NULLS LAST,
               cv.id ASC
           )
         )[1] AS "currentPrice"
