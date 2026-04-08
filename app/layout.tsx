@@ -31,7 +31,21 @@ export default async function RootLayout({
             <div className="site-header-inner">
               <div className="brand-lockup">
                 <Link href="/" className="brand-mark" aria-label="Go to home page">
-                  <span className="brand-mark-dot" />
+                  <svg
+                    className="brand-mark-icon"
+                    viewBox="0 0 64 64"
+                    role="img"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <rect width="64" height="64" rx="14" fill="#111827" />
+                    <circle cx="32" cy="32" r="20" fill="#f8fafc" stroke="#111827" strokeWidth="3" />
+                    <path d="M12 32a20 20 0 0 1 40 0z" fill="#ef4444" />
+                    <path d="M12 32a20 20 0 0 0 40 0z" fill="#f8fafc" />
+                    <rect x="12" y="29" width="40" height="6" fill="#111827" />
+                    <circle cx="32" cy="32" r="8" fill="#ffffff" stroke="#111827" strokeWidth="3" />
+                    <circle cx="32" cy="32" r="3" fill="#f8fafc" stroke="#111827" strokeWidth="2" />
+                  </svg>
                 </Link>
                 <div>
                   <Link href="/" className="brand">

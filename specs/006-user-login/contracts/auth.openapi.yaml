@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: Authentication API
+  version: 0.1.0
+  description: Contract for first-party account registration, session sign-in, and sign-out flows.
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Account created and authenticated session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSessionResponse"
+        "400":
+          description: Validation failed or normalized email already exists
+  /api/auth/login:
+    post:
+      summary: Sign in with email and password
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSessionResponse"
+        "401":
+          description: Invalid credentials
+  /api/auth/logout:
+    post:
+      summary: Sign out the current user
+      operationId: logoutUser
+      responses:
+        "204":
+          description: Session ended
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        returnTo:
+          type: string
+          description: Optional same-app public-page destination to restore after successful authentication.
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+        returnTo:
+          type: string
+          description: Optional same-app public-page destination to restore after successful authentication.
+    AuthSessionResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - userId
+        - email
+        - displayName
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string

@@ -23,9 +23,12 @@
     "snapshots:run": "node scripts/run-snapshots.mjs"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^6.0.0",
     "@tanstack/react-query": "^5.64.2",
+    "bcryptjs": "^3.0.3",
     "next": "^16.0.0",
+    "next-auth": "^4.24.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0",
