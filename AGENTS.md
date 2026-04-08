@@ -36,6 +36,7 @@
 - `npm run db:generate`
 - `npm run dev`
 - `npm run db:migrate`
+- `export TEAMS_WEBHOOK_ENCRYPTION_KEY=<local-secret>`
 - `npm run test:unit`
 - `npm run test:integration`
 - `npm run test:e2e`
@@ -57,8 +58,11 @@
 - Existing PostgreSQL catalog plus demo-store fallback; no new persisted storage required (003-results-sorting)
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Azure Developer CLI, Bicep (004-azure-deploy)
 - Azure Database for PostgreSQL Flexible Server 17 (004-azure-deploy)
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Zod, native `fetch`, Node `crypto` (005-teams-value-alert)
+- PostgreSQL 17 for Teams alert preferences, encrypted webhook destination, baseline state, and delivery history (005-teams-value-alert)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod
 - 002-user-settings: Added a browser-local settings surface with dark mode support and persistent theme selection
 - 004-azure-deploy: Added Azure App Service + PostgreSQL Flexible Server deployment scaffolding with Azure Developer CLI and Bicep
+- 005-teams-value-alert: Added persisted Microsoft Teams workflow alerts with encrypted webhook storage, snapshot-triggered threshold delivery, and duplicate suppression

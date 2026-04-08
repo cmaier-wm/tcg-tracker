@@ -27,3 +27,21 @@ export function toFullDateTime(value: string) {
     timeZone: "UTC"
   }).format(new Date(value));
 }
+
+export function toLocalDateTime(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(new Date(value));
+}
+
+export function toAlertStatusLabel(value: "idle" | "sent" | "failed") {
+  switch (value) {
+    case "sent":
+      return "Delivered";
+    case "failed":
+      return "Needs attention";
+    default:
+      return "Idle";
+  }
+}

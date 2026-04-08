@@ -47,8 +47,24 @@ npm run db:up
 npm run db:generate
 npm run db:migrate
 npm run db:seed
+export TEAMS_WEBHOOK_ENCRYPTION_KEY='replace-with-a-local-secret'
 npm run dev
 ```
+
+## Microsoft Teams Alerts
+
+The settings page now supports Microsoft Teams portfolio gain alerts through a
+user-provided Teams Workflow webhook URL.
+
+Local setup notes:
+
+- Set `TEAMS_WEBHOOK_ENCRYPTION_KEY` before starting the app so saved webhook
+  URLs can be encrypted at rest.
+- Run `npm run db:migrate` after pulling schema changes so the
+  `TeamsAlertPreference` and `TeamsAlertDelivery` tables exist locally.
+- Alerts are evaluated whenever valuation snapshots are saved. A new Teams
+  message is sent only when the portfolio rises more than `$1,000` above the
+  last successful alert baseline.
 
 ## Deploying To Azure
 
@@ -102,6 +118,7 @@ Automated checks:
 npm run test:unit
 npm run test:integration
 npm run test:e2e
+npm run test:e2e -- tests/e2e/teams-alerts.spec.ts
 npm run catalog:sync -- 3
 npm run snapshots:run
 npm run db:down

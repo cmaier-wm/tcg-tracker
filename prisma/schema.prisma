@@ -89,6 +89,8 @@ model UserAccount {
   updatedAt          DateTime                   @updatedAt
   holdings           PortfolioHolding[]
   valuationSnapshots PortfolioValuationSnapshot[]
+  teamsAlertPreference TeamsAlertPreference?
+  teamsAlertDeliveries TeamsAlertDelivery[]
 }
 
 model PortfolioHolding {
@@ -107,14 +109,52 @@ model PortfolioHolding {
 }
 
 model PortfolioValuationSnapshot {
-  id                String      @id @default(cuid())
-  userId            String
-  capturedAt        DateTime
-  totalValue        Float
-  holdingCount      Int
+  id                 String      @id @default(cuid())
+  userId             String
+  capturedAt         DateTime
+  totalValue         Float
+  holdingCount       Int
   pricedHoldingCount Int
-  createdAt         DateTime    @default(now())
-  user              UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt          DateTime    @default(now())
+  user               UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, capturedAt])
+}
+
+model TeamsAlertPreference {
+  id                  String               @id @default(cuid())
+  userId              String               @unique
+  enabled             Boolean              @default(false)
+  destinationLabel    String?
+  triggerAmountUsd    Int                  @default(1000)
+  encryptedWebhookUrl String?
+  webhookUrlIv        String?
+  baselineValue       Float?
+  lastEvaluatedAt     DateTime?
+  lastDeliveredAt     DateTime?
+  lastFailureAt       DateTime?
+  lastFailureMessage  String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  user                UserAccount          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries          TeamsAlertDelivery[]
+}
+
+model TeamsAlertDelivery {
+  id             String               @id @default(cuid())
+  userId         String
+  preferenceId   String
+  capturedAt     DateTime
+  portfolioValue Float
+  baselineValue  Float
+  gainAmount     Float
+  status         String
+  failureMessage String?
+  responseCode   Int?
+  createdAt      DateTime             @default(now())
+  user           UserAccount          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preference     TeamsAlertPreference @relation(fields: [preferenceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([preferenceId, createdAt])
 }

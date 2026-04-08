@@ -54,7 +54,7 @@ export function AddToPortfolioButton({
         />
       </label>
       <button className="button" type="submit" disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save holding"}
+        {isSaving ? "Saving..." : "Save Holding"}
       </button>
     </form>
   );

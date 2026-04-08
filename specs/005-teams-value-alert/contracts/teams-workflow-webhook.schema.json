@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tcg-tracker.local/contracts/teams-workflow-webhook.schema.json",
+  "title": "Teams Workflow Webhook Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "$schema",
+    "version",
+    "body"
+  ],
+  "properties": {
+    "type": {
+      "const": "AdaptiveCard"
+    },
+    "$schema": {
+      "type": "string",
+      "const": "http://adaptivecards.io/schemas/adaptive-card.json"
+    },
+    "version": {
+      "const": "1.4"
+    },
+    "body": {
+      "type": "array",
+      "minItems": 3
+    }
+  }
+}

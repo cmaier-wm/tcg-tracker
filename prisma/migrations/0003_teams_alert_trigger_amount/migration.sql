@@ -1,0 +1,2 @@
+ALTER TABLE "TeamsAlertPreference"
+ADD COLUMN "triggerAmountUsd" INTEGER NOT NULL DEFAULT 1000;

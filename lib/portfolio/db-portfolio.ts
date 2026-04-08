@@ -12,6 +12,10 @@ export async function getOrCreateDefaultUser() {
   });
 }
 
+export async function getDefaultUserAccount() {
+  return getOrCreateDefaultUser();
+}
+
 export async function getDatabasePortfolio() {
   const user = await getOrCreateDefaultUser();
 
@@ -58,4 +62,3 @@ export async function getDatabasePortfolioHistory() {
     }
   });
 }
-

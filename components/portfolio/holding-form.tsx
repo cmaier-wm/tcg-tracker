@@ -116,7 +116,7 @@ export function HoldingForm({
             disabled={isSaving}
             onClick={() => void removeHolding()}
           >
-            Remove holding
+            Remove Holding
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoStore } from "@/lib/db/demo-store";
 import { getOrCreateDefaultUser } from "@/lib/portfolio/db-portfolio";
 import { valuePortfolio } from "@/lib/portfolio/value-portfolio";
+import { evaluatePortfolioAlert } from "@/lib/teams/evaluate-portfolio-alert";
 
 export async function saveValuationSnapshot() {
   return withDatabaseFallback(
@@ -59,6 +60,10 @@ export async function saveValuationSnapshot() {
         where: { userId: user.id },
         orderBy: { capturedAt: "asc" }
       });
+      const alert = await evaluatePortfolioAlert({
+        capturedAt: snapshot.capturedAt.toISOString(),
+        portfolioValue: snapshot.totalValue
+      });
 
       return {
         snapshot: {
@@ -70,7 +75,8 @@ export async function saveValuationSnapshot() {
         history: history.map((item) => ({
           capturedAt: item.capturedAt.toISOString(),
           marketPrice: item.totalValue
-        }))
+        })),
+        alert
       };
     },
     async () => {
@@ -88,7 +94,12 @@ export async function saveValuationSnapshot() {
         marketPrice: snapshot.totalValue
       });
 
-      return { snapshot, history: store.portfolioHistory };
+      const alert = await evaluatePortfolioAlert({
+        capturedAt: snapshot.capturedAt,
+        portfolioValue: snapshot.totalValue
+      });
+
+      return { snapshot, history: store.portfolioHistory, alert };
     }
   );
 }

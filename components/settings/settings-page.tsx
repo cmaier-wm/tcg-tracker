@@ -1,5 +1,6 @@
 import React from "react";
 import { ThemeToggle } from "@/components/settings/theme-toggle";
+import { TeamsAlertSettings } from "@/components/settings/teams-alert-settings";
 
 export function SettingsPage() {
   return (
@@ -21,6 +22,18 @@ export function SettingsPage() {
           </div>
         </div>
         <ThemeToggle />
+      </section>
+      <section className="surface-card stack">
+        <div className="section-heading">
+          <div>
+            <h2>Alerts</h2>
+            <p className="muted">
+              Configure outbound notifications when your portfolio value makes a meaningful
+              jump.
+            </p>
+          </div>
+        </div>
+        <TeamsAlertSettings />
       </section>
     </div>
   );
