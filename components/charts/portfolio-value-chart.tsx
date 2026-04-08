@@ -26,7 +26,7 @@ export function PortfolioValueChart({ points }: { points: PortfolioPoint[] }) {
           <XAxis dataKey="capturedAt" tickFormatter={toCompactDate} />
           <YAxis tickFormatter={(value) => `$${value}`} />
           <Tooltip
-            formatter={(value: number) => toCurrency(value)}
+            formatter={(value: number) => [toCurrency(value), "Total Value"]}
             labelFormatter={(value: string) => toFullDateTime(value)}
           />
           <Area

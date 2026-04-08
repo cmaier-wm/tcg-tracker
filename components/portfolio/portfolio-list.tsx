@@ -45,6 +45,7 @@ export function PortfolioList({ holdings }: { holdings: Holding[] }) {
               <span className="badge">Qty {holding.quantity}</span>
             </div>
             <HoldingForm
+              key={`${holding.id}:${holding.quantity}`}
               holdingId={holding.id}
               quantity={holding.quantity}
               cardName={holding.cardName}

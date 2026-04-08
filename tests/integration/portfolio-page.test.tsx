@@ -4,7 +4,9 @@ import PortfolioPage from "@/app/portfolio/page";
 
 describe("portfolio page", () => {
   it("shows portfolio profit/loss content", async () => {
-    const page = await PortfolioPage();
+    const page = await PortfolioPage({
+      searchParams: Promise.resolve({})
+    });
     render(page);
 
     expect(screen.getByText("My Portfolio")).toBeInTheDocument();

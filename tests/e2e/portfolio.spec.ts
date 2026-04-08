@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { createTestCredentials, registerWithUi } from "@/tests/e2e/auth-helpers";
 
 test("view the portfolio summary", async ({ page }) => {
-  await page.goto("/portfolio");
+  const credentials = createTestCredentials("portfolio");
+
+  await registerWithUi(page, credentials);
+  await expect(page).toHaveURL(/\/portfolio$/);
 
   await expect(page.getByText("My Portfolio")).toBeVisible();
   await expect(page.getByText("Your Cards")).toBeVisible();

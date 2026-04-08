@@ -2,13 +2,24 @@ import React from "react";
 import { CardEmptyState } from "@/components/cards/card-empty-state";
 import { PortfolioValueChart } from "@/components/charts/portfolio-value-chart";
 import { PortfolioList } from "@/components/portfolio/portfolio-list";
+import { PortfolioPagination } from "@/components/portfolio/portfolio-pagination";
+import { PortfolioSort } from "@/components/portfolio/portfolio-sort";
 import { toCurrency, toSignedCurrency } from "@/lib/api/serializers";
+import { requirePageAuth } from "@/lib/auth/route-guards";
 import { calculateTodayProfitLoss } from "@/lib/portfolio/calculate-today-profit-loss";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 import { getPortfolioHistory } from "@/lib/portfolio/get-portfolio-history";
+import { normalizePortfolioSort } from "@/lib/portfolio/portfolio-sort";
 
-export default async function PortfolioPage() {
-  const portfolio = await getPortfolio();
+export default async function PortfolioPage({
+  searchParams
+}: {
+  searchParams?: Promise<{ sort?: string; page?: string }>;
+}) {
+  await requirePageAuth("/portfolio");
+  const params = searchParams ? await searchParams : {};
+  const selectedSort = normalizePortfolioSort(params.sort);
+  const portfolio = await getPortfolio({ sort: selectedSort, page: params.page });
   const history = await getPortfolioHistory();
   const todayProfitLoss = calculateTodayProfitLoss(
     history.points.map((point) => ({
@@ -59,9 +70,17 @@ export default async function PortfolioPage() {
               <h2>Your Cards</h2>
               <p className="muted">Manage tracked cards and estimated values.</p>
             </div>
+            {portfolio.holdings.length ? <PortfolioSort selectedSort={selectedSort} /> : null}
           </div>
           {portfolio.holdings.length ? (
-            <PortfolioList holdings={portfolio.holdings} />
+            <>
+              <PortfolioList holdings={portfolio.holdings} />
+              <PortfolioPagination
+                page={portfolio.page}
+                totalPages={portfolio.totalPages}
+                sort={selectedSort}
+              />
+            </>
           ) : (
             <CardEmptyState
               title="Your portfolio is empty"

@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function HoldingForm({
@@ -21,26 +22,10 @@ export function HoldingForm({
   const router = useRouter();
   const [nextQuantity, setNextQuantity] = useState(quantity);
   const [isSaving, setIsSaving] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const lastSavedQuantityRef = useRef(quantity);
 
-  useEffect(() => {
-    setNextQuantity(quantity);
-    lastSavedQuantityRef.current = quantity;
-  }, [quantity]);
-
-  useEffect(() => {
-    if (nextQuantity < 1 || nextQuantity === lastSavedQuantityRef.current) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      void submitQuantity(nextQuantity);
-    }, 300);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [nextQuantity]);
-
-  async function submitQuantity(quantityToSave: number) {
+  const submitQuantity = useEffectEvent(async (quantityToSave: number) => {
     setIsSaving(true);
     const response = await fetch(`/api/portfolio/${holdingId}`, {
       method: "PATCH",
@@ -54,13 +39,27 @@ export function HoldingForm({
       lastSavedQuantityRef.current = quantityToSave;
       toast.success("Quantity updated");
       router.refresh();
+    } else if (response.status === 401) {
+      router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
     } else {
       toast.error("Unable to complete action");
       setNextQuantity(lastSavedQuantityRef.current);
     }
 
     setIsSaving(false);
-  }
+  });
+
+  useEffect(() => {
+    if (nextQuantity < 1 || nextQuantity === lastSavedQuantityRef.current) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      void submitQuantity(nextQuantity);
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [nextQuantity]);
 
   async function removeHolding() {
     setIsSaving(true);
@@ -72,8 +71,12 @@ export function HoldingForm({
     });
 
     if (response.ok) {
+      setIsConfirmingDelete(false);
       toast.success("Card removed from portfolio");
       router.refresh();
+    } else if (response.status === 401) {
+      setIsConfirmingDelete(false);
+      router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
     } else {
       toast.error("Unable to complete action");
       setIsSaving(false);
@@ -112,14 +115,63 @@ export function HoldingForm({
         <div className="button-row">
           <button
             type="button"
-            className="button secondary"
+            className="icon-button danger"
             disabled={isSaving}
-            onClick={() => void removeHolding()}
+            aria-label="Remove holding"
+            title="Remove holding"
+            onClick={() => setIsConfirmingDelete(true)}
           >
-            Remove Holding
+            <Trash2 aria-hidden="true" className="icon-button-glyph" strokeWidth={2} />
           </button>
         </div>
       </div>
+      {isConfirmingDelete ? (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={() => {
+            if (!isSaving) {
+              setIsConfirmingDelete(false);
+            }
+          }}
+        >
+          <div
+            className="confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`delete-holding-title-${holdingId}`}
+            aria-describedby={`delete-holding-copy-${holdingId}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="stack">
+              <h3 id={`delete-holding-title-${holdingId}`}>Remove this holding?</h3>
+              <p id={`delete-holding-copy-${holdingId}`} className="muted">
+                {cardName
+                  ? `Delete ${cardName} from your portfolio. This action cannot be undone.`
+                  : "Delete this card from your portfolio. This action cannot be undone."}
+              </p>
+            </div>
+            <div className="button-row confirm-dialog-actions">
+              <button
+                type="button"
+                className="button secondary"
+                disabled={isSaving}
+                onClick={() => setIsConfirmingDelete(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button danger"
+                disabled={isSaving}
+                onClick={() => void removeHolding()}
+              >
+                Delete Holding
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
