@@ -1,5 +1,6 @@
 import { withDatabaseFallback } from "@/lib/db/runtime";
-import { getDemoStore } from "@/lib/db/demo-store";
+import { getDemoUserState } from "@/lib/db/demo-store";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
 import { getDatabasePortfolioHistory } from "@/lib/portfolio/db-portfolio";
 
 export async function getPortfolioHistory() {
@@ -15,7 +16,8 @@ export async function getPortfolioHistory() {
       };
     },
     async () => {
-      const store = getDemoStore();
+      const user = await requireAuthenticatedUser();
+      const store = getDemoUserState(user.userId);
 
       return {
         points: store.portfolioHistory.map((point) => ({

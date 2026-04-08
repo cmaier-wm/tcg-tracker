@@ -1,17 +1,19 @@
 import { notFound } from "@/lib/api/http-errors";
 import { prisma } from "@/lib/db/prisma";
 import { withDatabaseFallback } from "@/lib/db/runtime";
-import { getDemoStore } from "@/lib/db/demo-store";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
+import { getDemoUserState } from "@/lib/db/demo-store";
 import { saveValuationSnapshot } from "@/lib/portfolio/save-valuation-snapshot";
 
 export async function removeHolding(holdingId: string) {
   return withDatabaseFallback(
     async () => {
+      const user = await requireAuthenticatedUser();
       const existing = await prisma.portfolioHolding.findUnique({
         where: { id: holdingId }
       });
 
-      if (!existing) {
+      if (!existing || existing.userId !== user.userId) {
         throw notFound("Holding not found");
       }
 
@@ -19,10 +21,11 @@ export async function removeHolding(holdingId: string) {
         where: { id: holdingId }
       });
 
-      await saveValuationSnapshot();
+      await saveValuationSnapshot(user.userId);
     },
     async () => {
-      const store = getDemoStore();
+      const user = await requireAuthenticatedUser();
+      const store = getDemoUserState(user.userId);
       const index = store.holdings.findIndex((item) => item.id === holdingId);
 
       if (index === -1) {
@@ -30,7 +33,7 @@ export async function removeHolding(holdingId: string) {
       }
 
       store.holdings.splice(index, 1);
-      await saveValuationSnapshot();
+      await saveValuationSnapshot(user.userId);
     }
   );
 }

@@ -17,10 +17,10 @@
 
 **Purpose**: Prepare dependencies, documentation surfaces, and auth-specific scaffolding used by all stories.
 
-- [ ] T001 Add Auth.js and password-hashing dependencies in /Users/cmaier/Source/tcg-tracker/package.json
-- [ ] T002 Add auth environment documentation for local and Azure deployment in /Users/cmaier/Source/tcg-tracker/README.md
-- [ ] T003 [P] Add user-login feature guidance and commands in /Users/cmaier/Source/tcg-tracker/AGENTS.md
-- [ ] T004 [P] Refine manual and production auth verification steps for validation, return-to-public-page flows, concurrent sessions, and deployment prerequisites in /Users/cmaier/Source/tcg-tracker/specs/006-user-login/quickstart.md
+- [X] T001 Add Auth.js and password-hashing dependencies in /Users/cmaier/Source/tcg-tracker/package.json
+- [X] T002 Add auth environment documentation for local and Azure deployment in /Users/cmaier/Source/tcg-tracker/README.md
+- [X] T003 [P] Add user-login feature guidance and commands in /Users/cmaier/Source/tcg-tracker/AGENTS.md
+- [X] T004 [P] Refine manual and production auth verification steps for validation, return-to-public-page flows, concurrent sessions, and deployment prerequisites in /Users/cmaier/Source/tcg-tracker/specs/006-user-login/quickstart.md
 
 ---
 
@@ -30,16 +30,16 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete.
 
-- [ ] T005 Extend account, credential, and session models for login ownership in /Users/cmaier/Source/tcg-tracker/prisma/schema.prisma
-- [ ] T006 Create the user-login migration for credentials, sessions, and legacy-claim support in /Users/cmaier/Source/tcg-tracker/prisma/migrations/0004_user_login/migration.sql
-- [ ] T007 [P] Add shared auth request/response schemas in /Users/cmaier/Source/tcg-tracker/lib/auth/schemas.ts
-- [ ] T008 [P] Implement password hashing and verification helpers in /Users/cmaier/Source/tcg-tracker/lib/auth/password.ts
-- [ ] T009 [P] Implement Auth.js configuration, secure cookie settings, inactivity-expiry policy, and session callbacks in /Users/cmaier/Source/tcg-tracker/lib/auth/auth-config.ts
-- [ ] T010 [P] Implement authenticated-user lookup, current-session invalidation, and validated `returnTo` helpers in /Users/cmaier/Source/tcg-tracker/lib/auth/auth-session.ts
-- [ ] T011 [P] Implement reusable page/API auth guards in /Users/cmaier/Source/tcg-tracker/lib/auth/route-guards.ts
-- [ ] T012 Add Next.js auth route wiring in /Users/cmaier/Source/tcg-tracker/app/api/auth/[...nextauth]/route.ts
-- [ ] T013 Add auth-aware legacy bootstrap claim service with atomic rollback semantics for the first registered user in /Users/cmaier/Source/tcg-tracker/lib/auth/legacy-bootstrap.ts
-- [ ] T014 Update demo-store primitives for credential and session-aware local fallback behavior in /Users/cmaier/Source/tcg-tracker/lib/db/demo-store.ts
+- [X] T005 Extend account, credential, and session models for login ownership in /Users/cmaier/Source/tcg-tracker/prisma/schema.prisma
+- [X] T006 Create the user-login migration for credentials, sessions, and legacy-claim support in /Users/cmaier/Source/tcg-tracker/prisma/migrations/0004_user_login/migration.sql
+- [X] T007 [P] Add shared auth request/response schemas in /Users/cmaier/Source/tcg-tracker/lib/auth/schemas.ts
+- [X] T008 [P] Implement password hashing and verification helpers in /Users/cmaier/Source/tcg-tracker/lib/auth/password.ts
+- [X] T009 [P] Implement Auth.js configuration, secure cookie settings, inactivity-expiry policy, and session callbacks in /Users/cmaier/Source/tcg-tracker/lib/auth/auth-config.ts
+- [X] T010 [P] Implement authenticated-user lookup, current-session invalidation, and validated `returnTo` helpers in /Users/cmaier/Source/tcg-tracker/lib/auth/auth-session.ts
+- [X] T011 [P] Implement reusable page/API auth guards in /Users/cmaier/Source/tcg-tracker/lib/auth/route-guards.ts
+- [X] T012 Add Next.js auth route wiring in /Users/cmaier/Source/tcg-tracker/app/api/auth/[...nextauth]/route.ts
+- [X] T013 Add auth-aware legacy bootstrap claim service with atomic rollback semantics for the first registered user in /Users/cmaier/Source/tcg-tracker/lib/auth/legacy-bootstrap.ts
+- [X] T014 Update demo-store primitives for credential and session-aware local fallback behavior in /Users/cmaier/Source/tcg-tracker/lib/db/demo-store.ts
 
 **Checkpoint**: Prisma, session resolution, and shared auth guards are ready for story implementation.
 
@@ -53,21 +53,21 @@
 
 ### Verification for User Story 1
 
-- [ ] T015 [P] [US1] Add auth contract tests for register, login, logout, validation failures, and normalized email handling in /Users/cmaier/Source/tcg-tracker/tests/contract/auth.contract.test.ts
-- [ ] T016 [P] [US1] Add integration tests for valid registration, malformed or partial credential rejection, duplicate email rejection, normalized-email uniqueness, concurrent sessions, and session persistence in /Users/cmaier/Source/tcg-tracker/tests/integration/auth-session.test.ts
-- [ ] T017 [P] [US1] Add end-to-end coverage for register/login/logout flows, signed-out redirect state, and public-page `returnTo` behavior in /Users/cmaier/Source/tcg-tracker/tests/e2e/auth.spec.ts
+- [X] T015 [P] [US1] Add auth contract tests for register, login, logout, validation failures, and normalized email handling in /Users/cmaier/Source/tcg-tracker/tests/contract/auth.contract.test.ts
+- [X] T016 [P] [US1] Add integration tests for valid registration, malformed or partial credential rejection, duplicate email rejection, normalized-email uniqueness, concurrent sessions, and session persistence in /Users/cmaier/Source/tcg-tracker/tests/integration/auth-session.test.ts
+- [X] T017 [P] [US1] Add end-to-end coverage for register/login/logout flows, signed-out redirect state, and public-page `returnTo` behavior in /Users/cmaier/Source/tcg-tracker/tests/e2e/auth.spec.ts
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Implement registration endpoint with email normalization, email/password validation, optional public-page `returnTo`, and first-user legacy claim behavior in /Users/cmaier/Source/tcg-tracker/app/api/auth/register/route.ts
-- [ ] T019 [US1] Implement login endpoint with normalized-email comparison, validation failures, and concurrent-session support in /Users/cmaier/Source/tcg-tracker/app/api/auth/login/route.ts
-- [ ] T020 [US1] Implement logout endpoint with current-session invalidation and `/login` redirect behavior in /Users/cmaier/Source/tcg-tracker/app/api/auth/logout/route.ts
-- [ ] T021 [P] [US1] Build the login form component in /Users/cmaier/Source/tcg-tracker/components/auth/login-form.tsx
-- [ ] T022 [P] [US1] Build the registration form component in /Users/cmaier/Source/tcg-tracker/components/auth/register-form.tsx
-- [ ] T023 [P] [US1] Build the authenticated sign-out control in /Users/cmaier/Source/tcg-tracker/components/auth/sign-out-button.tsx
-- [ ] T024 [US1] Add the login page with signed-out redirect handling and validated public-page `returnTo` support in /Users/cmaier/Source/tcg-tracker/app/login/page.tsx
-- [ ] T025 [US1] Add the registration page with auto-sign-in completion flow and validated public-page `returnTo` support in /Users/cmaier/Source/tcg-tracker/app/register/page.tsx
-- [ ] T026 [US1] Update shared navigation to reflect signed-in versus signed-out auth state in /Users/cmaier/Source/tcg-tracker/components/site-nav.tsx
+- [X] T018 [US1] Implement registration endpoint with email normalization, email/password validation, optional public-page `returnTo`, and first-user legacy claim behavior in /Users/cmaier/Source/tcg-tracker/app/api/auth/register/route.ts
+- [X] T019 [US1] Implement login endpoint with normalized-email comparison, validation failures, and concurrent-session support in /Users/cmaier/Source/tcg-tracker/app/api/auth/login/route.ts
+- [X] T020 [US1] Implement logout endpoint with current-session invalidation and `/login` redirect behavior in /Users/cmaier/Source/tcg-tracker/app/api/auth/logout/route.ts
+- [X] T021 [P] [US1] Build the login form component in /Users/cmaier/Source/tcg-tracker/components/auth/login-form.tsx
+- [X] T022 [P] [US1] Build the registration form component in /Users/cmaier/Source/tcg-tracker/components/auth/register-form.tsx
+- [X] T023 [P] [US1] Build the authenticated sign-out control in /Users/cmaier/Source/tcg-tracker/components/auth/sign-out-button.tsx
+- [X] T024 [US1] Add the login page with signed-out redirect handling and validated public-page `returnTo` support in /Users/cmaier/Source/tcg-tracker/app/login/page.tsx
+- [X] T025 [US1] Add the registration page with auto-sign-in completion flow and validated public-page `returnTo` support in /Users/cmaier/Source/tcg-tracker/app/register/page.tsx
+- [X] T026 [US1] Update shared navigation to reflect signed-in versus signed-out auth state in /Users/cmaier/Source/tcg-tracker/components/site-nav.tsx
 
 **Checkpoint**: User Story 1 is complete when account creation and sign-in work independently of portfolio/settings scoping.
 
@@ -81,25 +81,25 @@
 
 ### Verification for User Story 2
 
-- [ ] T027 [P] [US2] Update portfolio contract coverage for authenticated ownership and signed-out rejection in /Users/cmaier/Source/tcg-tracker/tests/contract/portfolio.contract.test.ts
-- [ ] T028 [P] [US2] Add integration coverage for portfolio isolation across two accounts in /Users/cmaier/Source/tcg-tracker/tests/integration/portfolio-service.test.ts
-- [ ] T029 [P] [US2] Update end-to-end portfolio flow coverage for authenticated ownership in /Users/cmaier/Source/tcg-tracker/tests/e2e/portfolio.spec.ts
-- [ ] T030 [P] [US2] Add verification that card catalog and card detail browsing remain public while add-to-portfolio auth redirects preserve validated `returnTo` behavior in /Users/cmaier/Source/tcg-tracker/tests/e2e/cards-browse.spec.ts
+- [X] T027 [P] [US2] Update portfolio contract coverage for authenticated ownership and signed-out rejection in /Users/cmaier/Source/tcg-tracker/tests/contract/portfolio.contract.test.ts
+- [X] T028 [P] [US2] Add integration coverage for portfolio isolation across two accounts in /Users/cmaier/Source/tcg-tracker/tests/integration/portfolio-service.test.ts
+- [X] T029 [P] [US2] Update end-to-end portfolio flow coverage for authenticated ownership in /Users/cmaier/Source/tcg-tracker/tests/e2e/portfolio.spec.ts
+- [X] T030 [P] [US2] Add verification that card catalog and card detail browsing remain public while add-to-portfolio auth redirects preserve validated `returnTo` behavior in /Users/cmaier/Source/tcg-tracker/tests/e2e/cards-browse.spec.ts
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Replace default-user portfolio resolution with session-derived ownership in /Users/cmaier/Source/tcg-tracker/lib/portfolio/db-portfolio.ts
-- [ ] T032 [P] [US2] Update portfolio read/write services to require the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/get-portfolio.ts
-- [ ] T033 [P] [US2] Update holding creation to scope records to the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/add-holding.ts
-- [ ] T034 [P] [US2] Update holding updates and removals to scope records to the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/update-holding.ts
-- [ ] T035 [P] [US2] Update holding deletions to scope records to the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/remove-holding.ts
-- [ ] T036 [P] [US2] Update valuation snapshot ownership and history reads in /Users/cmaier/Source/tcg-tracker/lib/portfolio/save-valuation-snapshot.ts
-- [ ] T037 [US2] Gate the portfolio page behind auth while preserving redirects for signed-out users in /Users/cmaier/Source/tcg-tracker/app/portfolio/page.tsx
-- [ ] T038 [US2] Enforce session-based access for portfolio collection routes in /Users/cmaier/Source/tcg-tracker/app/api/portfolio/route.ts
-- [ ] T039 [US2] Enforce session-based access for holding mutation routes in /Users/cmaier/Source/tcg-tracker/app/api/portfolio/[holdingId]/route.ts
-- [ ] T040 [US2] Enforce session-based access for portfolio history routes in /Users/cmaier/Source/tcg-tracker/app/api/portfolio/history/route.ts
-- [ ] T041 [US2] Keep card catalog browsing public while requiring auth for add-to-portfolio interactions and preserving validated `returnTo` destinations in /Users/cmaier/Source/tcg-tracker/components/portfolio/add-to-portfolio-button.tsx
-- [ ] T042 [US2] Add expired-session write rejection coverage for portfolio mutations in /Users/cmaier/Source/tcg-tracker/tests/integration/portfolio-service.test.ts
+- [X] T031 [US2] Replace default-user portfolio resolution with session-derived ownership in /Users/cmaier/Source/tcg-tracker/lib/portfolio/db-portfolio.ts
+- [X] T032 [P] [US2] Update portfolio read/write services to require the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/get-portfolio.ts
+- [X] T033 [P] [US2] Update holding creation to scope records to the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/add-holding.ts
+- [X] T034 [P] [US2] Update holding updates and removals to scope records to the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/update-holding.ts
+- [X] T035 [P] [US2] Update holding deletions to scope records to the authenticated user in /Users/cmaier/Source/tcg-tracker/lib/portfolio/remove-holding.ts
+- [X] T036 [P] [US2] Update valuation snapshot ownership and history reads in /Users/cmaier/Source/tcg-tracker/lib/portfolio/save-valuation-snapshot.ts
+- [X] T037 [US2] Gate the portfolio page behind auth while preserving redirects for signed-out users in /Users/cmaier/Source/tcg-tracker/app/portfolio/page.tsx
+- [X] T038 [US2] Enforce session-based access for portfolio collection routes in /Users/cmaier/Source/tcg-tracker/app/api/portfolio/route.ts
+- [X] T039 [US2] Enforce session-based access for holding mutation routes in /Users/cmaier/Source/tcg-tracker/app/api/portfolio/[holdingId]/route.ts
+- [X] T040 [US2] Enforce session-based access for portfolio history routes in /Users/cmaier/Source/tcg-tracker/app/api/portfolio/history/route.ts
+- [X] T041 [US2] Keep card catalog browsing public while requiring auth for add-to-portfolio interactions and preserving validated `returnTo` destinations in /Users/cmaier/Source/tcg-tracker/components/portfolio/add-to-portfolio-button.tsx
+- [X] T042 [US2] Add expired-session write rejection coverage for portfolio mutations in /Users/cmaier/Source/tcg-tracker/tests/integration/portfolio-service.test.ts
 
 **Checkpoint**: User Story 2 is complete when portfolio state is isolated per account and protected routes no longer fall back to the shared default user.
 
@@ -113,21 +113,21 @@
 
 ### Verification for User Story 3
 
-- [ ] T043 [P] [US3] Update Teams settings contract coverage for authenticated ownership and signed-out rejection in /Users/cmaier/Source/tcg-tracker/tests/contract/teams-alert-settings.contract.test.ts
-- [ ] T044 [P] [US3] Update settings-page contract coverage for protected settings access in /Users/cmaier/Source/tcg-tracker/tests/contract/settings-page.contract.test.tsx
-- [ ] T045 [P] [US3] Add integration coverage for per-user Teams settings isolation in /Users/cmaier/Source/tcg-tracker/tests/integration/teams-alert-settings.test.ts
-- [ ] T046 [P] [US3] Update end-to-end Teams settings flow for authenticated ownership in /Users/cmaier/Source/tcg-tracker/tests/e2e/teams-alerts.spec.ts
-- [ ] T047 [P] [US3] Add expired-session write rejection coverage for account-backed settings in /Users/cmaier/Source/tcg-tracker/tests/integration/teams-alert-settings.test.ts
+- [X] T043 [P] [US3] Update Teams settings contract coverage for authenticated ownership and signed-out rejection in /Users/cmaier/Source/tcg-tracker/tests/contract/teams-alert-settings.contract.test.ts
+- [X] T044 [P] [US3] Update settings-page contract coverage for protected settings access in /Users/cmaier/Source/tcg-tracker/tests/contract/settings-page.contract.test.tsx
+- [X] T045 [P] [US3] Add integration coverage for per-user Teams settings isolation in /Users/cmaier/Source/tcg-tracker/tests/integration/teams-alert-settings.test.ts
+- [X] T046 [P] [US3] Update end-to-end Teams settings flow for authenticated ownership in /Users/cmaier/Source/tcg-tracker/tests/e2e/teams-alerts.spec.ts
+- [X] T047 [P] [US3] Add expired-session write rejection coverage for account-backed settings in /Users/cmaier/Source/tcg-tracker/tests/integration/teams-alert-settings.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T048 [US3] Replace default-user Teams preference resolution with session-derived ownership in /Users/cmaier/Source/tcg-tracker/lib/teams/alert-preferences.ts
-- [ ] T049 [US3] Scope Teams alert evaluation and delivery reads to the authenticated owner in /Users/cmaier/Source/tcg-tracker/lib/teams/evaluate-portfolio-alert.ts
-- [ ] T050 [US3] Gate the settings page behind auth while preserving browser-local theme behavior in /Users/cmaier/Source/tcg-tracker/app/settings/page.tsx
-- [ ] T051 [US3] Update settings page composition for signed-in account-backed settings behavior in /Users/cmaier/Source/tcg-tracker/components/settings/settings-page.tsx
-- [ ] T052 [US3] Update Teams settings UI to load and save the authenticated user’s data only in /Users/cmaier/Source/tcg-tracker/components/settings/teams-alert-settings.tsx
-- [ ] T053 [US3] Enforce session-based access for Teams settings routes in /Users/cmaier/Source/tcg-tracker/app/api/settings/teams-alert/route.ts
-- [ ] T054 [US3] Enforce session-based access for Teams settings history routes in /Users/cmaier/Source/tcg-tracker/app/api/settings/teams-alert/history/route.ts
+- [X] T048 [US3] Replace default-user Teams preference resolution with session-derived ownership in /Users/cmaier/Source/tcg-tracker/lib/teams/alert-preferences.ts
+- [X] T049 [US3] Scope Teams alert evaluation and delivery reads to the authenticated owner in /Users/cmaier/Source/tcg-tracker/lib/teams/evaluate-portfolio-alert.ts
+- [X] T050 [US3] Gate the settings page behind auth while preserving browser-local theme behavior in /Users/cmaier/Source/tcg-tracker/app/settings/page.tsx
+- [X] T051 [US3] Update settings page composition for signed-in account-backed settings behavior in /Users/cmaier/Source/tcg-tracker/components/settings/settings-page.tsx
+- [X] T052 [US3] Update Teams settings UI to load and save the authenticated user’s data only in /Users/cmaier/Source/tcg-tracker/components/settings/teams-alert-settings.tsx
+- [X] T053 [US3] Enforce session-based access for Teams settings routes in /Users/cmaier/Source/tcg-tracker/app/api/settings/teams-alert/route.ts
+- [X] T054 [US3] Enforce session-based access for Teams settings history routes in /Users/cmaier/Source/tcg-tracker/app/api/settings/teams-alert/history/route.ts
 
 **Checkpoint**: User Story 3 is complete when account-backed settings are isolated by authenticated user and protected settings routes reject signed-out access.
 
@@ -137,11 +137,11 @@
 
 **Purpose**: Finish cross-story hardening, guidance synchronization, and release validation.
 
-- [ ] T055 [P] Add unit coverage for password helpers and legacy-claim logic in /Users/cmaier/Source/tcg-tracker/tests/unit/auth-password.test.ts
-- [ ] T056 [P] Add unit coverage for auth guard helpers in /Users/cmaier/Source/tcg-tracker/tests/unit/auth-session.test.ts
-- [ ] T057 [P] Add structured auth audit logging for failed sign-in, unauthorized access, and legacy-claim outcomes in /Users/cmaier/Source/tcg-tracker/lib/auth/audit-log.ts
-- [ ] T058 [P] Update MCP and development workflow guidance for login-related setup in /Users/cmaier/Source/tcg-tracker/docs/development/mcps.md
-- [ ] T059 Run the full login verification suite and capture any manual verification deltas in /Users/cmaier/Source/tcg-tracker/specs/006-user-login/quickstart.md
+- [X] T055 [P] Add unit coverage for password helpers and legacy-claim logic in /Users/cmaier/Source/tcg-tracker/tests/unit/auth-password.test.ts
+- [X] T056 [P] Add unit coverage for auth guard helpers in /Users/cmaier/Source/tcg-tracker/tests/unit/auth-session.test.ts
+- [X] T057 [P] Add structured auth audit logging for failed sign-in, unauthorized access, and legacy-claim outcomes in /Users/cmaier/Source/tcg-tracker/lib/auth/audit-log.ts
+- [X] T058 [P] Update MCP and development workflow guidance for login-related setup in /Users/cmaier/Source/tcg-tracker/docs/development/mcps.md
+- [X] T059 Run the full login verification suite and capture any manual verification deltas in /Users/cmaier/Source/tcg-tracker/specs/006-user-login/quickstart.md
 
 ---
 

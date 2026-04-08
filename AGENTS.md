@@ -36,6 +36,7 @@
 - `npm run db:generate`
 - `npm run dev`
 - `npm run db:migrate`
+- `export AUTH_SECRET=<local-secret>`
 - `export TEAMS_WEBHOOK_ENCRYPTION_KEY=<local-secret>`
 - `npm run test:unit`
 - `npm run test:integration`
@@ -49,6 +50,8 @@
 - `env AZD_CONFIG_DIR=/tmp/.azd azd up`
 - Use the `.specify/scripts/bash/` helpers for spec-kit workflow maintenance as
   needed.
+- `npm run dev` automatically runs `prisma migrate deploy` and `prisma generate`
+  before starting the local server on port `3000`.
 
 ## Active Technologies
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod (001-card-portfolio-tracker)
@@ -68,3 +71,4 @@
 - 002-user-settings: Added a browser-local settings surface with dark mode support and persistent theme selection
 - 004-azure-deploy: Added Azure App Service + PostgreSQL Flexible Server deployment scaffolding with Azure Developer CLI and Bicep
 - 005-teams-value-alert: Added persisted Microsoft Teams workflow alerts with encrypted webhook storage, snapshot-triggered threshold delivery, and duplicate suppression
+- 006-user-login: Added email/password registration, session-backed login/logout, protected portfolio/settings routes, account-owned portfolio data, and account-owned Teams alert settings

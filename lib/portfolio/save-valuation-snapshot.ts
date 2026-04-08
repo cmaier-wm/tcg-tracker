@@ -1,16 +1,18 @@
 import { prisma } from "@/lib/db/prisma";
 import { withDatabaseFallback } from "@/lib/db/runtime";
-import { getDemoStore } from "@/lib/db/demo-store";
-import { getOrCreateDefaultUser } from "@/lib/portfolio/db-portfolio";
+import { getDemoUserState } from "@/lib/db/demo-store";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
 import { valuePortfolio } from "@/lib/portfolio/value-portfolio";
 import { evaluatePortfolioAlert } from "@/lib/teams/evaluate-portfolio-alert";
 
-export async function saveValuationSnapshot() {
+export async function saveValuationSnapshot(userId?: string) {
   return withDatabaseFallback(
     async () => {
-      const user = await getOrCreateDefaultUser();
+      const user = userId
+        ? { userId }
+        : await requireAuthenticatedUser();
       const holdings = await prisma.portfolioHolding.findMany({
-        where: { userId: user.id },
+        where: { userId: user.userId },
         include: {
           variation: {
             include: {
@@ -34,7 +36,7 @@ export async function saveValuationSnapshot() {
       const snapshot = await prisma.portfolioValuationSnapshot.upsert({
         where: {
           userId_capturedAt: {
-            userId: user.id,
+            userId: user.userId,
             capturedAt: snapshotDate
           }
         },
@@ -46,7 +48,7 @@ export async function saveValuationSnapshot() {
           ).length
         },
         create: {
-          userId: user.id,
+          userId: user.userId,
           capturedAt: snapshotDate,
           totalValue,
           holdingCount: holdings.length,
@@ -57,7 +59,7 @@ export async function saveValuationSnapshot() {
       });
 
       const history = await prisma.portfolioValuationSnapshot.findMany({
-        where: { userId: user.id },
+        where: { userId: user.userId },
         orderBy: { capturedAt: "asc" }
       });
       const alert = await evaluatePortfolioAlert({
@@ -80,7 +82,8 @@ export async function saveValuationSnapshot() {
       };
     },
     async () => {
-      const store = getDemoStore();
+      const resolvedUserId = userId ?? (await requireAuthenticatedUser()).userId;
+      const store = getDemoUserState(resolvedUserId);
       const valuation = valuePortfolio(store.holdings);
       const snapshot = {
         capturedAt: new Date().toISOString(),

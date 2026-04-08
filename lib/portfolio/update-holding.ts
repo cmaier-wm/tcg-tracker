@@ -1,7 +1,8 @@
 import { badRequest, notFound } from "@/lib/api/http-errors";
 import { prisma } from "@/lib/db/prisma";
 import { withDatabaseFallback } from "@/lib/db/runtime";
-import { getDemoStore } from "@/lib/db/demo-store";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
+import { getDemoUserState } from "@/lib/db/demo-store";
 import { saveValuationSnapshot } from "@/lib/portfolio/save-valuation-snapshot";
 
 export async function updateHolding(holdingId: string, quantity: number) {
@@ -11,11 +12,12 @@ export async function updateHolding(holdingId: string, quantity: number) {
 
   return withDatabaseFallback(
     async () => {
+      const user = await requireAuthenticatedUser();
       const existing = await prisma.portfolioHolding.findUnique({
         where: { id: holdingId }
       });
 
-      if (!existing) {
+      if (!existing || existing.userId !== user.userId) {
         throw notFound("Holding not found");
       }
 
@@ -24,11 +26,12 @@ export async function updateHolding(holdingId: string, quantity: number) {
         data: { quantity }
       });
 
-      await saveValuationSnapshot();
+      await saveValuationSnapshot(user.userId);
       return updated;
     },
     async () => {
-      const store = getDemoStore();
+      const user = await requireAuthenticatedUser();
+      const store = getDemoUserState(user.userId);
       const holding = store.holdings.find((item) => item.id === holdingId);
 
       if (!holding) {
@@ -36,7 +39,7 @@ export async function updateHolding(holdingId: string, quantity: number) {
       }
 
       holding.quantity = quantity;
-      await saveValuationSnapshot();
+      await saveValuationSnapshot(user.userId);
 
       return holding;
     }

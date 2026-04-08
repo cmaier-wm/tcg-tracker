@@ -1,5 +1,6 @@
 import http from "node:http";
 import { expect, test } from "@playwright/test";
+import { createTestCredentials, registerWithUi } from "@/tests/e2e/auth-helpers";
 
 test("sends one Teams alert per qualifying gain range", async ({ page, request }) => {
   const receivedPayloads: unknown[] = [];
@@ -24,6 +25,9 @@ test("sends one Teams alert per qualifying gain range", async ({ page, request }
   const port = typeof address === "object" && address ? address.port : 0;
 
   try {
+    const credentials = createTestCredentials("teams");
+
+    await registerWithUi(page, credentials);
     await page.goto("/settings");
     await expect(page.getByRole("checkbox", { name: "Teams alerts toggle" })).toBeEnabled();
     await page.getByLabel("Destination Label").fill("Trading alerts");
@@ -35,7 +39,9 @@ test("sends one Teams alert per qualifying gain range", async ({ page, request }
 
     await expect(page.getByText("Teams alerts saved.")).toBeVisible();
 
-    const addResponse = await request.post("/api/portfolio", {
+    const authenticatedRequest = page.context().request;
+
+    const addResponse = await authenticatedRequest.post("/api/portfolio", {
       headers: {
         "Content-Type": "application/json"
       },
@@ -48,13 +54,13 @@ test("sends one Teams alert per qualifying gain range", async ({ page, request }
     expect(addResponse.ok()).toBe(true);
     await expect.poll(() => receivedPayloads.length).toBe(1);
 
-    const portfolioResponse = await request.get("/api/portfolio");
+    const portfolioResponse = await authenticatedRequest.get("/api/portfolio");
     const portfolioPayload = await portfolioResponse.json();
     const holdingId = portfolioPayload.holdings[0]?.id as string;
 
     expect(holdingId).toBeTruthy();
 
-    const sameQuantityResponse = await request.patch(`/api/portfolio/${holdingId}`, {
+    const sameQuantityResponse = await authenticatedRequest.patch(`/api/portfolio/${holdingId}`, {
       headers: {
         "Content-Type": "application/json"
       },
@@ -67,7 +73,7 @@ test("sends one Teams alert per qualifying gain range", async ({ page, request }
     await page.waitForTimeout(250);
     expect(receivedPayloads).toHaveLength(1);
 
-    const nextThresholdResponse = await request.patch(`/api/portfolio/${holdingId}`, {
+    const nextThresholdResponse = await authenticatedRequest.patch(`/api/portfolio/${holdingId}`, {
       headers: {
         "Content-Type": "application/json"
       },

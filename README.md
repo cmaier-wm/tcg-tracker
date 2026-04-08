@@ -44,12 +44,33 @@ Current UI design reference:
 ```bash
 npm install
 npm run db:up
-npm run db:generate
-npm run db:migrate
 npm run db:seed
+export AUTH_SECRET='replace-with-a-local-secret'
 export TEAMS_WEBHOOK_ENCRYPTION_KEY='replace-with-a-local-secret'
 npm run dev
 ```
+
+`npm run dev` automatically applies checked-in Prisma migrations with
+`prisma migrate deploy` and refreshes the generated Prisma client before the
+server starts on port `3000`. Keep `npm run db:migrate` for the separate case
+where you are authoring a brand-new local migration.
+
+## User Login
+
+The app now supports local email-and-password registration and sign-in for
+account-scoped portfolio data and Teams alert settings.
+
+Local setup notes:
+
+- Set `AUTH_SECRET` before starting the app so signed-in sessions can be
+  issued consistently across reloads.
+- `npm run dev` now applies checked-in auth migrations automatically so the
+  `UserCredential`, `AuthSession`, and `AuthAuditEvent` tables stay in sync
+  without a separate manual migrate step.
+- `/cards` and card detail pages remain public while `/portfolio`, `/settings`,
+  and the matching portfolio/settings APIs require authentication.
+- The first newly registered account claims any legacy demo portfolio/settings
+  data once; later accounts start from empty account-owned state.
 
 ## Microsoft Teams Alerts
 
@@ -60,8 +81,9 @@ Local setup notes:
 
 - Set `TEAMS_WEBHOOK_ENCRYPTION_KEY` before starting the app so saved webhook
   URLs can be encrypted at rest.
-- Run `npm run db:migrate` after pulling schema changes so the
-  `TeamsAlertPreference` and `TeamsAlertDelivery` tables exist locally.
+- `npm run dev` applies checked-in Prisma migrations automatically before the
+  app starts, including the Teams alert tables when they are part of the repo
+  migration history.
 - Alerts are evaluated whenever valuation snapshots are saved. A new Teams
   message is sent only when the portfolio rises more than `$1,000` above the
   last successful alert baseline.
@@ -118,6 +140,7 @@ Automated checks:
 npm run test:unit
 npm run test:integration
 npm run test:e2e
+npm run test:e2e -- tests/e2e/auth.spec.ts
 npm run test:e2e -- tests/e2e/teams-alerts.spec.ts
 npm run catalog:sync -- 3
 npm run snapshots:run

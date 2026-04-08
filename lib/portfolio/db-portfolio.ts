@@ -1,27 +1,20 @@
 import { prisma } from "@/lib/db/prisma";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
 
-export async function getOrCreateDefaultUser() {
-  return prisma.userAccount.upsert({
-    where: { email: "collector@local.tcg" },
-    update: {},
-    create: {
-      id: "demo-user",
-      email: "collector@local.tcg",
-      displayName: "Collector"
-    }
+export async function getAuthenticatedUserAccount() {
+  const sessionUser = await requireAuthenticatedUser();
+
+  return prisma.userAccount.findUniqueOrThrow({
+    where: { id: sessionUser.userId }
   });
 }
 
-export async function getDefaultUserAccount() {
-  return getOrCreateDefaultUser();
-}
-
 export async function getDatabasePortfolio() {
-  const user = await getOrCreateDefaultUser();
+  const user = await requireAuthenticatedUser();
 
   return prisma.portfolioHolding.findMany({
     where: {
-      userId: user.id
+      userId: user.userId
     },
     include: {
       variation: {
@@ -51,11 +44,11 @@ export async function getDatabasePortfolio() {
 }
 
 export async function getDatabasePortfolioHistory() {
-  const user = await getOrCreateDefaultUser();
+  const user = await requireAuthenticatedUser();
 
   return prisma.portfolioValuationSnapshot.findMany({
     where: {
-      userId: user.id
+      userId: user.userId
     },
     orderBy: {
       capturedAt: "asc"

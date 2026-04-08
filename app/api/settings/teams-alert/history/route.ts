@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withRouteHandler } from "@/lib/api/route-handler";
+import { requireApiAuth } from "@/lib/auth/route-guards";
 import { getTeamsAlertDeliveryHistory } from "@/lib/teams/alert-preferences";
 
 const historyQuerySchema = z.object({
@@ -9,6 +10,7 @@ const historyQuerySchema = z.object({
 
 export async function GET(request: Request) {
   return withRouteHandler(async () => {
+    await requireApiAuth();
     const url = new URL(request.url);
     const query = historyQuerySchema.parse({
       page: url.searchParams.get("page") ?? undefined,

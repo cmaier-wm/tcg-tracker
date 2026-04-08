@@ -3,10 +3,11 @@ import { badRequest } from "@/lib/api/http-errors";
 import {
   type DemoTeamsAlertDelivery,
   type DemoTeamsAlertPreference,
-  getDemoStore
+  getDemoUserState
 } from "@/lib/db/demo-store";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
 import { withDatabaseFallback } from "@/lib/db/runtime";
-import { getDefaultUserAccount } from "@/lib/portfolio/db-portfolio";
+import { getAuthenticatedUserAccount } from "@/lib/portfolio/db-portfolio";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 import { decryptWebhookUrl, encryptWebhookUrl } from "@/lib/teams/encrypt-webhook";
 import {
@@ -142,7 +143,7 @@ export async function getTeamsAlertSettings() {
 
   return withDatabaseFallback(
     async () => {
-      const user = await getDefaultUserAccount();
+      const user = await getAuthenticatedUserAccount();
       const preference = await prisma.teamsAlertPreference.findUnique({
         where: { userId: user.id }
       });
@@ -166,7 +167,10 @@ export async function getTeamsAlertSettings() {
           : null
       );
     },
-    async () => toSettingsResponse(getDemoStore().teamsAlertPreference)
+    async () => {
+      const user = await requireAuthenticatedUser();
+      return toSettingsResponse(getDemoUserState(user.userId).teamsAlertPreference);
+    }
   );
 }
 
@@ -175,7 +179,7 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
 
   return withDatabaseFallback(
     async () => {
-      const user = await getDefaultUserAccount();
+      const user = await getAuthenticatedUserAccount();
       const existing = await prisma.teamsAlertPreference.findUnique({
         where: { userId: user.id }
       });
@@ -252,7 +256,8 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       });
     },
     async () => {
-      const store = getDemoStore();
+      const user = await requireAuthenticatedUser();
+      const store = getDemoUserState(user.userId);
       const previous = store.teamsAlertPreference;
       let nextPreference: DemoTeamsAlertPreference;
 
@@ -317,7 +322,7 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
 export async function getTeamsAlertPreferenceForDelivery(): Promise<DeliveryPreferenceRecord | null> {
   return withDatabaseFallback(
     async () => {
-      const user = await getDefaultUserAccount();
+      const user = await getAuthenticatedUserAccount();
       const preference = await prisma.teamsAlertPreference.findUnique({
         where: { userId: user.id }
       });
@@ -343,15 +348,16 @@ export async function getTeamsAlertPreferenceForDelivery(): Promise<DeliveryPref
       };
     },
     async () => {
-      const preference = getDemoStore().teamsAlertPreference;
+      const user = await requireAuthenticatedUser();
+      const preference = getDemoUserState(user.userId).teamsAlertPreference;
 
       if (!preference) {
         return null;
       }
 
       return {
-        userId: "demo-user",
-        displayName: "Collector",
+        userId: user.userId,
+        displayName: user.displayName,
         preferenceId: preference.id,
         enabled: preference.enabled,
         destinationLabel: preference.destinationLabel,
@@ -378,7 +384,7 @@ export async function getTeamsAlertDeliveryHistory(input?: {
 
   return withDatabaseFallback(
     async () => {
-      const user = await getDefaultUserAccount();
+      const user = await getAuthenticatedUserAccount();
       const [totalItems, deliveries] = await Promise.all([
         prisma.teamsAlertDelivery.count({
           where: { userId: user.id }
@@ -411,8 +417,9 @@ export async function getTeamsAlertDeliveryHistory(input?: {
       };
     },
     async () => {
-      const deliveries = [...getDemoStore().teamsAlertDeliveries].sort((left, right) =>
-        right.capturedAt.localeCompare(left.capturedAt)
+      const user = await requireAuthenticatedUser();
+      const deliveries = [...getDemoUserState(user.userId).teamsAlertDeliveries].sort(
+        (left, right) => right.capturedAt.localeCompare(left.capturedAt)
       );
       const totalItems = deliveries.length;
 
@@ -430,7 +437,7 @@ export async function getTeamsAlertDeliveryHistory(input?: {
 export async function touchTeamsAlertEvaluation(capturedAt: string) {
   return withDatabaseFallback(
     async () => {
-      const user = await getDefaultUserAccount();
+      const user = await getAuthenticatedUserAccount();
       await prisma.teamsAlertPreference.updateMany({
         where: { userId: user.id },
         data: {
@@ -439,7 +446,8 @@ export async function touchTeamsAlertEvaluation(capturedAt: string) {
       });
     },
     async () => {
-      const store = getDemoStore();
+      const user = await requireAuthenticatedUser();
+      const store = getDemoUserState(user.userId);
 
       if (store.teamsAlertPreference) {
         store.teamsAlertPreference.lastEvaluatedAt = capturedAt;
@@ -487,7 +495,7 @@ export async function recordTeamsAlertDeliveryAttempt(input: {
       });
     },
     async () => {
-      const store = getDemoStore();
+      const store = getDemoUserState(input.userId);
       const preference = store.teamsAlertPreference;
 
       if (!preference) {
@@ -540,7 +548,8 @@ export async function recordTeamsAlertFailure(input: {
       });
     },
     async () => {
-      const preference = getDemoStore().teamsAlertPreference;
+      const user = await requireAuthenticatedUser();
+      const preference = getDemoUserState(user.userId).teamsAlertPreference;
 
       if (preference) {
         preference.lastEvaluatedAt = input.capturedAt;

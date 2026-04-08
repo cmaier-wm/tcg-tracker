@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GET, PUT } from "@/app/api/settings/teams-alert/route";
+import { setTestAuthenticatedUser } from "@/lib/auth/auth-session";
 import { resetDemoStore } from "@/lib/db/demo-store";
 
 const originalEncryptionKey = process.env.TEAMS_WEBHOOK_ENCRYPTION_KEY;
@@ -7,6 +8,7 @@ const originalEncryptionKey = process.env.TEAMS_WEBHOOK_ENCRYPTION_KEY;
 describe("teams alert settings route", () => {
   beforeEach(() => {
     resetDemoStore();
+    setTestAuthenticatedUser(undefined);
     process.env.TEAMS_WEBHOOK_ENCRYPTION_KEY = "settings-route-secret";
   });
 
@@ -138,5 +140,28 @@ describe("teams alert settings route", () => {
       enabled: false,
       baselineValue: 0
     });
+  });
+
+  it("rejects settings writes when the current session is missing", async () => {
+    setTestAuthenticatedUser(null);
+
+    const response = await PUT(
+      new Request("http://localhost/api/settings/teams-alert", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          enabled: true,
+          destinationLabel: "Trading alerts",
+          triggerAmountUsd: 1000,
+          webhookUrl: "https://example.com/workflows/hook"
+        })
+      })
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(payload.error).toBe("Authentication is required.");
   });
 });

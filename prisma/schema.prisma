@@ -82,15 +82,54 @@ model PriceSnapshot {
 }
 
 model UserAccount {
-  id                 String                     @id @default(cuid())
-  email              String                     @unique
-  displayName        String
-  createdAt          DateTime                   @default(now())
-  updatedAt          DateTime                   @updatedAt
-  holdings           PortfolioHolding[]
+  id                   String                     @id @default(cuid())
+  email                String                     @unique
+  displayName          String
+  isLegacyDefault      Boolean                    @default(false)
+  legacyClaimedAt      DateTime?
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  credential           UserCredential?
+  authSessions         AuthSession[]
+  authAuditEvents      AuthAuditEvent[]
+  holdings             PortfolioHolding[]
   valuationSnapshots PortfolioValuationSnapshot[]
   teamsAlertPreference TeamsAlertPreference?
   teamsAlertDeliveries TeamsAlertDelivery[]
+}
+
+model UserCredential {
+  userId           String      @id
+  normalizedEmail  String      @unique
+  passwordHash     String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  user             UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuthSession {
+  id           String      @id @default(cuid())
+  userId       String
+  sessionToken String      @unique
+  expiresAt    DateTime
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model AuthAuditEvent {
+  id         String      @id @default(cuid())
+  userId     String?
+  eventType  String
+  outcome    String
+  detail     String?
+  createdAt  DateTime    @default(now())
+  user       UserAccount? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
 }
 
 model PortfolioHolding {

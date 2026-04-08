@@ -5,6 +5,7 @@ const config = [
   {
     ignores: [
       ".next/**",
+      ".azuredist/**",
       "coverage/**",
       "dist/**",
       "build/**",
@@ -16,4 +17,3 @@ const config = [
 ];
 
 export default config;
-

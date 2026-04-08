@@ -1,8 +1,8 @@
 import { badRequest, notFound } from "@/lib/api/http-errors";
 import { prisma } from "@/lib/db/prisma";
 import { withDatabaseFallback } from "@/lib/db/runtime";
-import { getDemoCards, getDemoStore } from "@/lib/db/demo-store";
-import { getOrCreateDefaultUser } from "@/lib/portfolio/db-portfolio";
+import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
+import { getDemoCards, getDemoUserState } from "@/lib/db/demo-store";
 import { saveValuationSnapshot } from "@/lib/portfolio/save-valuation-snapshot";
 
 export async function addHolding(cardVariationId: string, quantity: number) {
@@ -12,7 +12,7 @@ export async function addHolding(cardVariationId: string, quantity: number) {
 
   return withDatabaseFallback(
     async () => {
-      const user = await getOrCreateDefaultUser();
+      const user = await requireAuthenticatedUser();
       const variation = await prisma.cardVariation.findUnique({
         where: { id: cardVariationId }
       });
@@ -24,7 +24,7 @@ export async function addHolding(cardVariationId: string, quantity: number) {
       const holding = await prisma.portfolioHolding.upsert({
         where: {
           userId_cardVariationId: {
-            userId: user.id,
+            userId: user.userId,
             cardVariationId
           }
         },
@@ -34,17 +34,18 @@ export async function addHolding(cardVariationId: string, quantity: number) {
           }
         },
         create: {
-          userId: user.id,
+          userId: user.userId,
           cardVariationId,
           quantity
         }
       });
 
-      await saveValuationSnapshot();
+      await saveValuationSnapshot(user.userId);
       return holding;
     },
     async () => {
-      const store = getDemoStore();
+      const user = await requireAuthenticatedUser();
+      const store = getDemoUserState(user.userId);
       const variationExists = getDemoCards()
         .flatMap((card) => card.variations)
         .some((variation) => variation.id === cardVariationId);
@@ -65,7 +66,7 @@ export async function addHolding(cardVariationId: string, quantity: number) {
         });
       }
 
-      await saveValuationSnapshot();
+      await saveValuationSnapshot(user.userId);
       return store.holdings.find((holding) => holding.cardVariationId === cardVariationId);
     }
   );

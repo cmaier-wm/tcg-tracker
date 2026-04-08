@@ -159,6 +159,9 @@ Primary uses:
   failures that are not provable from shell networking alone.
 - Support targeted browser automation during UI debugging without requiring the
   full end-to-end test suite for every check.
+- Check auth-gated flows such as `/login`, `/register`, `/portfolio`, and
+  `/settings` when debugging redirects, session state, or public `returnTo`
+  behavior from `/cards`.
 
 Typical tool families exposed by this MCP:
 

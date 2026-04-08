@@ -6,6 +6,7 @@ import { CardPriceSummary } from "@/components/cards/card-price-summary";
 import { PriceHistoryChart } from "@/components/charts/price-history-chart";
 import { AddToPortfolioButton } from "@/components/portfolio/add-to-portfolio-button";
 import { HoldingForm } from "@/components/portfolio/holding-form";
+import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 import { getPriceHistory } from "@/lib/pricing/get-price-history";
 import { getCardDetail } from "@/lib/tcgtracking/get-card-detail";
@@ -17,12 +18,11 @@ export default async function CardDetailPage({
   params: Promise<{ category: string; cardId: string }>;
 }) {
   const resolvedParams = await params;
+  const authenticatedUser = await getOptionalAuthenticatedUser();
   const card = await getCardDetail(resolvedParams.category, resolvedParams.cardId);
-  const portfolio = await getPortfolio();
   const selectedVariation = selectPreferredVariation(card.variations);
-  const holding = portfolio.holdings.find(
-    (item) => item.cardVariationId === selectedVariation?.id
-  );
+  const portfolio = authenticatedUser ? await getPortfolio() : null;
+  const holding = portfolio?.holdings.find((item) => item.cardVariationId === selectedVariation?.id);
   const history = selectedVariation ? await getPriceHistory(selectedVariation.id) : { points: [] };
 
   return (
@@ -57,6 +57,7 @@ export default async function CardDetailPage({
           </div>
           {selectedVariation && holding ? (
             <HoldingForm
+              key={`${holding.id}:${holding.quantity}`}
               holdingId={holding.id}
               quantity={holding.quantity}
               cardName={card.name}

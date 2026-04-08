@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Toaster } from "sonner";
 import { DevOriginRedirect } from "@/components/dev-origin-redirect";
 import { SiteNav } from "@/components/site-nav";
+import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
 import { normalizeThemeMode } from "@/lib/settings/theme-preference";
 import { themeCookieName } from "@/lib/settings/theme-storage";
 import "./globals.css";
@@ -21,6 +22,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const theme = normalizeThemeMode(cookieStore.get(themeCookieName)?.value);
+  const authenticatedUser = await getOptionalAuthenticatedUser();
 
   return (
     <html lang="en" data-theme={theme} suppressHydrationWarning>
@@ -54,7 +56,7 @@ export default async function RootLayout({
                   <p className="eyebrow">Trading Card Database</p>
                 </div>
               </div>
-              <SiteNav />
+              <SiteNav authenticatedUser={authenticatedUser} />
             </div>
           </header>
           <main className="page-shell">{children}</main>

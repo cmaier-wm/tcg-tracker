@@ -32,6 +32,8 @@ export function AddToPortfolioButton({
       toast.success("Card added to portfolio");
       router.push("/portfolio");
       router.refresh();
+    } else if (response.status === 401) {
+      router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
     } else {
       toast.error("Unable to complete action");
     }
