@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
@@ -29,11 +29,7 @@ export function CatalogFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isNavigating, setIsNavigating] = useState(false);
-
-  useEffect(() => {
-    setIsNavigating(false);
-  }, [pathname, searchParams]);
+  const [isNavigating, startNavigation] = useTransition();
 
   function navigateWithForm() {
     const form = formRef.current;
@@ -65,12 +61,12 @@ export function CatalogFilters({
     const currentUrl = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
 
     if (nextUrl === currentUrl) {
-      setIsNavigating(false);
       return;
     }
 
-    setIsNavigating(true);
-    router.replace(nextUrl);
+    startNavigation(() => {
+      router.replace(nextUrl);
+    });
   }
 
   function submitFilters() {
@@ -101,12 +97,12 @@ export function CatalogFilters({
     const currentUrl = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
 
     if (resetHref === currentUrl) {
-      setIsNavigating(false);
       return;
     }
 
-    setIsNavigating(true);
-    router.replace(resetHref);
+    startNavigation(() => {
+      router.replace(resetHref);
+    });
   }
 
   return (

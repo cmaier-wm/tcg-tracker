@@ -29,13 +29,6 @@ export function InfiniteCardList({
   const requestInFlightRef = useRef(false);
 
   useEffect(() => {
-    setItems(initialItems);
-    setIsLoading(false);
-    setHasMore(initialItems.length === pageSize);
-    requestInFlightRef.current = false;
-  }, [initialItems, pageSize, query, selectedCategory, selectedSet, selectedSort]);
-
-  useEffect(() => {
     const node = loaderRef.current;
     if (!node) {
       return;

@@ -50,6 +50,7 @@ export function CardsBrowserPage({
       />
       {items.length ? (
         <InfiniteCardList
+          key={[query ?? "", selectedCategory ?? "", selectedSet ?? "", selectedSort].join(":")}
           initialItems={items}
           query={query}
           selectedCategory={selectedCategory}
