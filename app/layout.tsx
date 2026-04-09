@@ -11,7 +11,7 @@ import { themeCookieName } from "@/lib/settings/theme-storage";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TCG Tracker",
+  title: "Pokemon TCG Tracker",
   description: "Track TCG cards, price history, and portfolio value."
 };
 
@@ -51,7 +51,7 @@ export default async function RootLayout({
                 </Link>
                 <div>
                   <Link href="/" className="brand">
-                    TCG Tracker
+                    Pokemon TCG Tracker
                   </Link>
                   <p className="eyebrow">Trading Card Database</p>
                 </div>
@@ -62,7 +62,7 @@ export default async function RootLayout({
           <main className="page-shell">{children}</main>
           <footer className="site-footer">
             <div className="site-footer-inner">
-              <p>TCG Tracker</p>
+              <p>Pokemon TCG Tracker</p>
               <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
             </div>
           </footer>
