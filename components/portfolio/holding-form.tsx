@@ -6,18 +6,26 @@ import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+const quantityCelebrationDurationMs = 1800;
+
 export function HoldingForm({
   holdingId,
   quantity,
   cardName,
   variationLabel,
-  compact = false
+  compact = false,
+  onQuantityCelebration
 }: {
   holdingId: string;
   quantity: number;
   cardName?: string;
   variationLabel?: string;
   compact?: boolean;
+  onQuantityCelebration?: (payload: {
+    holdingId: string;
+    cardName?: string;
+    quantity: number;
+  }) => void;
 }) {
   const router = useRouter();
   const [nextQuantity, setNextQuantity] = useState(quantity);
@@ -37,16 +45,22 @@ export function HoldingForm({
 
     if (response.ok) {
       lastSavedQuantityRef.current = quantityToSave;
-      toast.success("Quantity updated");
-      router.refresh();
+      onQuantityCelebration?.({
+        holdingId,
+        cardName,
+        quantity: quantityToSave
+      });
+      window.setTimeout(() => {
+        router.refresh();
+      }, quantityCelebrationDurationMs);
     } else if (response.status === 401) {
+      setIsSaving(false);
       router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
     } else {
       toast.error("Unable to complete action");
       setNextQuantity(lastSavedQuantityRef.current);
+      setIsSaving(false);
     }
-
-    setIsSaving(false);
   });
 
   useEffect(() => {

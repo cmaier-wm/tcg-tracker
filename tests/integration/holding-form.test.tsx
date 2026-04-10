@@ -37,8 +37,50 @@ describe("holding form", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it("celebrates a successful quantity update", async () => {
+    const user = userEvent.setup();
+    const onQuantityCelebration = vi.fn();
+
+    render(
+      <HoldingForm
+        holdingId="holding-1"
+        quantity={1}
+        cardName="Charizard ex"
+        variationLabel="English"
+        compact
+        onQuantityCelebration={onQuantityCelebration}
+      />
+    );
+
+    const input = screen.getByLabelText("Quantity");
+
+    await user.clear(input);
+    await user.type(input, "3");
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith("/api/portfolio/holding-1", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quantity: 3 })
+      });
+      expect(onQuantityCelebration).toHaveBeenCalledWith({
+        holdingId: "holding-1",
+        cardName: "Charizard ex",
+        quantity: 3
+      });
+      expect(mockRefresh).not.toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(mockRefresh).toHaveBeenCalled();
+    }, { timeout: 2600 });
   });
 
   it("requires confirmation before deleting a holding", async () => {

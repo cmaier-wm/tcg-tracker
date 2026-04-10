@@ -832,6 +832,56 @@ html[data-theme="dark"] .pokeball-spinner-button {
   justify-content: flex-end;
 }
 
+.portfolio-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.portfolio-celebration-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 112%, rgba(251, 191, 36, 0.12), transparent 36%),
+    radial-gradient(circle at 50% 16%, rgba(255, 248, 231, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.32), rgba(2, 6, 23, 0.74));
+  animation: portfolio-celebration-fade 2.2s ease-out forwards;
+}
+
+.portfolio-celebration-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.portfolio-celebration-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.portfolio-celebration-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes portfolio-celebration-fade {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.96;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .theme-toggle-card {
   display: grid;
   gap: 20px;
