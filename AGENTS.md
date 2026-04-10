@@ -65,6 +65,8 @@
 - PostgreSQL 17 for Teams alert preferences, encrypted webhook destination, baseline state, and delivery history (005-teams-value-alert)
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Auth.js, Zod, password hashing library (`bcryptjs` or equivalent) (006-user-login)
 - PostgreSQL 17 for users, sessions, account-owned portfolio data, and account-owned Teams settings (006-user-login)
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Auth.js session helpers, Zod, native `Response` and string handling for CSV output (008-portfolio-spreadsheet-export)
+- PostgreSQL 17 for authenticated portfolio holdings and latest price snapshots, with the existing in-memory demo-store fallback when the database is unavailable in non-production or test fallback paths (008-portfolio-spreadsheet-export)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod

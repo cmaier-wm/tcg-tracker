@@ -36,7 +36,7 @@ param postgresVersion string = '17'
 param nodeRuntime string = 'NODE|22-lts'
 
 @description('Startup command for the Azure Web App.')
-param appCommandLine string = 'node server.js'
+param appCommandLine string = 'node azure-start.mjs'
 
 var resourceToken = uniqueString(subscription().id, resourceGroup().id, location, environmentName)
 var commonTags = {

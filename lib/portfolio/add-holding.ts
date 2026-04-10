@@ -62,7 +62,8 @@ export async function addHolding(cardVariationId: string, quantity: number) {
         store.holdings.push({
           id: `holding-${Math.random().toString(36).slice(2, 9)}`,
           cardVariationId,
-          quantity
+          quantity,
+          createdAt: new Date().toISOString()
         });
       }
 

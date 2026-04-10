@@ -1,0 +1,87 @@
+openapi: 3.1.0
+info:
+  title: Portfolio Export API
+  version: 0.1.0
+  description: >
+    Contract for downloading the authenticated user's portfolio holdings as a
+    spreadsheet-compatible CSV export.
+paths:
+  /api/portfolio/export:
+    get:
+      summary: Download the signed-in user's portfolio export
+      description: >
+        Returns a CSV attachment containing all holdings owned by the current
+        authenticated user. The optional sort query controls row order only.
+      parameters:
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            enum:
+              - price-desc
+              - price-asc
+              - name-asc
+              - name-desc
+              - quantity-desc
+              - quantity-asc
+          description: Existing portfolio sort option to apply to exported rows.
+      responses:
+        "200":
+          description: CSV file generated successfully
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/csv; charset=utf-8
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename="portfolio-export-2026-04-09.csv"
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  Category,Set,Card,Collector Number,Variation,Quantity,Unit Market Price,Estimated Value,Last Valuation At
+                  Pokemon,Scarlet & Violet,Charizard ex,125/198,English / Holo / NM,2,34.25,68.50,2026-04-02T08:00:00.000Z
+        "401":
+          description: Authentication is required or the session is no longer valid
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: Authentication is required.
+        "409":
+          description: The authenticated account has no holdings to export
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                  - code
+                properties:
+                  error:
+                    type: string
+                    example: No portfolio data available to export.
+                  code:
+                    type: string
+                    example: portfolio_empty
+        "500":
+          description: Export generation failed unexpectedly
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: Unexpected server error
