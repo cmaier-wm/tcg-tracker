@@ -37,19 +37,18 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
         q: options.q,
         category,
         set,
-        sort
+        sort,
+        limit,
+        offset
       });
 
-      return sortCardListItems(
-        cards.map((card) => ({
+      return cards.map((card) => ({
           ...card,
           collectorNumber: card.collectorNumber ?? undefined,
           rarity: card.rarity ?? undefined,
           imageUrl: card.imageUrl ?? undefined,
           currentPrice: card.currentPrice ?? undefined
-        })),
-        sort
-      ).slice(offset, limit ? offset + limit : undefined);
+      }));
     },
     async () =>
       sortCardListItems(

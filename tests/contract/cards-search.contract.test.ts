@@ -75,4 +75,15 @@ describe("cards search contract", () => {
       "Belle - Strange but Special"
     ]);
   });
+
+  it("applies limit and offset after sorting", async () => {
+    const items = await getCardCatalog({
+      sort: "price-desc",
+      limit: 1,
+      offset: 1
+    });
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.name).toBe("Charizard ex");
+  });
 });

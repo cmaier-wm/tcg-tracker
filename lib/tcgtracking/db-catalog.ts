@@ -1,13 +1,138 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
 import { tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
+
+let catalogIndexesPromise: Promise<void> | undefined;
+
+async function ensureCatalogQueryIndexes() {
+  if (!catalogIndexesPromise) {
+    const execute = prisma.$executeRawUnsafe.bind(prisma);
+
+    catalogIndexesPromise = (async () => {
+      await execute(
+        'CREATE INDEX IF NOT EXISTS "CardSet_categoryId_idx" ON "CardSet"("categoryId")'
+      );
+      await execute('CREATE INDEX IF NOT EXISTS "Card_setId_idx" ON "Card"("setId")');
+      await execute(
+        'CREATE INDEX IF NOT EXISTS "CardVariation_cardId_idx" ON "CardVariation"("cardId")'
+      );
+      await execute(
+        'CREATE INDEX IF NOT EXISTS "PriceSnapshot_cardVariationId_capturedAt_idx" ON "PriceSnapshot"("cardVariationId", "capturedAt" DESC)'
+      );
+    })().catch((error) => {
+      catalogIndexesPromise = undefined;
+      throw error;
+    });
+  }
+
+  await catalogIndexesPromise;
+}
+
+const rarityRankSql = Prisma.sql`
+  CASE
+    WHEN fc.rarity IS NULL OR BTRIM(fc.rarity) = '' THEN NULL
+    WHEN LOWER(fc.rarity) = 'common' THEN 0
+    WHEN LOWER(fc.rarity) = 'uncommon' THEN 1
+    WHEN LOWER(fc.rarity) IN ('rare holo', 'holo rare', 'rare') THEN 2
+    WHEN LOWER(fc.rarity) = 'legendary' THEN 3
+    WHEN LOWER(fc.rarity) = 'double rare' THEN 4
+    WHEN LOWER(fc.rarity) = 'ultra rare' THEN 5
+    WHEN LOWER(fc.rarity) = 'illustration rare' THEN 6
+    WHEN LOWER(fc.rarity) = 'special illustration rare' THEN 7
+    WHEN LOWER(fc.rarity) = 'secret rare' THEN 8
+    WHEN LOWER(fc.rarity) = 'hyper rare' THEN 9
+    WHEN LOWER(fc.rarity) = 'alternate art' THEN 10
+    WHEN LOWER(fc.rarity) LIKE '%common%' THEN 0
+    WHEN LOWER(fc.rarity) LIKE '%uncommon%' THEN 1
+    WHEN LOWER(fc.rarity) LIKE '%rare holo%' THEN 2
+    WHEN LOWER(fc.rarity) LIKE '%holo rare%' THEN 2
+    WHEN LOWER(fc.rarity) LIKE '%rare%' THEN 2
+    WHEN LOWER(fc.rarity) LIKE '%legendary%' THEN 3
+    WHEN LOWER(fc.rarity) LIKE '%double rare%' THEN 4
+    WHEN LOWER(fc.rarity) LIKE '%ultra rare%' THEN 5
+    WHEN LOWER(fc.rarity) LIKE '%illustration rare%' THEN 6
+    WHEN LOWER(fc.rarity) LIKE '%special illustration rare%' THEN 7
+    WHEN LOWER(fc.rarity) LIKE '%secret rare%' THEN 8
+    WHEN LOWER(fc.rarity) LIKE '%hyper rare%' THEN 9
+    WHEN LOWER(fc.rarity) LIKE '%alternate art%' THEN 10
+    ELSE NULL
+  END
+`;
+
+const collectorNumberRankSql = Prisma.sql`
+  CASE
+    WHEN fc."collectorNumber" IS NULL THEN NULL
+    ELSE NULLIF(SUBSTRING(fc."collectorNumber" FROM '^[0-9]+'), '')::int
+  END
+`;
+
+function getCatalogOrderSql(sort: CatalogSortValue) {
+  const tieBreakers = Prisma.sql`
+    LOWER(fc.name) ASC,
+    LOWER(fc."setName") ASC,
+    ${collectorNumberRankSql} ASC NULLS LAST,
+    fc."collectorNumber" ASC NULLS LAST,
+    ${rarityRankSql} ASC NULLS LAST,
+    LOWER(fc.rarity) ASC NULLS LAST,
+    vs."currentPrice" DESC NULLS LAST,
+    fc.id ASC
+  `;
+
+  switch (sort) {
+    case "price-asc":
+      return Prisma.sql`ORDER BY vs."currentPrice" ASC NULLS LAST, ${tieBreakers}`;
+    case "price-desc":
+      return Prisma.sql`ORDER BY vs."currentPrice" DESC NULLS LAST, ${tieBreakers}`;
+    case "name-asc":
+      return Prisma.sql`ORDER BY LOWER(fc.name) ASC, ${tieBreakers}`;
+    case "name-desc":
+      return Prisma.sql`ORDER BY LOWER(fc.name) DESC, ${tieBreakers}`;
+    case "number-asc":
+      return Prisma.sql`
+        ORDER BY
+          ${collectorNumberRankSql} ASC NULLS LAST,
+          fc."collectorNumber" ASC NULLS LAST,
+          ${tieBreakers}
+      `;
+    case "number-desc":
+      return Prisma.sql`
+        ORDER BY
+          ${collectorNumberRankSql} DESC NULLS LAST,
+          fc."collectorNumber" DESC NULLS LAST,
+          ${tieBreakers}
+      `;
+    case "set-asc":
+      return Prisma.sql`ORDER BY LOWER(fc."setName") ASC, ${tieBreakers}`;
+    case "set-desc":
+      return Prisma.sql`ORDER BY LOWER(fc."setName") DESC, ${tieBreakers}`;
+    case "rarity-asc":
+      return Prisma.sql`
+        ORDER BY
+          ${rarityRankSql} ASC NULLS LAST,
+          LOWER(fc.rarity) ASC NULLS LAST,
+          ${tieBreakers}
+      `;
+    case "rarity-desc":
+      return Prisma.sql`
+        ORDER BY
+          ${rarityRankSql} DESC NULLS LAST,
+          LOWER(fc.rarity) DESC NULLS LAST,
+          ${tieBreakers}
+      `;
+  }
+}
 
 export async function getDatabaseCardCatalog(options: {
   q?: string | null;
   category?: string | null;
   set?: string | null;
-  sort?: string | null;
+  sort: CatalogSortValue;
+  limit?: number;
+  offset?: number;
 }) {
+  await ensureCatalogQueryIndexes();
+
   const searchTokens = tokenizeSearchQuery(options.q);
   const whereClauses: Prisma.Sql[] = [];
 
@@ -40,6 +165,13 @@ export async function getDatabaseCardCatalog(options: {
     whereClauses.length > 0
       ? Prisma.sql`WHERE ${Prisma.join(whereClauses, " AND ")}`
       : Prisma.empty;
+  const orderSql = getCatalogOrderSql(options.sort);
+  const offsetSql =
+    options.offset && options.offset > 0
+      ? Prisma.sql`OFFSET ${options.offset}`
+      : Prisma.empty;
+  const limitSql =
+    options.limit && options.limit > 0 ? Prisma.sql`LIMIT ${options.limit}` : Prisma.empty;
 
   return prisma.$queryRaw<
     Array<{
@@ -129,6 +261,9 @@ export async function getDatabaseCardCatalog(options: {
       COALESCE(vs."variationCount", 0)::int AS "variationCount"
     FROM filtered_cards fc
     LEFT JOIN variation_stats vs ON vs."cardId" = fc.id
+    ${orderSql}
+    ${offsetSql}
+    ${limitSql}
   `);
 }
 
