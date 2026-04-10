@@ -19,6 +19,8 @@ mkdirSync(outputDir, { recursive: true });
 
 cpSync(standaloneDir, outputDir, { recursive: true });
 
+rmSync(join(outputDir, ".env"), { force: true });
+
 mkdirSync(join(outputDir, ".next"), { recursive: true });
 cpSync(staticDir, join(outputDir, ".next", "static"), { recursive: true });
 
