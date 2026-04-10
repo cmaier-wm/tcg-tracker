@@ -80,7 +80,7 @@ describe("holding form", () => {
 
     await waitFor(() => {
       expect(mockRefresh).toHaveBeenCalled();
-    }, { timeout: 2600 });
+    }, { timeout: 3800 });
   });
 
   it("requires confirmation before deleting a holding", async () => {

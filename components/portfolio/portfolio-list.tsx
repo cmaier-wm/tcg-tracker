@@ -34,7 +34,7 @@ export function PortfolioList({ holdings }: { holdings: Holding[] }) {
 
     const timeoutId = window.setTimeout(() => {
       setCelebration(null);
-    }, 1800);
+    }, 3000);
 
     return () => window.clearTimeout(timeoutId);
   }, [celebration]);

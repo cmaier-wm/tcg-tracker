@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-const quantityCelebrationDurationMs = 1800;
+const quantityCelebrationDurationMs = 3000;
 
 export function HoldingForm({
   holdingId,

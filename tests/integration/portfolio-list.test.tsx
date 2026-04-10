@@ -74,6 +74,6 @@ describe("portfolio list", () => {
 
     await waitFor(() => {
       expect(screen.queryByRole("status", { name: /quantity updated for charizard ex/i })).not.toBeInTheDocument();
-    }, { timeout: 2500 });
+    }, { timeout: 3800 });
   });
 });
