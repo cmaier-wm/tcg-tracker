@@ -55,6 +55,11 @@ npm run dev
 server starts on port `3000`. Keep `npm run db:migrate` for the separate case
 where you are authoring a brand-new local migration.
 
+If Codex Desktop worktrees are missing the `Run` action, run
+`npm run codex:sync-worktrees` from this checkout to copy the tracked
+environment file into each `tcg-tracker` worktree under `$CODEX_HOME/worktrees`
+or `~/.codex/worktrees`.
+
 ## User Login
 
 The app now supports local email-and-password registration and sign-in for
@@ -120,6 +125,9 @@ Azure packaging note:
   `prisma/schema.prisma` configured with
   `binaryTargets = ["native", "debian-openssl-3.0.x"]` so the packaged
   standalone build includes Prisma's Linux query engine.
+- Azure deployments start through `node azure-start.mjs`, which runs
+  `prisma migrate deploy` against the packaged `prisma/` directory before
+  booting Next.js. Keep the checked-in migrations current before `azd up`.
 - After changing Prisma versions or generator settings, rerun
   `npm run db:generate` before `npm run build` and `npm run azure:package`.
 - If Azure serves demo fallback data while the database is populated, verify the

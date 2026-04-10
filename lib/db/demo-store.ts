@@ -4,6 +4,7 @@ type Holding = {
   id: string;
   cardVariationId: string;
   quantity: number;
+  createdAt?: string;
 };
 
 type PortfolioPoint = {

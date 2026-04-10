@@ -351,6 +351,39 @@ textarea:focus {
   align-items: start;
 }
 
+.portfolio-actions {
+  justify-content: end;
+  align-items: start;
+}
+
+.portfolio-export-control {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
+.button.secondary.portfolio-export-button {
+  gap: 8px;
+  border-color: #1e3a8a;
+  background: #1e3a8a;
+  color: #f8fafc;
+}
+
+.button.secondary.portfolio-export-button:hover {
+  background: #1e40af;
+  border-color: #1e40af;
+}
+
+.portfolio-export-button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.portfolio-export-note {
+  max-width: 260px;
+  text-align: right;
+}
+
 .button-row {
   display: flex;
   gap: 12px;
