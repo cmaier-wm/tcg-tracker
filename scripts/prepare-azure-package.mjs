@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
@@ -23,6 +23,17 @@ mkdirSync(outputDir, { recursive: true });
 cpSync(standaloneDir, outputDir, { recursive: true });
 
 rmSync(join(outputDir, ".env"), { force: true });
+
+const packageJsonPath = join(outputDir, "package.json");
+
+if (existsSync(packageJsonPath)) {
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  packageJson.scripts = {
+    ...packageJson.scripts,
+    start: "node server.js"
+  };
+  writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
+}
 
 mkdirSync(join(outputDir, ".next"), { recursive: true });
 cpSync(staticDir, join(outputDir, ".next", "static"), { recursive: true });
