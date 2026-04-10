@@ -120,6 +120,9 @@ Azure packaging note:
   `prisma/schema.prisma` configured with
   `binaryTargets = ["native", "debian-openssl-3.0.x"]` so the packaged
   standalone build includes Prisma's Linux query engine.
+- Azure deployments start through `node azure-start.mjs`, which runs
+  `prisma migrate deploy` against the packaged `prisma/` directory before
+  booting Next.js. Keep the checked-in migrations current before `azd up`.
 - After changing Prisma versions or generator settings, rerun
   `npm run db:generate` before `npm run build` and `npm run azure:package`.
 - If Azure serves demo fallback data while the database is populated, verify the

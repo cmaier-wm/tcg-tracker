@@ -91,7 +91,7 @@
     },
     "appCommandLine": {
       "type": "string",
-      "defaultValue": "node server.js",
+      "defaultValue": "node azure-start.mjs",
       "metadata": {
         "description": "Startup command for the Azure Web App."
       }

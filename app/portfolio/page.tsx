@@ -1,6 +1,7 @@
 import React from "react";
 import { CardEmptyState } from "@/components/cards/card-empty-state";
 import { PortfolioValueChart } from "@/components/charts/portfolio-value-chart";
+import { PortfolioExportButton } from "@/components/portfolio/portfolio-export-button";
 import { PortfolioList } from "@/components/portfolio/portfolio-list";
 import { PortfolioPagination } from "@/components/portfolio/portfolio-pagination";
 import { PortfolioSort } from "@/components/portfolio/portfolio-sort";
@@ -70,7 +71,10 @@ export default async function PortfolioPage({
               <h2>Your Cards</h2>
               <p className="muted">Manage tracked cards and estimated values.</p>
             </div>
-            {portfolio.holdings.length ? <PortfolioSort selectedSort={selectedSort} /> : null}
+            <div className="button-row portfolio-actions">
+              <PortfolioExportButton disabled={portfolio.holdingCount === 0} />
+              {portfolio.holdings.length ? <PortfolioSort selectedSort={selectedSort} /> : null}
+            </div>
           </div>
           {portfolio.holdings.length ? (
             <>

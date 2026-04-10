@@ -32,6 +32,10 @@ function getRegistrationErrorMessage(error: unknown) {
     error instanceof Prisma.PrismaClientKnownRequestError &&
     (error.code === "P2021" || error.code === "P2022")
   ) {
+    if (process.env.NODE_ENV === "production") {
+      return "Registration is unavailable because the deployed database schema is out of date. Apply the latest Prisma migrations and try again.";
+    }
+
     return "Registration is unavailable because the local database schema is out of date. Run npm run db:migrate and try again.";
   }
 
