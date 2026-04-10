@@ -15,6 +15,7 @@
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:seed": "node scripts/seed-demo-data.mjs",
+    "codex:sync-worktrees": "bash scripts/sync-codex-worktrees.sh",
     "catalog:sync": "node scripts/sync-catalog.mjs",
     "azure:prepare": "node scripts/azure-prepare-env.mjs",
     "azure:package": "node scripts/prepare-azure-package.mjs",

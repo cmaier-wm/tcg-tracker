@@ -35,6 +35,7 @@
 - `npm run db:up`
 - `npm run db:generate`
 - `npm run dev`
+- `npm run codex:sync-worktrees`
 - `npm run db:migrate`
 - `export AUTH_SECRET=<local-secret>`
 - `export TEAMS_WEBHOOK_ENCRYPTION_KEY=<local-secret>`
@@ -52,6 +53,9 @@
   needed.
 - `npm run dev` automatically runs `prisma migrate deploy` and `prisma generate`
   before starting the local server on port `3000`.
+- `npm run codex:sync-worktrees` backfills the tracked Codex Desktop Run action
+  into older `tcg-tracker` worktrees under `$CODEX_HOME/worktrees` or
+  `~/.codex/worktrees`.
 
 ## Active Technologies
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod (001-card-portfolio-tracker)
