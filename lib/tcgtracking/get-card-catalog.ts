@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoCards } from "@/lib/db/demo-store";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
@@ -18,6 +19,12 @@ type CatalogOptions = {
   offset?: number;
 };
 
+const getCachedDatabaseCardCatalog = unstable_cache(
+  async (options: CatalogOptions) => getDatabaseCardCatalog(options),
+  ["db-card-catalog"],
+  { revalidate: 60 }
+);
+
 function normalizeFilter(value?: string | null) {
   const normalized = value?.trim().toLowerCase();
   return normalized ? normalized : undefined;
@@ -33,23 +40,22 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
 
   return withDatabaseFallback(
     async () => {
-      const cards = await getDatabaseCardCatalog({
+      const cards = await getCachedDatabaseCardCatalog({
         q: options.q,
         category,
         set,
-        sort
+        sort,
+        limit,
+        offset
       });
 
-      return sortCardListItems(
-        cards.map((card) => ({
+      return cards.map((card) => ({
           ...card,
           collectorNumber: card.collectorNumber ?? undefined,
           rarity: card.rarity ?? undefined,
           imageUrl: card.imageUrl ?? undefined,
           currentPrice: card.currentPrice ?? undefined
-        })),
-        sort
-      ).slice(offset, limit ? offset + limit : undefined);
+        }));
     },
     async () =>
       sortCardListItems(

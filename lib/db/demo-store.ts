@@ -74,6 +74,16 @@ export type DemoAuthAuditEvent = {
   createdAt: string;
 };
 
+export type DemoPasswordResetToken = {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  expiresAt: string;
+  usedAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+};
+
 type DemoUserState = {
   holdings: Holding[];
   portfolioHistory: PortfolioPoint[];
@@ -86,6 +96,7 @@ type DemoStore = {
   credentials: DemoUserCredential[];
   sessions: DemoAuthSession[];
   authAuditEvents: DemoAuthAuditEvent[];
+  passwordResetTokens: DemoPasswordResetToken[];
   userStateById: Record<string, DemoUserState>;
   holdings: Holding[];
   portfolioHistory: PortfolioPoint[];
@@ -160,6 +171,7 @@ export function getDemoStore() {
       credentials: [],
       sessions: [],
       authAuditEvents: [],
+      passwordResetTokens: [],
       userStateById: {
         [LEGACY_USER_ID]: createLegacyUserState()
       }

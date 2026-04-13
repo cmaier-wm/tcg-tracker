@@ -18,10 +18,11 @@ export async function withRouteHandler<T>(handler: () => Promise<T>) {
       );
     }
 
+    console.error("Unhandled route error", error);
+
     return NextResponse.json(
       { error: "Unexpected server error" },
       { status: 500 }
     );
   }
 }
-

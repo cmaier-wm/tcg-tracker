@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
 
@@ -7,41 +6,183 @@ export async function getDatabaseCardCatalog(options: {
   category?: string | null;
   set?: string | null;
   sort?: string | null;
+  limit?: number;
+  offset?: number;
 }) {
   const searchTokens = tokenizeSearchQuery(options.q);
-  const whereClauses: Prisma.Sql[] = [];
+  const whereClauses: string[] = [];
+  const parameters: Array<string | number> = [];
+  const offset = Math.max(0, options.offset ?? 0);
+  const limit = options.limit != null ? Math.max(1, options.limit) : null;
 
   if (options.category) {
-    whereClauses.push(Prisma.sql`cc.slug = ${options.category}`);
+    parameters.push(options.category);
+    whereClauses.push(`cc.slug = $${parameters.length}`);
   }
 
   if (options.set) {
     const normalizedSet = options.set.replace(/-/g, " ");
     const setPattern = `%${normalizedSet}%`;
 
+    parameters.push(normalizedSet, setPattern);
     whereClauses.push(
-      Prisma.sql`(s.name ILIKE ${normalizedSet} OR s.name ILIKE ${setPattern})`
+      `(s.name ILIKE $${parameters.length - 1} OR s.name ILIKE $${parameters.length})`
     );
   }
 
   for (const token of searchTokens) {
     const tokenPattern = `%${token}%`;
 
+    parameters.push(tokenPattern, tokenPattern, tokenPattern);
     whereClauses.push(
-      Prisma.sql`(
-        c.name ILIKE ${tokenPattern}
-        OR c."collectorNumber" ILIKE ${tokenPattern}
-        OR s.name ILIKE ${tokenPattern}
+      `(
+        c.name ILIKE $${parameters.length - 2}
+        OR c."collectorNumber" ILIKE $${parameters.length - 1}
+        OR s.name ILIKE $${parameters.length}
       )`
     );
   }
 
   const whereSql =
     whereClauses.length > 0
-      ? Prisma.sql`WHERE ${Prisma.join(whereClauses, " AND ")}`
-      : Prisma.empty;
+      ? `WHERE ${whereClauses.join(" AND ")}`
+      : "";
 
-  return prisma.$queryRaw<
+  const rarityRankSql = `
+    CASE
+      WHEN fc.rarity IS NULL OR BTRIM(fc.rarity) = '' THEN NULL
+      WHEN LOWER(fc.rarity) = 'common' THEN 0
+      WHEN LOWER(fc.rarity) = 'uncommon' THEN 1
+      WHEN LOWER(fc.rarity) = 'rare holo' THEN 2
+      WHEN LOWER(fc.rarity) = 'holo rare' THEN 2
+      WHEN LOWER(fc.rarity) = 'rare' THEN 2
+      WHEN LOWER(fc.rarity) = 'legendary' THEN 3
+      WHEN LOWER(fc.rarity) = 'double rare' THEN 4
+      WHEN LOWER(fc.rarity) = 'ultra rare' THEN 5
+      WHEN LOWER(fc.rarity) = 'illustration rare' THEN 6
+      WHEN LOWER(fc.rarity) = 'special illustration rare' THEN 7
+      WHEN LOWER(fc.rarity) = 'secret rare' THEN 8
+      WHEN LOWER(fc.rarity) = 'hyper rare' THEN 9
+      WHEN LOWER(fc.rarity) = 'alternate art' THEN 10
+      WHEN LOWER(fc.rarity) LIKE '%common%' THEN 0
+      WHEN LOWER(fc.rarity) LIKE '%uncommon%' THEN 1
+      WHEN LOWER(fc.rarity) LIKE '%rare holo%' THEN 2
+      WHEN LOWER(fc.rarity) LIKE '%holo rare%' THEN 2
+      WHEN LOWER(fc.rarity) LIKE '%rare%' THEN 2
+      WHEN LOWER(fc.rarity) LIKE '%legendary%' THEN 3
+      WHEN LOWER(fc.rarity) LIKE '%double rare%' THEN 4
+      WHEN LOWER(fc.rarity) LIKE '%ultra rare%' THEN 5
+      WHEN LOWER(fc.rarity) LIKE '%illustration rare%' THEN 6
+      WHEN LOWER(fc.rarity) LIKE '%special illustration rare%' THEN 7
+      WHEN LOWER(fc.rarity) LIKE '%secret rare%' THEN 8
+      WHEN LOWER(fc.rarity) LIKE '%hyper rare%' THEN 9
+      WHEN LOWER(fc.rarity) LIKE '%alternate art%' THEN 10
+      ELSE NULL
+    END
+  `;
+
+  const collectorNumberSortSql = `
+    CASE
+      WHEN fc."collectorNumber" IS NULL OR BTRIM(fc."collectorNumber") = '' THEN NULL
+      ELSE LOWER(fc."collectorNumber")
+    END
+  `;
+
+  const orderSql =
+    options.sort === "price-asc"
+      ? `ORDER BY
+          vs."currentPrice" ASC NULLS LAST,
+          fc.name ASC,
+          fc."setName" ASC,
+          ${collectorNumberSortSql} ASC NULLS LAST,
+          ${rarityRankSql} ASC NULLS LAST,
+          LOWER(fc.rarity) ASC NULLS LAST,
+          fc.id ASC`
+      : options.sort === "name-asc"
+        ? `ORDER BY
+            fc.name ASC,
+            fc."setName" ASC,
+            ${collectorNumberSortSql} ASC NULLS LAST,
+            ${rarityRankSql} ASC NULLS LAST,
+            LOWER(fc.rarity) ASC NULLS LAST,
+            vs."currentPrice" DESC NULLS LAST,
+            fc.id ASC`
+        : options.sort === "name-desc"
+          ? `ORDER BY
+              fc.name DESC,
+              fc."setName" ASC,
+              ${collectorNumberSortSql} ASC NULLS LAST,
+              ${rarityRankSql} ASC NULLS LAST,
+              LOWER(fc.rarity) ASC NULLS LAST,
+              vs."currentPrice" DESC NULLS LAST,
+              fc.id ASC`
+          : options.sort === "number-asc"
+            ? `ORDER BY
+                ${collectorNumberSortSql} ASC NULLS LAST,
+                fc.name ASC,
+                fc."setName" ASC,
+                ${rarityRankSql} ASC NULLS LAST,
+                LOWER(fc.rarity) ASC NULLS LAST,
+                vs."currentPrice" DESC NULLS LAST,
+                fc.id ASC`
+            : options.sort === "number-desc"
+              ? `ORDER BY
+                  ${collectorNumberSortSql} DESC NULLS LAST,
+                  fc.name ASC,
+                  fc."setName" ASC,
+                  ${rarityRankSql} ASC NULLS LAST,
+                  LOWER(fc.rarity) ASC NULLS LAST,
+                  vs."currentPrice" DESC NULLS LAST,
+                  fc.id ASC`
+              : options.sort === "set-asc"
+                ? `ORDER BY
+                    fc."setName" ASC,
+                    fc.name ASC,
+                    ${collectorNumberSortSql} ASC NULLS LAST,
+                    ${rarityRankSql} ASC NULLS LAST,
+                    LOWER(fc.rarity) ASC NULLS LAST,
+                    vs."currentPrice" DESC NULLS LAST,
+                    fc.id ASC`
+                : options.sort === "set-desc"
+                  ? `ORDER BY
+                      fc."setName" DESC,
+                      fc.name ASC,
+                      ${collectorNumberSortSql} ASC NULLS LAST,
+                      ${rarityRankSql} ASC NULLS LAST,
+                      LOWER(fc.rarity) ASC NULLS LAST,
+                      vs."currentPrice" DESC NULLS LAST,
+                      fc.id ASC`
+                  : options.sort === "rarity-asc"
+                    ? `ORDER BY
+                        ${rarityRankSql} ASC NULLS LAST,
+                        LOWER(fc.rarity) ASC NULLS LAST,
+                        fc.name ASC,
+                        fc."setName" ASC,
+                        ${collectorNumberSortSql} ASC NULLS LAST,
+                        vs."currentPrice" DESC NULLS LAST,
+                        fc.id ASC`
+                    : options.sort === "rarity-desc"
+                      ? `ORDER BY
+                          ${rarityRankSql} DESC NULLS LAST,
+                          LOWER(fc.rarity) DESC NULLS LAST,
+                          fc.name ASC,
+                          fc."setName" ASC,
+                          ${collectorNumberSortSql} ASC NULLS LAST,
+                          vs."currentPrice" DESC NULLS LAST,
+                          fc.id ASC`
+                      : `ORDER BY
+                          vs."currentPrice" DESC NULLS LAST,
+                          fc.name ASC,
+                          fc."setName" ASC,
+                          ${collectorNumberSortSql} ASC NULLS LAST,
+                          ${rarityRankSql} ASC NULLS LAST,
+                          LOWER(fc.rarity) ASC NULLS LAST,
+                          fc.id ASC`;
+
+  const paginationSql =
+    limit == null ? `OFFSET ${offset}` : `LIMIT ${limit} OFFSET ${offset}`;
+
+  return prisma.$queryRawUnsafe<
     Array<{
       id: string;
       category: string;
@@ -54,7 +195,8 @@ export async function getDatabaseCardCatalog(options: {
       currentPrice: number | null;
       variationCount: number;
     }>
-  >(Prisma.sql`
+  >(
+    `
     WITH filtered_cards AS (
       SELECT
         c.id,
@@ -129,7 +271,11 @@ export async function getDatabaseCardCatalog(options: {
       COALESCE(vs."variationCount", 0)::int AS "variationCount"
     FROM filtered_cards fc
     LEFT JOIN variation_stats vs ON vs."cardId" = fc.id
-  `);
+    ${orderSql}
+    ${paginationSql}
+  `,
+    ...parameters
+  );
 }
 
 export async function getDatabaseCardDetail(category: string, cardId: string) {

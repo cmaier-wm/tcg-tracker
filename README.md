@@ -47,6 +47,7 @@ npm run db:up
 npm run db:seed
 export AUTH_SECRET='replace-with-a-local-secret'
 export TEAMS_WEBHOOK_ENCRYPTION_KEY='replace-with-a-local-secret'
+export AUTH_RESET_EMAIL_ENDPOINT='https://your-reset-delivery-endpoint'
 npm run dev
 ```
 
@@ -72,6 +73,10 @@ Local setup notes:
 - `npm run dev` now applies checked-in auth migrations automatically so the
   `UserCredential`, `AuthSession`, and `AuthAuditEvent` tables stay in sync
   without a separate manual migrate step.
+- `AUTH_RESET_EMAIL_ENDPOINT` is optional for local development. When it is not
+  set, password reset requests log the recovery URL to the local server output.
+  In production, set it to a server-side email delivery endpoint that accepts
+  `{ "email": "...", "resetUrl": "..." }`.
 - `/cards` and card detail pages remain public while `/portfolio`, `/settings`,
   and the matching portfolio/settings APIs require authentication.
 - The first newly registered account claims any legacy demo portfolio/settings

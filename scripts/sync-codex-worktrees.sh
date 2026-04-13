@@ -21,6 +21,10 @@ while IFS= read -r worktree; do
   target_dir="$worktree/.codex/environments"
   target_env="$target_dir/environment.toml"
 
+  if [[ "$target_env" == "$SOURCE_ENV" ]]; then
+    continue
+  fi
+
   mkdir -p "$target_dir"
   cp "$SOURCE_ENV" "$target_env"
   echo "Synced $target_env"

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -65,6 +66,9 @@ export function LoginForm({ returnTo }: { returnTo: string | null }) {
           required
         />
       </label>
+      <Link href="/reset-password" className="button secondary">
+        Forgot Password?
+      </Link>
       <button className="button" type="submit" disabled={isPending}>
         {isPending ? "Signing In..." : "Sign In"}
       </button>
