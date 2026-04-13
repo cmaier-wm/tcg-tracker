@@ -9,12 +9,10 @@ export async function getAuthenticatedUserAccount() {
   });
 }
 
-export async function getDatabasePortfolio() {
-  const user = await requireAuthenticatedUser();
-
+export async function getDatabasePortfolio(userId: string) {
   return prisma.portfolioHolding.findMany({
     where: {
-      userId: user.userId
+      userId
     },
     include: {
       variation: {

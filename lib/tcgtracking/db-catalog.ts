@@ -3,121 +3,95 @@ import { prisma } from "@/lib/db/prisma";
 import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
 import { tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
 
-let catalogIndexesPromise: Promise<void> | undefined;
-
-async function ensureCatalogQueryIndexes() {
-  if (!catalogIndexesPromise) {
-    const execute = prisma.$executeRawUnsafe.bind(prisma);
-
-    catalogIndexesPromise = (async () => {
-      await execute(
-        'CREATE INDEX IF NOT EXISTS "CardSet_categoryId_idx" ON "CardSet"("categoryId")'
-      );
-      await execute('CREATE INDEX IF NOT EXISTS "Card_setId_idx" ON "Card"("setId")');
-      await execute(
-        'CREATE INDEX IF NOT EXISTS "CardVariation_cardId_idx" ON "CardVariation"("cardId")'
-      );
-      await execute(
-        'CREATE INDEX IF NOT EXISTS "PriceSnapshot_cardVariationId_capturedAt_idx" ON "PriceSnapshot"("cardVariationId", "capturedAt" DESC)'
-      );
-    })().catch((error) => {
-      catalogIndexesPromise = undefined;
-      throw error;
-    });
-  }
-
-  await catalogIndexesPromise;
-}
-
 const rarityRankSql = Prisma.sql`
   CASE
-    WHEN fc.rarity IS NULL OR BTRIM(fc.rarity) = '' THEN NULL
-    WHEN LOWER(fc.rarity) = 'common' THEN 0
-    WHEN LOWER(fc.rarity) = 'uncommon' THEN 1
-    WHEN LOWER(fc.rarity) IN ('rare holo', 'holo rare', 'rare') THEN 2
-    WHEN LOWER(fc.rarity) = 'legendary' THEN 3
-    WHEN LOWER(fc.rarity) = 'double rare' THEN 4
-    WHEN LOWER(fc.rarity) = 'ultra rare' THEN 5
-    WHEN LOWER(fc.rarity) = 'illustration rare' THEN 6
-    WHEN LOWER(fc.rarity) = 'special illustration rare' THEN 7
-    WHEN LOWER(fc.rarity) = 'secret rare' THEN 8
-    WHEN LOWER(fc.rarity) = 'hyper rare' THEN 9
-    WHEN LOWER(fc.rarity) = 'alternate art' THEN 10
-    WHEN LOWER(fc.rarity) LIKE '%common%' THEN 0
-    WHEN LOWER(fc.rarity) LIKE '%uncommon%' THEN 1
-    WHEN LOWER(fc.rarity) LIKE '%rare holo%' THEN 2
-    WHEN LOWER(fc.rarity) LIKE '%holo rare%' THEN 2
-    WHEN LOWER(fc.rarity) LIKE '%rare%' THEN 2
-    WHEN LOWER(fc.rarity) LIKE '%legendary%' THEN 3
-    WHEN LOWER(fc.rarity) LIKE '%double rare%' THEN 4
-    WHEN LOWER(fc.rarity) LIKE '%ultra rare%' THEN 5
-    WHEN LOWER(fc.rarity) LIKE '%illustration rare%' THEN 6
-    WHEN LOWER(fc.rarity) LIKE '%special illustration rare%' THEN 7
-    WHEN LOWER(fc.rarity) LIKE '%secret rare%' THEN 8
-    WHEN LOWER(fc.rarity) LIKE '%hyper rare%' THEN 9
-    WHEN LOWER(fc.rarity) LIKE '%alternate art%' THEN 10
+    WHEN c.rarity IS NULL OR BTRIM(c.rarity) = '' THEN NULL
+    WHEN LOWER(c.rarity) = 'common' THEN 0
+    WHEN LOWER(c.rarity) = 'uncommon' THEN 1
+    WHEN LOWER(c.rarity) IN ('rare holo', 'holo rare', 'rare') THEN 2
+    WHEN LOWER(c.rarity) = 'legendary' THEN 3
+    WHEN LOWER(c.rarity) = 'double rare' THEN 4
+    WHEN LOWER(c.rarity) = 'ultra rare' THEN 5
+    WHEN LOWER(c.rarity) = 'illustration rare' THEN 6
+    WHEN LOWER(c.rarity) = 'special illustration rare' THEN 7
+    WHEN LOWER(c.rarity) = 'secret rare' THEN 8
+    WHEN LOWER(c.rarity) = 'hyper rare' THEN 9
+    WHEN LOWER(c.rarity) = 'alternate art' THEN 10
+    WHEN LOWER(c.rarity) LIKE '%common%' THEN 0
+    WHEN LOWER(c.rarity) LIKE '%uncommon%' THEN 1
+    WHEN LOWER(c.rarity) LIKE '%rare holo%' THEN 2
+    WHEN LOWER(c.rarity) LIKE '%holo rare%' THEN 2
+    WHEN LOWER(c.rarity) LIKE '%rare%' THEN 2
+    WHEN LOWER(c.rarity) LIKE '%legendary%' THEN 3
+    WHEN LOWER(c.rarity) LIKE '%double rare%' THEN 4
+    WHEN LOWER(c.rarity) LIKE '%ultra rare%' THEN 5
+    WHEN LOWER(c.rarity) LIKE '%illustration rare%' THEN 6
+    WHEN LOWER(c.rarity) LIKE '%special illustration rare%' THEN 7
+    WHEN LOWER(c.rarity) LIKE '%secret rare%' THEN 8
+    WHEN LOWER(c.rarity) LIKE '%hyper rare%' THEN 9
+    WHEN LOWER(c.rarity) LIKE '%alternate art%' THEN 10
     ELSE NULL
   END
 `;
 
 const collectorNumberRankSql = Prisma.sql`
   CASE
-    WHEN fc."collectorNumber" IS NULL THEN NULL
-    ELSE NULLIF(SUBSTRING(fc."collectorNumber" FROM '^[0-9]+'), '')::int
+    WHEN c."collectorNumber" IS NULL THEN NULL
+    ELSE NULLIF(SUBSTRING(c."collectorNumber" FROM '^[0-9]+'), '')::int
   END
 `;
 
 function getCatalogOrderSql(sort: CatalogSortValue) {
   const tieBreakers = Prisma.sql`
-    LOWER(fc.name) ASC,
-    LOWER(fc."setName") ASC,
+    LOWER(c.name) ASC,
+    LOWER(s.name) ASC,
     ${collectorNumberRankSql} ASC NULLS LAST,
-    fc."collectorNumber" ASC NULLS LAST,
+    c."collectorNumber" ASC NULLS LAST,
     ${rarityRankSql} ASC NULLS LAST,
-    LOWER(fc.rarity) ASC NULLS LAST,
-    vs."currentPrice" DESC NULLS LAST,
-    fc.id ASC
+    LOWER(c.rarity) ASC NULLS LAST,
+    c."currentPrice" DESC NULLS LAST,
+    c.id ASC
   `;
 
   switch (sort) {
     case "price-asc":
-      return Prisma.sql`ORDER BY vs."currentPrice" ASC NULLS LAST, ${tieBreakers}`;
+      return Prisma.sql`ORDER BY c."currentPrice" ASC NULLS LAST, ${tieBreakers}`;
     case "price-desc":
-      return Prisma.sql`ORDER BY vs."currentPrice" DESC NULLS LAST, ${tieBreakers}`;
+      return Prisma.sql`ORDER BY c."currentPrice" DESC NULLS LAST, ${tieBreakers}`;
     case "name-asc":
-      return Prisma.sql`ORDER BY LOWER(fc.name) ASC, ${tieBreakers}`;
+      return Prisma.sql`ORDER BY LOWER(c.name) ASC, ${tieBreakers}`;
     case "name-desc":
-      return Prisma.sql`ORDER BY LOWER(fc.name) DESC, ${tieBreakers}`;
+      return Prisma.sql`ORDER BY LOWER(c.name) DESC, ${tieBreakers}`;
     case "number-asc":
       return Prisma.sql`
         ORDER BY
           ${collectorNumberRankSql} ASC NULLS LAST,
-          fc."collectorNumber" ASC NULLS LAST,
+          c."collectorNumber" ASC NULLS LAST,
           ${tieBreakers}
       `;
     case "number-desc":
       return Prisma.sql`
         ORDER BY
           ${collectorNumberRankSql} DESC NULLS LAST,
-          fc."collectorNumber" DESC NULLS LAST,
+          c."collectorNumber" DESC NULLS LAST,
           ${tieBreakers}
       `;
     case "set-asc":
-      return Prisma.sql`ORDER BY LOWER(fc."setName") ASC, ${tieBreakers}`;
+      return Prisma.sql`ORDER BY LOWER(s.name) ASC, ${tieBreakers}`;
     case "set-desc":
-      return Prisma.sql`ORDER BY LOWER(fc."setName") DESC, ${tieBreakers}`;
+      return Prisma.sql`ORDER BY LOWER(s.name) DESC, ${tieBreakers}`;
     case "rarity-asc":
       return Prisma.sql`
         ORDER BY
           ${rarityRankSql} ASC NULLS LAST,
-          LOWER(fc.rarity) ASC NULLS LAST,
+          LOWER(c.rarity) ASC NULLS LAST,
           ${tieBreakers}
       `;
     case "rarity-desc":
       return Prisma.sql`
         ORDER BY
           ${rarityRankSql} DESC NULLS LAST,
-          LOWER(fc.rarity) DESC NULLS LAST,
+          LOWER(c.rarity) DESC NULLS LAST,
           ${tieBreakers}
       `;
   }
@@ -131,8 +105,6 @@ export async function getDatabaseCardCatalog(options: {
   limit?: number;
   offset?: number;
 }) {
-  await ensureCatalogQueryIndexes();
-
   const searchTokens = tokenizeSearchQuery(options.q);
   const whereClauses: Prisma.Sql[] = [];
 
@@ -187,80 +159,21 @@ export async function getDatabaseCardCatalog(options: {
       variationCount: number;
     }>
   >(Prisma.sql`
-    WITH filtered_cards AS (
-      SELECT
-        c.id,
-        c.name,
-        c."collectorNumber",
-        c.rarity,
-        c."imageUrl",
-        s.name AS "setName",
-        cc.slug AS category,
-        cc.name AS "categoryName"
-      FROM "Card" c
-      INNER JOIN "CardSet" s ON s.id = c."setId"
-      INNER JOIN "CardCategory" cc ON cc.id = s."categoryId"
-      ${whereSql}
-    ),
-    latest_snapshots AS (
-      SELECT DISTINCT ON (ps."cardVariationId")
-        ps."cardVariationId",
-        ps."marketPrice"
-      FROM "PriceSnapshot" ps
-      INNER JOIN "CardVariation" cv ON cv.id = ps."cardVariationId"
-      INNER JOIN filtered_cards fc ON fc.id = cv."cardId"
-      ORDER BY ps."cardVariationId", ps."capturedAt" DESC
-    ),
-    variation_stats AS (
-      SELECT
-        cv."cardId",
-        COUNT(*)::int AS "variationCount",
-        (
-          ARRAY_AGG(
-            ls."marketPrice"::double precision
-            ORDER BY
-              CASE
-                WHEN LOWER(COALESCE(cv."languageCode", '')) = 'en'
-                  AND ls."marketPrice" IS NOT NULL THEN 0
-                WHEN COALESCE(cv."languageCode", '') = ''
-                  AND ls."marketPrice" IS NOT NULL THEN 1
-                WHEN ls."marketPrice" IS NOT NULL THEN 2
-                WHEN LOWER(COALESCE(cv."languageCode", '')) = 'en' THEN 3
-                WHEN COALESCE(cv."languageCode", '') = '' THEN 4
-                ELSE 5
-              END,
-              CASE
-                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'NM' THEN 0
-                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'LP' THEN 1
-                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'MP' THEN 2
-                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'HP' THEN 3
-                WHEN UPPER(COALESCE(cv."conditionCode", '')) = 'DMG' THEN 4
-                WHEN cv."conditionCode" IS NULL THEN 5
-                ELSE 6
-              END,
-              CASE WHEN cv."isDefault" THEN 0 ELSE 1 END,
-              ls."marketPrice" DESC NULLS LAST,
-              cv.id ASC
-          )
-        )[1] AS "currentPrice"
-      FROM "CardVariation" cv
-      INNER JOIN filtered_cards fc ON fc.id = cv."cardId"
-      LEFT JOIN latest_snapshots ls ON ls."cardVariationId" = cv.id
-      GROUP BY cv."cardId"
-    )
     SELECT
-      fc.id,
-      fc.category,
-      fc."categoryName",
-      fc."setName",
-      fc.name,
-      fc."collectorNumber",
-      fc.rarity,
-      fc."imageUrl",
-      vs."currentPrice",
-      COALESCE(vs."variationCount", 0)::int AS "variationCount"
-    FROM filtered_cards fc
-    LEFT JOIN variation_stats vs ON vs."cardId" = fc.id
+      c.id,
+      cc.slug AS category,
+      cc.name AS "categoryName",
+      s.name AS "setName",
+      c.name,
+      c."collectorNumber",
+      c.rarity,
+      c."imageUrl",
+      c."currentPrice",
+      c."variationCount"
+    FROM "Card" c
+    INNER JOIN "CardSet" s ON s.id = c."setId"
+    INNER JOIN "CardCategory" cc ON cc.id = s."categoryId"
+    ${whereSql}
     ${orderSql}
     ${offsetSql}
     ${limitSql}
@@ -277,19 +190,48 @@ export async function getDatabaseCardDetail(category: string, cardId: string) {
         }
       }
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      collectorNumber: true,
+      rarity: true,
+      imageUrl: true,
       set: {
-        include: {
+        select: {
+          name: true,
           category: true
         }
       },
       variations: {
-        include: {
+        where: {
+          OR: [
+            {
+              languageCode: null
+            },
+            {
+              languageCode: {
+                equals: "en",
+                mode: "insensitive"
+              }
+            }
+          ]
+        },
+        select: {
+          id: true,
+          variantLabel: true,
+          languageCode: true,
+          finish: true,
+          conditionCode: true,
+          isDefault: true,
           priceSnapshots: {
             orderBy: {
               capturedAt: "desc"
             },
-            take: 1
+            take: 1,
+            select: {
+              marketPrice: true,
+              capturedAt: true
+            }
           }
         },
         orderBy: [{ isDefault: "desc" }, { languageCode: "asc" }, { variantLabel: "asc" }]
@@ -301,7 +243,14 @@ export async function getDatabaseCardDetail(category: string, cardId: string) {
 export async function getDatabaseVariationHistory(variationId: string) {
   return prisma.priceSnapshot.findMany({
     where: {
-      cardVariationId: variationId
+      cardVariationId: variationId,
+      marketPrice: {
+        not: null
+      }
+    },
+    select: {
+      capturedAt: true,
+      marketPrice: true
     },
     orderBy: {
       capturedAt: "asc"

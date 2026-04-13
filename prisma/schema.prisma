@@ -44,12 +44,15 @@ model Card {
   rarity             String?
   imageUrl           String?
   externalProductUrl String?
+  currentPrice       Float?
+  variationCount     Int             @default(0)
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   set                CardSet         @relation(fields: [setId], references: [id], onDelete: Cascade)
   variations         CardVariation[]
 
   @@index([setId])
+  @@index([currentPrice])
 }
 
 model CardVariation {

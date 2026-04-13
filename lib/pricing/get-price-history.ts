@@ -10,12 +10,10 @@ export async function getPriceHistory(variationId: string) {
 
       return {
         variationId,
-        points: snapshots
-          .filter((snapshot) => snapshot.marketPrice != null)
-          .map((snapshot) => ({
-            capturedAt: snapshot.capturedAt.toISOString(),
-            marketPrice: snapshot.marketPrice as number
-          }))
+        points: snapshots.map((snapshot) => ({
+          capturedAt: snapshot.capturedAt.toISOString(),
+          marketPrice: snapshot.marketPrice as number
+        }))
       };
     },
     async () => {
