@@ -50,12 +50,12 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
       });
 
       return cards.map((card) => ({
-          ...card,
-          collectorNumber: card.collectorNumber ?? undefined,
-          rarity: card.rarity ?? undefined,
-          imageUrl: card.imageUrl ?? undefined,
-          currentPrice: card.currentPrice ?? undefined
-        }));
+        ...card,
+        collectorNumber: card.collectorNumber ?? undefined,
+        rarity: card.rarity ?? undefined,
+        imageUrl: card.imageUrl ?? undefined,
+        currentPrice: card.currentPrice ?? undefined
+      }));
     },
     async () =>
       sortCardListItems(
@@ -89,7 +89,6 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
           })
           .map(toCardListItem),
         sort
-      )
-        .slice(offset, limit ? offset + limit : undefined)
+      ).slice(offset, limit ? offset + limit : undefined)
   );
 }

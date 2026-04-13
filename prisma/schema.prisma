@@ -30,6 +30,8 @@ model CardSet {
   updatedAt     DateTime @updatedAt
   category      CardCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   cards         Card[]
+
+  @@index([categoryId])
 }
 
 model Card {
@@ -42,10 +44,15 @@ model Card {
   rarity             String?
   imageUrl           String?
   externalProductUrl String?
+  currentPrice       Float?
+  variationCount     Int             @default(0)
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   set                CardSet         @relation(fields: [setId], references: [id], onDelete: Cascade)
   variations         CardVariation[]
+
+  @@index([setId])
+  @@index([currentPrice])
 }
 
 model CardVariation {
@@ -64,6 +71,7 @@ model CardVariation {
   holdings       PortfolioHolding[]
 
   @@unique([cardId, languageCode, finish, conditionCode, variantLabel])
+  @@index([cardId])
 }
 
 model PriceSnapshot {
@@ -79,6 +87,7 @@ model PriceSnapshot {
   variation       CardVariation @relation(fields: [cardVariationId], references: [id], onDelete: Cascade)
 
   @@unique([cardVariationId, sourceName, capturedAt])
+  @@index([cardVariationId, capturedAt(sort: Desc)])
 }
 
 model UserAccount {

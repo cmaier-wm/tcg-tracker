@@ -1,6 +1,10 @@
 import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoCards, getDemoUserState } from "@/lib/db/demo-store";
-import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
+import { prisma } from "@/lib/db/prisma";
+import {
+  requireAuthenticatedUser,
+  type AuthenticatedUser
+} from "@/lib/auth/auth-session";
 import { getDatabasePortfolio } from "@/lib/portfolio/db-portfolio";
 import {
   normalizePortfolioSort,
@@ -9,6 +13,16 @@ import {
 import { valuePortfolio } from "@/lib/portfolio/value-portfolio";
 
 export const portfolioPageSize = 5;
+
+type GetPortfolioOptions = {
+  sort?: string | null;
+  page?: string | null;
+  user?: AuthenticatedUser | null;
+};
+
+type GetPortfolioHoldingOptions = {
+  user?: AuthenticatedUser | null;
+};
 
 export function normalizePortfolioPage(value?: string | null) {
   const page = Number.parseInt(value ?? "", 10);
@@ -35,13 +49,14 @@ function paginatePortfolioHoldings<T>(holdings: T[], page: number) {
   };
 }
 
-export async function getPortfolio(options?: { sort?: string | null; page?: string | null }) {
+export async function getPortfolio(options: GetPortfolioOptions = {}) {
   const sort = normalizePortfolioSort(options?.sort);
   const page = normalizePortfolioPage(options?.page);
 
   return withDatabaseFallback(
     async () => {
-      const holdings = await getDatabasePortfolio();
+      const user = options.user ?? (await requireAuthenticatedUser());
+      const holdings = await getDatabasePortfolio(user.userId);
       const mapped = holdings.map((holding) => {
         const estimatedValue =
           (holding.variation.priceSnapshots[0]?.marketPrice ?? 0) * holding.quantity;
@@ -75,7 +90,7 @@ export async function getPortfolio(options?: { sort?: string | null; page?: stri
       };
     },
     async () => {
-      const user = await requireAuthenticatedUser();
+      const user = options.user ?? (await requireAuthenticatedUser());
       const store = getDemoUserState(user.userId);
       const valuation = valuePortfolio(store.holdings);
       const cardsByVariation = new Map(
@@ -111,6 +126,39 @@ export async function getPortfolio(options?: { sort?: string | null; page?: stri
         totalPages: paginatedHoldings.totalPages,
         totalItems: paginatedHoldings.totalItems
       };
+    }
+  );
+}
+
+export async function getPortfolioHoldingByVariationId(
+  cardVariationId: string,
+  options: GetPortfolioHoldingOptions = {}
+) {
+  return withDatabaseFallback(
+    async () => {
+      const user = options.user ?? (await requireAuthenticatedUser());
+
+      return prisma.portfolioHolding.findUnique({
+        where: {
+          userId_cardVariationId: {
+            userId: user.userId,
+            cardVariationId
+          }
+        },
+        select: {
+          id: true,
+          cardVariationId: true,
+          quantity: true
+        }
+      });
+    },
+    async () => {
+      const user = options.user ?? (await requireAuthenticatedUser());
+      const store = getDemoUserState(user.userId);
+
+      return (
+        store.holdings.find((holding) => holding.cardVariationId === cardVariationId) ?? null
+      );
     }
   );
 }

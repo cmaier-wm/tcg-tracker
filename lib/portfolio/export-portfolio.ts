@@ -123,7 +123,8 @@ function sortRows(rows: SortablePortfolioExportRow[], sort: PortfolioSortValue) 
 }
 
 async function getDatabaseExportRows(sort: PortfolioSortValue) {
-  const holdings = await getDatabasePortfolio();
+  const user = await requireAuthenticatedUser();
+  const holdings = await getDatabasePortfolio(user.userId);
 
   const rows = holdings.map<SortablePortfolioExportRow>((holding) => {
     const latestSnapshot = holding.variation.priceSnapshots[0];

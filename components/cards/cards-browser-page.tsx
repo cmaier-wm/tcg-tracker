@@ -30,6 +30,8 @@ export function CardsBrowserPage({
   sets,
   resetHref
 }: CardsBrowserPageProps) {
+  const stateKey = [query ?? "", selectedCategory ?? "", selectedSet ?? "", selectedSort].join(":");
+
   return (
     <div className="page-grid">
       <section className="page-intro stack">
@@ -41,6 +43,7 @@ export function CardsBrowserPage({
         </div>
       </section>
       <CatalogFilters
+        key={`filters:${stateKey}`}
         query={query}
         selectedSet={selectedSet}
         selectedSort={selectedSort}
@@ -50,7 +53,7 @@ export function CardsBrowserPage({
       />
       {items.length ? (
         <InfiniteCardList
-          key={[query ?? "", selectedCategory ?? "", selectedSet ?? "", selectedSort].join(":")}
+          key={`results:${stateKey}`}
           initialItems={items}
           query={query}
           selectedCategory={selectedCategory}

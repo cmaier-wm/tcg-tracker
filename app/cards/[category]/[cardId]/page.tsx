@@ -7,7 +7,7 @@ import { PriceHistoryChart } from "@/components/charts/price-history-chart";
 import { AddToPortfolioButton } from "@/components/portfolio/add-to-portfolio-button";
 import { HoldingForm } from "@/components/portfolio/holding-form";
 import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
-import { getPortfolio } from "@/lib/portfolio/get-portfolio";
+import { getPortfolioHoldingByVariationId } from "@/lib/portfolio/get-portfolio";
 import { getPriceHistory } from "@/lib/pricing/get-price-history";
 import { getCardDetail } from "@/lib/tcgtracking/get-card-detail";
 import { selectPreferredVariation } from "@/lib/tcgtracking/select-preferred-variation";
@@ -18,12 +18,19 @@ export default async function CardDetailPage({
   params: Promise<{ category: string; cardId: string }>;
 }) {
   const resolvedParams = await params;
-  const authenticatedUser = await getOptionalAuthenticatedUser();
-  const card = await getCardDetail(resolvedParams.category, resolvedParams.cardId);
+  const [authenticatedUser, card] = await Promise.all([
+    getOptionalAuthenticatedUser(),
+    getCardDetail(resolvedParams.category, resolvedParams.cardId)
+  ]);
   const selectedVariation = selectPreferredVariation(card.variations);
-  const portfolio = authenticatedUser ? await getPortfolio() : null;
-  const holding = portfolio?.holdings.find((item) => item.cardVariationId === selectedVariation?.id);
-  const history = selectedVariation ? await getPriceHistory(selectedVariation.id) : { points: [] };
+  const [holding, history] = await Promise.all([
+    authenticatedUser && selectedVariation
+      ? getPortfolioHoldingByVariationId(selectedVariation.id, { user: authenticatedUser })
+      : Promise.resolve(null),
+    selectedVariation
+      ? getPriceHistory(selectedVariation.id)
+      : Promise.resolve({ variationId: "", points: [] })
+  ]);
 
   return (
     <div className="page-grid">
