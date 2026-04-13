@@ -1,10 +1,14 @@
 import {
   cpSync,
   existsSync,
+  lstatSync,
   mkdirSync,
   readdirSync,
   readFileSync,
+  readlinkSync,
+  symlinkSync,
   rmSync,
+  unlinkSync,
   writeFileSync
 } from "node:fs";
 import { join } from "node:path";
@@ -14,10 +18,9 @@ const standaloneDir = join(root, ".next", "standalone");
 const staticDir = join(root, ".next", "static");
 const publicDir = join(root, "public");
 const prismaDir = join(root, "prisma");
-const prismaScopedDir = join(root, "node_modules", "@prisma");
-const prismaCliDir = join(root, "node_modules", "prisma");
 const azureStartScript = join(root, "scripts", "azure-start.mjs");
 const outputDir = join(root, ".azuredist");
+const includePrismaCli = process.env.AZURE_INCLUDE_PRISMA_CLI === "true";
 
 function walkFiles(dir) {
   const entries = readdirSync(dir, { withFileTypes: true });
@@ -37,6 +40,42 @@ function walkFiles(dir) {
   }
 
   return files;
+}
+
+function walkSymlinks(dir) {
+  if (!existsSync(dir)) {
+    return [];
+  }
+
+  const entries = readdirSync(dir, { withFileTypes: true });
+  const links = [];
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    const stats = lstatSync(fullPath);
+
+    if (stats.isSymbolicLink()) {
+      links.push(fullPath);
+      continue;
+    }
+
+    if (entry.isDirectory()) {
+      links.push(...walkSymlinks(fullPath));
+    }
+  }
+
+  return links;
+}
+
+function syncRelativeSymlinks(sourceDir, destDir) {
+  for (const sourceLinkPath of walkSymlinks(sourceDir)) {
+    const relativeLinkPath = sourceLinkPath.slice(sourceDir.length + 1);
+    const destLinkPath = join(destDir, relativeLinkPath);
+    const linkTarget = readlinkSync(sourceLinkPath);
+
+    rmSync(destLinkPath, { force: true, recursive: true });
+    symlinkSync(linkTarget, destLinkPath, "file");
+  }
 }
 
 function getPrismaClientAliases(serverDir) {
@@ -73,6 +112,7 @@ rmSync(outputDir, { force: true, recursive: true });
 mkdirSync(outputDir, { recursive: true });
 
 cpSync(standaloneDir, outputDir, { recursive: true });
+syncRelativeSymlinks(standaloneDir, outputDir);
 
 rmSync(join(outputDir, ".env"), { force: true });
 
@@ -98,26 +138,31 @@ if (existsSync(prismaDir)) {
   cpSync(prismaDir, join(outputDir, "prisma"), { recursive: true });
 }
 
-if (existsSync(prismaScopedDir)) {
-  cpSync(prismaScopedDir, join(outputDir, "node_modules", "@prisma"), {
-    recursive: true
-  });
+if (includePrismaCli) {
+  const prismaScopedDir = join(root, "node_modules", "@prisma");
+  const prismaCliDir = join(root, "node_modules", "prisma");
+
+  if (existsSync(prismaScopedDir)) {
+    cpSync(prismaScopedDir, join(outputDir, "node_modules", "@prisma"), {
+      recursive: true
+    });
+  }
+
+  if (existsSync(prismaCliDir)) {
+    cpSync(prismaCliDir, join(outputDir, "node_modules", "prisma"), {
+      recursive: true
+    });
+  }
 }
 
-if (existsSync(prismaCliDir)) {
-  cpSync(prismaCliDir, join(outputDir, "node_modules", "prisma"), {
-    recursive: true
-  });
-}
-
-const prismaClientDir = join(root, "node_modules", "@prisma", "client");
+const prismaClientDir = join(outputDir, "node_modules", "@prisma", "client");
 const prismaClientAliases = getPrismaClientAliases(join(root, ".next", "server"));
 
 for (const alias of prismaClientAliases) {
   const aliasDir = join(outputDir, "node_modules", "@prisma", alias);
 
   if (existsSync(prismaClientDir) && !existsSync(aliasDir)) {
-    cpSync(prismaClientDir, aliasDir, { recursive: true });
+    symlinkSync("client", aliasDir, "dir");
   }
 }
 
