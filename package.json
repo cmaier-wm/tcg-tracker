@@ -20,6 +20,7 @@
     "azure:prepare": "node scripts/azure-prepare-env.mjs",
     "azure:package": "node scripts/prepare-azure-package.mjs",
     "azure:verify": "node scripts/azure-verify-deployment.mjs",
+    "portfolio:summary:prod": "node scripts/summarize-portfolio-changes.mjs",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration tests/contract",
     "test:e2e": "playwright test",

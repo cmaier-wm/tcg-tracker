@@ -52,6 +52,9 @@ Repository impact:
   Database for PostgreSQL Flexible Server 17 and Azure Key Vault.
 - Normal deployment commands live in `README.md` and use:
   `azd env new`, `azd env set`, `azd provision --preview`, and `azd up`.
+- Operational read-only reporting against production may use Azure CLI plus Key
+  Vault to fetch the dedicated `portfolio-summary-database-url` secret, then run
+  `npm run portfolio:summary:prod`.
 
 ### Figma MCP
 
