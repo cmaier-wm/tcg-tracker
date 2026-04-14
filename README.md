@@ -23,6 +23,7 @@ The current application uses:
 - Docker Compose for local PostgreSQL
 - TanStack Query, Recharts, and Zod
 - Vitest, React Testing Library, and Playwright
+- Swift 6 with SwiftUI, Observation, and Swift Charts for the native iOS client
 
 The primary feature specification and delivery artifacts live under
 [`specs/001-card-portfolio-tracker/`](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker).
@@ -54,6 +55,36 @@ npm run dev
 `prisma migrate deploy` and refreshes the generated Prisma client before the
 server starts on port `3000`. Keep `npm run db:migrate` for the separate case
 where you are authoring a brand-new local migration.
+
+## Native iOS Client
+
+The repository now includes an iPhone-first native client under
+[`ios/`](/Users/cmaier/.codex/worktrees/2b13/tcg-tracker/ios).
+
+Local mobile workflow:
+
+1. Start the backend with the normal local web commands shown above.
+2. Use the debug base URL `http://127.0.0.1:3000` in Simulator.
+3. Open the Swift package or generated Xcode project under
+   [`ios/TCGTracker/`](/Users/cmaier/.codex/worktrees/2b13/tcg-tracker/ios/TCGTracker).
+4. Run the native unit suite from the package root with:
+
+```bash
+cd ios
+swift test
+```
+
+5. If full Xcode is installed locally, regenerate the package-backed Xcode
+   project when source structure changes:
+
+```bash
+cd ios
+swift package generate-xcodeproj
+```
+
+The native client reuses the existing Next.js app as its only backend. Mobile-
+specific backend additions are limited to `/api/mobile/session` and
+`/api/mobile/home` for signed-in bootstrap and portfolio summary composition.
 
 ## User Login
 

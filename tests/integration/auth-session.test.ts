@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/auth-session";
 import { resetDemoStore, getDemoStore } from "@/lib/db/demo-store";
 import { hashPassword } from "@/lib/auth/password";
+import { getMobileSession } from "@/lib/mobile/get-mobile-session";
 import {
   loginRequestSchema,
   normalizeEmail,
@@ -96,5 +97,18 @@ describe("auth session integration", () => {
     expect(resolvePostAuthRedirect("/cards/pokemon/card-1")).toBe("/cards/pokemon/card-1");
     expect(resolvePostAuthRedirect("/portfolio")).toBe("/portfolio");
     expect(resolvePostAuthRedirect("https://example.com")).toBe("/portfolio");
+  });
+
+  it("exposes the signed-in account through the mobile session helper", async () => {
+    const session = await getMobileSession();
+
+    expect(session).toEqual({
+      status: "authenticated",
+      user: {
+        userId: "demo-user",
+        email: "collector@local.tcg",
+        displayName: "Collector"
+      }
+    });
   });
 });

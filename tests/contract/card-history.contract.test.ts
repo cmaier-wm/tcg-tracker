@@ -10,5 +10,10 @@ describe("card history contract", () => {
       marketPrice: expect.any(Number)
     });
   });
-});
 
+  it("returns an array shape for mobile chart rendering", async () => {
+    const history = await getPriceHistory("sv1-charizard-ex-en-nm-holo");
+
+    expect(Array.isArray(history.points)).toBe(true);
+  });
+});

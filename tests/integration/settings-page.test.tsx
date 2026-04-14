@@ -230,4 +230,15 @@ describe("settings page", () => {
       expect(screen.getByText("Webhook History")).toBeInTheDocument();
     });
   });
+
+  it("does not render Teams settings controls when signed out", async () => {
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={false} />);
+
+    expect(screen.queryByRole("button", { name: "Save Teams Alerts" })).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Sign in to manage account-backed Teams alerts. Theme preferences stay available on this device even when signed out."
+      )
+    ).toBeInTheDocument();
+  });
 });
