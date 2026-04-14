@@ -29,9 +29,7 @@ describe("register form", () => {
     await user.click(screen.getByRole("button", { name: "Create Account" }));
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Password must contain at least 8 characters."
-    );
     expect(toast.error).toHaveBeenCalledWith("Password must contain at least 8 characters.");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

@@ -4,6 +4,7 @@ import { getDemoCards } from "@/lib/db/demo-store";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
 import { toCardListItem } from "@/lib/tcgtracking/mappers";
 import {
+  type CatalogSortValue,
   matchesSearchTokens,
   normalizeCatalogSort,
   sortCardListItems,
@@ -19,8 +20,12 @@ type CatalogOptions = {
   offset?: number;
 };
 
+type DatabaseCatalogOptions = Omit<CatalogOptions, "sort"> & {
+  sort: CatalogSortValue;
+};
+
 const getCachedDatabaseCardCatalog = unstable_cache(
-  async (options: CatalogOptions) => getDatabaseCardCatalog(options),
+  async (options: DatabaseCatalogOptions) => getDatabaseCardCatalog(options),
   ["db-card-catalog"],
   { revalidate: 60 }
 );

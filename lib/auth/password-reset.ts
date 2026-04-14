@@ -210,15 +210,16 @@ export async function createPasswordResetRequest(email: string) {
   );
 }
 
-export function buildPasswordResetUrl(token: string) {
-  const baseUrl =
+export function buildPasswordResetUrl(token: string, baseUrl?: string) {
+  const resolvedBaseUrl =
+    baseUrl?.trim() ||
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
     process.env.APP_URL?.trim() ||
     "http://localhost:3000";
 
   return new URL(
     `${PASSWORD_RESET_REQUEST_ROUTE}/${encodeURIComponent(token)}`,
-    baseUrl
+    resolvedBaseUrl
   ).toString();
 }
 

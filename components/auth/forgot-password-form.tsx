@@ -14,7 +14,6 @@ const DEFAULT_SUCCESS_MESSAGE =
 export function ForgotPasswordForm() {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -24,14 +23,11 @@ export function ForgotPasswordForm() {
     if (!parsed.success) {
       const nextError =
         parsed.error.issues[0]?.message ?? "Unable to request a password reset.";
-      setErrorMessage(nextError);
       toast.error(nextError);
       return;
     }
 
     startTransition(async () => {
-      setErrorMessage(null);
-
       const response = await fetch("/api/auth/password-reset/request", {
         method: "POST",
         headers: {
@@ -50,14 +46,12 @@ export function ForgotPasswordForm() {
           typeof rawPayload.error === "string"
             ? rawPayload.error
             : "Unable to request a password reset.";
-        setErrorMessage(nextError);
         toast.error(nextError);
         return;
       }
 
       const payload = passwordResetRequestAcceptedSchema.safeParse(rawPayload);
       const nextMessage = payload.success ? payload.data.message : DEFAULT_SUCCESS_MESSAGE;
-      setErrorMessage(null);
       toast.success(nextMessage);
     });
   }
@@ -84,11 +78,6 @@ export function ForgotPasswordForm() {
           required
         />
       </label>
-      {errorMessage ? (
-        <p className="muted" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
       <button className="button" type="submit" disabled={isPending}>
         {isPending ? "Sending Reset Link..." : "Send Reset Link"}
       </button>

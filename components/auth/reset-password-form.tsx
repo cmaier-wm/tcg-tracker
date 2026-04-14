@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { passwordResetConfirmSchema } from "@/lib/auth/schemas";
@@ -18,7 +18,12 @@ export function ResetPasswordForm({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(initialErrorMessage);
+
+  useEffect(() => {
+    if (initialErrorMessage) {
+      toast.error(initialErrorMessage);
+    }
+  }, [initialErrorMessage]);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,14 +33,11 @@ export function ResetPasswordForm({
     if (!parsed.success) {
       const nextError =
         parsed.error.issues[0]?.message ?? "Unable to reset password.";
-      setErrorMessage(nextError);
       toast.error(nextError);
       return;
     }
 
     startTransition(async () => {
-      setErrorMessage(null);
-
       const response = await fetch("/api/auth/password-reset/confirm", {
         method: "POST",
         headers: {
@@ -50,7 +52,6 @@ export function ResetPasswordForm({
 
       if (!response.ok) {
         const nextError = payload.error ?? "Unable to reset password.";
-        setErrorMessage(nextError);
         toast.error(nextError);
         return;
       }
@@ -67,9 +68,7 @@ export function ResetPasswordForm({
         <div className="section-heading">
           <div>
             <h1>Reset Link Unavailable</h1>
-            <p className="muted" role="alert">
-              {initialErrorMessage}
-            </p>
+            <p className="muted">Request a new reset link to continue.</p>
           </div>
         </div>
         <Link href="/reset-password" className="button">
@@ -101,11 +100,6 @@ export function ResetPasswordForm({
           required
         />
       </label>
-      {errorMessage ? (
-        <p className="muted" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
       <button className="button" type="submit" disabled={isPending}>
         {isPending ? "Updating Password..." : "Update Password"}
       </button>
