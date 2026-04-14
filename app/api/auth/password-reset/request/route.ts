@@ -30,6 +30,17 @@ function getRequestErrorMessage(error: unknown) {
   return "Password reset is unavailable right now. Try again later.";
 }
 
+function getPasswordResetBaseUrl(request: Request) {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const forwardedHost = request.headers.get("x-forwarded-host");
+
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return new URL(request.url).origin;
+}
+
 export async function POST(request: Request) {
   try {
     const payload = passwordResetRequestSchema.parse(await request.json());
@@ -38,7 +49,10 @@ export async function POST(request: Request) {
     if (result.resetToken) {
       await deliverPasswordReset({
         email: result.email,
-        resetUrl: buildPasswordResetUrl(result.resetToken)
+        resetUrl: buildPasswordResetUrl(
+          result.resetToken,
+          getPasswordResetBaseUrl(request)
+        )
       });
     }
 

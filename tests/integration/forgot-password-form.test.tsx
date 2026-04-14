@@ -28,8 +28,8 @@ describe("forgot password form", () => {
     await user.click(screen.getByRole("button", { name: "Send Reset Link" }));
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert")).toHaveTextContent("Enter a valid email address.");
     expect(toast.error).toHaveBeenCalledWith("Enter a valid email address.");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("shows the generic success confirmation after a successful request", async () => {
