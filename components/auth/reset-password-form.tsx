@@ -87,10 +87,6 @@ export function ResetPasswordForm({
       <div className="section-heading">
         <div>
           <h1>Choose a New Password</h1>
-          <p className="muted">
-            Enter a new password with at least 8 characters. It must be
-            different from your current password.
-          </p>
         </div>
       </div>
       <label className="field">

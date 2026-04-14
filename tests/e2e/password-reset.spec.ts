@@ -18,9 +18,10 @@ test("requests a password reset with a generic confirmation", async ({ page }) =
   await page.getByLabel("Email").fill(credentials.email);
   await page.getByRole("button", { name: "Send Reset Link" }).click();
 
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.getByText(
     "If an account exists for that email, a password reset link has been sent."
-  );
+  )).toBeVisible();
+  await expect(page.locator("form").getByRole("status")).toHaveCount(0);
 });
 
 test("resets the password and rejects reuse of the same reset link", async ({ page }) => {

@@ -55,10 +55,10 @@ describe("forgot password form", () => {
     await user.click(screen.getByRole("button", { name: "Send Reset Link" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("status")).toHaveTextContent(
+      expect(toast.success).toHaveBeenCalledWith(
         "If an account exists for that email, a password reset link has been sent."
       );
-      expect(toast.success).toHaveBeenCalled();
     });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 });

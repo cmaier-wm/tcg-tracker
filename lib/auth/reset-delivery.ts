@@ -4,6 +4,24 @@ type DeliverPasswordResetInput = {
 };
 
 export async function deliverPasswordReset(input: DeliverPasswordResetInput) {
+  const endpoint = process.env.AUTH_RESET_EMAIL_ENDPOINT?.trim();
+
+  if (endpoint) {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(input)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Password reset delivery failed with status ${response.status}.`);
+    }
+
+    return;
+  }
+
   if (process.env.NODE_ENV !== "production") {
     console.info(
       `[password-reset] ${input.email} ${input.resetUrl}`
@@ -11,21 +29,5 @@ export async function deliverPasswordReset(input: DeliverPasswordResetInput) {
     return;
   }
 
-  const endpoint = process.env.AUTH_RESET_EMAIL_ENDPOINT?.trim();
-
-  if (!endpoint) {
-    throw new Error("Password reset email delivery is not configured.");
-  }
-
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(input)
-  });
-
-  if (!response.ok) {
-    throw new Error(`Password reset delivery failed with status ${response.status}.`);
-  }
+  throw new Error("Password reset email delivery is not configured.");
 }

@@ -15,7 +15,6 @@ export function ForgotPasswordForm() {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,7 +25,6 @@ export function ForgotPasswordForm() {
       const nextError =
         parsed.error.issues[0]?.message ?? "Unable to request a password reset.";
       setErrorMessage(nextError);
-      setSuccessMessage(null);
       toast.error(nextError);
       return;
     }
@@ -53,14 +51,12 @@ export function ForgotPasswordForm() {
             ? rawPayload.error
             : "Unable to request a password reset.";
         setErrorMessage(nextError);
-        setSuccessMessage(null);
         toast.error(nextError);
         return;
       }
 
       const payload = passwordResetRequestAcceptedSchema.safeParse(rawPayload);
       const nextMessage = payload.success ? payload.data.message : DEFAULT_SUCCESS_MESSAGE;
-      setSuccessMessage(nextMessage);
       setErrorMessage(null);
       toast.success(nextMessage);
     });
@@ -91,11 +87,6 @@ export function ForgotPasswordForm() {
       {errorMessage ? (
         <p className="muted" role="alert">
           {errorMessage}
-        </p>
-      ) : null}
-      {successMessage ? (
-        <p className="muted" role="status">
-          {successMessage}
         </p>
       ) : null}
       <button className="button" type="submit" disabled={isPending}>
