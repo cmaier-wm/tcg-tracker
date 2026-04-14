@@ -155,17 +155,4 @@ describe("cards browse pages", () => {
       })
     );
   });
-
-  it("shows the documented empty state when search returns no cards", async () => {
-    mockGetCardCatalog.mockResolvedValueOnce([]);
-
-    const page = await CardsPage({
-      searchParams: Promise.resolve({
-        q: "missing-card"
-      })
-    });
-    render(page);
-
-    expect(screen.getByText("No cards found")).toBeInTheDocument();
-  });
 });

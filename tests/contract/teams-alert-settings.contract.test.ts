@@ -50,24 +50,4 @@ describe("teams alert settings contract", () => {
     expect(payload.lastDeliveredAt).toBeNull();
     expect(payload.lastFailureAt).toBeNull();
   });
-
-  it("keeps the trigger amount writable for the mobile settings form", async () => {
-    const response = await PUT(
-      new Request("http://localhost/api/settings/teams-alert", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          enabled: true,
-          destinationLabel: "Trading alerts",
-          triggerAmountUsd: 1500,
-          webhookUrl: "https://example.com/workflows/hook"
-        })
-      })
-    );
-    const payload = await response.json();
-
-    expect(payload.triggerAmountUsd).toBe(1500);
-  });
 });

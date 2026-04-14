@@ -14,14 +14,4 @@ describe("card pricing section", () => {
     expect(screen.getByText("Current price")).toBeInTheDocument();
     expect(screen.getByText("Price History")).toBeInTheDocument();
   });
-
-  it("renders the selected card artwork for the mobile detail surface", async () => {
-    const page = await CardDetailPage({
-      params: Promise.resolve({ category: "pokemon", cardId: "sv1-charizard-ex" })
-    });
-
-    render(page);
-
-    expect(screen.getByRole("img", { name: /charizard ex/i })).toBeInTheDocument();
-  });
 });

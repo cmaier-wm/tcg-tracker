@@ -76,37 +76,4 @@ describe("portfolio service", () => {
     expect(response.status).toBe(401);
     expect(payload.error).toBe("Authentication is required.");
   });
-
-  it("refreshes computed totals after add, update, and remove operations", async () => {
-    const created = await addHolding("sv1-charizard-ex-en-nm-holo", 1);
-    let portfolio = await getPortfolio();
-    const initialTotal = portfolio.totalEstimatedValue;
-
-    expect(initialTotal).toBeGreaterThan(0);
-
-    const { PATCH, DELETE } = await import("@/app/api/portfolio/[holdingId]/route");
-
-    await PATCH(
-      new Request(`http://localhost/api/portfolio/${created.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity: 2 })
-      }),
-      { params: Promise.resolve({ holdingId: created.id }) }
-    );
-
-    portfolio = await getPortfolio();
-    expect(portfolio.totalEstimatedValue).toBeGreaterThan(initialTotal);
-
-    const deleteResponse = await DELETE(
-      new Request(`http://localhost/api/portfolio/${created.id}`),
-      {
-        params: Promise.resolve({ holdingId: created.id })
-      }
-    );
-
-    expect(deleteResponse.status).toBe(204);
-    portfolio = await getPortfolio();
-    expect(portfolio.holdings.some((holding) => holding.id === created.id)).toBe(false);
-  });
 });

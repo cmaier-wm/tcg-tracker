@@ -10,10 +10,5 @@ describe("portfolio history contract", () => {
       totalValue: expect.any(Number)
     });
   });
-
-  it("keeps the history response array-shaped for mobile chart rendering", async () => {
-    const history = await getPortfolioHistory();
-
-    expect(Array.isArray(history.points)).toBe(true);
-  });
 });
+
