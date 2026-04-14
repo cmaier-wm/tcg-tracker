@@ -14,6 +14,16 @@ describe("cards search contract", () => {
     });
   });
 
+  it("preserves mobile browse fields for imagery and pricing metadata", async () => {
+    const items = await getCardCatalog({ q: "charizard" });
+
+    expect(items[0]).toMatchObject({
+      imageUrl: expect.any(String),
+      currentPrice: expect.any(Number),
+      variationCount: expect.any(Number)
+    });
+  });
+
   it("matches card names and collector numbers together", async () => {
     const items = await getCardCatalog({ q: "charizard 125" });
 

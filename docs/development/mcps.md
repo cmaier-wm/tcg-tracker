@@ -96,6 +96,9 @@ Repository impact:
   state.
 - UI refinement work should use the current Figma Make file above as the
   canonical design reference unless a newer design link is explicitly adopted.
+- The current iOS client implementation mirrors the two-tab mobile shell,
+  detail push navigation, and settings entry from that Make file rather than
+  deriving mobile UX only from the desktop web pages.
 
 ### Postgres MCP
 
