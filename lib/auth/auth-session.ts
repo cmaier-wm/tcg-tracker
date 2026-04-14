@@ -329,6 +329,65 @@ export async function findUserAccountByEmail(normalizedEmail: string) {
   );
 }
 
+export async function attachCredentialToExistingAccount(input: {
+  email: string;
+  passwordHash: string;
+}) {
+  const normalizedEmail = normalizeEmail(input.email);
+
+  return withDatabaseFallback(
+    async () => {
+      const user = await prisma.userAccount.findUnique({
+        where: { email: normalizedEmail },
+        include: { credential: true }
+      });
+
+      if (!user || user.credential) {
+        return null;
+      }
+
+      const updatedUser = await prisma.userAccount.update({
+        where: { id: user.id },
+        data: {
+          credential: {
+            create: {
+              normalizedEmail,
+              passwordHash: input.passwordHash
+            }
+          }
+        }
+      });
+
+      return mapUser(updatedUser);
+    },
+    async () => {
+      const user = findDemoUserByEmail(normalizedEmail);
+
+      if (!user) {
+        return null;
+      }
+
+      const store = getDemoStore();
+      const existingCredential = store.credentials.find((item) => item.userId === user.id);
+
+      if (existingCredential) {
+        return null;
+      }
+
+      const now = new Date().toISOString();
+      store.credentials.push({
+        userId: user.id,
+        normalizedEmail,
+        passwordHash: input.passwordHash,
+        createdAt: now,
+        updatedAt: now
+      });
+
+      return mapUser(user);
+    }
+  );
+}
+
 export async function findLegacyUserAccount() {
   return withDatabaseFallback<{ id: string } | null>(
     async () => {

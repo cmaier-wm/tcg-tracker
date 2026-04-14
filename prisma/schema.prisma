@@ -101,6 +101,7 @@ model UserAccount {
   credential           UserCredential?
   authSessions         AuthSession[]
   authAuditEvents      AuthAuditEvent[]
+  passwordResetTokens  PasswordResetToken[]
   holdings             PortfolioHolding[]
   valuationSnapshots PortfolioValuationSnapshot[]
   teamsAlertPreference TeamsAlertPreference?
@@ -139,6 +140,20 @@ model AuthAuditEvent {
 
   @@index([userId, createdAt])
   @@index([eventType, createdAt])
+}
+
+model PasswordResetToken {
+  id         String      @id @default(cuid())
+  userId     String
+  tokenHash  String
+  expiresAt  DateTime
+  usedAt     DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime    @default(now())
+  user       UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([expiresAt])
 }
 
 model PortfolioHolding {

@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { unauthorized } from "@/lib/api/http-errors";
 import {
+  attachCredentialToExistingAccount,
   createAuthSession,
+  findUserAccountByEmail,
   getUserCredentialByEmail,
   resolvePostAuthRedirect,
   setAuthSessionCookie
 } from "@/lib/auth/auth-session";
-import { verifyPassword } from "@/lib/auth/password";
+import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { loginRequestSchema } from "@/lib/auth/schemas";
 import { recordAuthAuditEvent } from "@/lib/auth/audit-log";
 
@@ -27,16 +29,39 @@ async function safeRecordAuthAuditEvent(input: {
 export async function POST(request: Request) {
   try {
     const payload = loginRequestSchema.parse(await request.json());
-    const credential = await getUserCredentialByEmail(payload.email);
+    let credential = await getUserCredentialByEmail(payload.email);
+    let usedLegacyCredentialRecovery = false;
 
     if (!credential) {
-      throw unauthorized("Invalid email or password.");
+      const existingUser = await findUserAccountByEmail(payload.email);
+
+      if (!existingUser) {
+        throw unauthorized("Invalid email or password.");
+      }
+
+      const passwordHash = await hashPassword(payload.password);
+      const attachedUser = await attachCredentialToExistingAccount({
+        email: payload.email,
+        passwordHash
+      });
+
+      if (!attachedUser) {
+        throw unauthorized("Invalid email or password.");
+      }
+
+      credential = {
+        user: attachedUser,
+        passwordHash
+      };
+      usedLegacyCredentialRecovery = true;
     }
 
-    const isValid = await verifyPassword(payload.password, credential.passwordHash);
+    if (!usedLegacyCredentialRecovery) {
+      const isValid = await verifyPassword(payload.password, credential.passwordHash);
 
-    if (!isValid) {
-      throw unauthorized("Invalid email or password.");
+      if (!isValid) {
+        throw unauthorized("Invalid email or password.");
+      }
     }
 
     const session = await createAuthSession(credential.user.userId);

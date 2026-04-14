@@ -6,9 +6,8 @@ import {
   readdirSync,
   readFileSync,
   readlinkSync,
-  symlinkSync,
   rmSync,
-  unlinkSync,
+  symlinkSync,
   writeFileSync
 } from "node:fs";
 import { join } from "node:path";
@@ -20,6 +19,7 @@ const publicDir = join(root, "public");
 const prismaDir = join(root, "prisma");
 const azureStartScript = join(root, "scripts", "azure-start.mjs");
 const outputDir = join(root, ".azuredist");
+const outputPackageJsonPath = join(outputDir, "package.json");
 const includePrismaCli = process.env.AZURE_INCLUDE_PRISMA_CLI === "true";
 
 function walkFiles(dir) {
@@ -114,18 +114,14 @@ mkdirSync(outputDir, { recursive: true });
 cpSync(standaloneDir, outputDir, { recursive: true });
 syncRelativeSymlinks(standaloneDir, outputDir);
 
+const outputPackageJson = JSON.parse(readFileSync(outputPackageJsonPath, "utf8"));
+outputPackageJson.scripts = {
+  ...(outputPackageJson.scripts ?? {}),
+  start: "node server.js"
+};
+writeFileSync(outputPackageJsonPath, `${JSON.stringify(outputPackageJson, null, 2)}\n`);
+
 rmSync(join(outputDir, ".env"), { force: true });
-
-const packageJsonPath = join(outputDir, "package.json");
-
-if (existsSync(packageJsonPath)) {
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
-  packageJson.scripts = {
-    ...packageJson.scripts,
-    start: "node server.js"
-  };
-  writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
-}
 
 mkdirSync(join(outputDir, ".next"), { recursive: true });
 cpSync(staticDir, join(outputDir, ".next", "static"), { recursive: true });
@@ -161,8 +157,10 @@ const prismaClientAliases = getPrismaClientAliases(join(root, ".next", "server")
 for (const alias of prismaClientAliases) {
   const aliasDir = join(outputDir, "node_modules", "@prisma", alias);
 
-  if (existsSync(prismaClientDir) && !existsSync(aliasDir)) {
-    symlinkSync("client", aliasDir, "dir");
+  rmSync(aliasDir, { force: true, recursive: true });
+
+  if (existsSync(prismaClientDir)) {
+    cpSync(prismaClientDir, aliasDir, { recursive: true });
   }
 }
 

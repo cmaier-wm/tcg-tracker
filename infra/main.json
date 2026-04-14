@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "9172792030289441446"
+      "templateHash": "9911513243945405454"
     }
   },
   "parameters": {
@@ -38,6 +38,27 @@
       "type": "securestring",
       "metadata": {
         "description": "PostgreSQL administrator password."
+      }
+    },
+    "resendApiKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional Resend API key for password reset email delivery."
+      }
+    },
+    "authResetFromEmail": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional sender email address for password reset email delivery."
+      }
+    },
+    "authResetFromName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional sender display name for password reset email delivery."
       }
     },
     "databaseName": {
@@ -209,6 +230,12 @@
           "appServicePlanSkuName": {
             "value": "[parameters('appServicePlanSkuName')]"
           },
+          "authResetFromEmail": {
+            "value": "[parameters('authResetFromEmail')]"
+          },
+          "authResetFromName": {
+            "value": "[parameters('authResetFromName')]"
+          },
           "applicationInsightsConnectionString": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', 'monitoring'), '2025-04-01').outputs.applicationInsightsConnectionString.value]"
           },
@@ -220,6 +247,9 @@
           },
           "nodeRuntime": {
             "value": "[parameters('nodeRuntime')]"
+          },
+          "resendApiKey": {
+            "value": "[parameters('resendApiKey')]"
           },
           "resourceToken": {
             "value": "[variables('resourceToken')]"
@@ -238,7 +268,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.42.1.51946",
-              "templateHash": "11222944595681955442"
+              "templateHash": "17221042663729773815"
             }
           },
           "parameters": {
@@ -246,6 +276,12 @@
               "type": "string"
             },
             "appServicePlanSkuName": {
+              "type": "string"
+            },
+            "authResetFromEmail": {
+              "type": "string"
+            },
+            "authResetFromName": {
               "type": "string"
             },
             "applicationInsightsConnectionString": {
@@ -259,6 +295,9 @@
             },
             "nodeRuntime": {
               "type": "string"
+            },
+            "resendApiKey": {
+              "type": "securestring"
             },
             "resourceToken": {
               "type": "string"
@@ -275,6 +314,10 @@
             "keyVaultName": "[format('azkv{0}', parameters('resourceToken'))]",
             "appServicePlanName": "[format('azasp{0}', parameters('resourceToken'))]",
             "webAppName": "[format('azapp{0}', parameters('resourceToken'))]",
+            "hasResendApiKey": "[not(empty(parameters('resendApiKey')))]",
+            "hasAuthResetFromEmail": "[not(empty(parameters('authResetFromEmail')))]",
+            "hasAuthResetFromName": "[not(empty(parameters('authResetFromName')))]",
+            "passwordResetEmailAppSettings": "[concat(if(variables('hasResendApiKey'), createArray(createObject('name', 'RESEND_API_KEY', 'value', format('@Microsoft.KeyVault(VaultName={0};SecretName=resend-api-key)', variables('keyVaultName')))), createArray()), if(variables('hasAuthResetFromEmail'), createArray(createObject('name', 'AUTH_RESET_FROM_EMAIL', 'value', format('@Microsoft.KeyVault(VaultName={0};SecretName=auth-reset-from-email)', variables('keyVaultName')))), createArray()), if(variables('hasAuthResetFromName'), createArray(createObject('name', 'AUTH_RESET_FROM_NAME', 'value', format('@Microsoft.KeyVault(VaultName={0};SecretName=auth-reset-from-name)', variables('keyVaultName')))), createArray()))]",
             "appTags": "[union(parameters('tags'), createObject('azd-service-name', parameters('serviceName')))]",
             "keyVaultSecretsUserRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
             "keyVaultSecretsOfficerRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]",
@@ -340,6 +383,42 @@
               ]
             },
             {
+              "condition": "[variables('hasResendApiKey')]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'resend-api-key')]",
+              "properties": {
+                "value": "[parameters('resendApiKey')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              ]
+            },
+            {
+              "condition": "[variables('hasAuthResetFromEmail')]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'auth-reset-from-email')]",
+              "properties": {
+                "value": "[parameters('authResetFromEmail')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              ]
+            },
+            {
+              "condition": "[variables('hasAuthResetFromName')]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('keyVaultName'), 'auth-reset-from-name')]",
+              "properties": {
+                "value": "[parameters('authResetFromName')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              ]
+            },
+            {
               "type": "Microsoft.Web/serverfarms",
               "apiVersion": "2023-12-01",
               "name": "[variables('appServicePlanName')]",
@@ -371,6 +450,9 @@
                 }
               },
               "properties": {
+                "clientCertEnabled": false,
+                "clientCertMode": "Optional",
+                "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentityName'))]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
                 "httpsOnly": true,
                 "publicNetworkAccess": "Enabled",
@@ -384,35 +466,9 @@
                     "supportCredentials": false
                   },
                   "ftpsState": "Disabled",
-                  "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentityName'))]",
                   "linuxFxVersion": "[parameters('nodeRuntime')]",
                   "minTlsVersion": "1.2",
-                  "appSettings": [
-                    {
-                      "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                      "value": "[parameters('applicationInsightsConnectionString')]"
-                    },
-                    {
-                      "name": "DATABASE_URL",
-                      "value": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=database-url)', variables('keyVaultName'))]"
-                    },
-                    {
-                      "name": "NEXT_TELEMETRY_DISABLED",
-                      "value": "1"
-                    },
-                    {
-                      "name": "NODE_ENV",
-                      "value": "production"
-                    },
-                    {
-                      "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-                      "value": "false"
-                    },
-                    {
-                      "name": "WEBSITE_RUN_FROM_PACKAGE",
-                      "value": "1"
-                    }
-                  ]
+                  "appSettings": "[concat(createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', parameters('applicationInsightsConnectionString')), createObject('name', 'DATABASE_URL', 'value', format('@Microsoft.KeyVault(VaultName={0};SecretName=database-url)', variables('keyVaultName')))), variables('passwordResetEmailAppSettings'), createArray(createObject('name', 'NEXT_TELEMETRY_DISABLED', 'value', '1'), createObject('name', 'NODE_ENV', 'value', 'production'), createObject('name', 'SCM_DO_BUILD_DURING_DEPLOYMENT', 'value', 'false'), createObject('name', 'WEBSITE_RUN_FROM_PACKAGE', 'value', '1'), createObject('name', 'WEBSITE_WARMUP_PATH', 'value', '/api/health')))]"
                 }
               },
               "dependsOn": [

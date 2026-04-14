@@ -14,6 +14,16 @@ param postgresAdminUsername string
 @description('PostgreSQL administrator password.')
 param postgresAdminPassword string
 
+@secure()
+@description('Optional Resend API key for password reset email delivery.')
+param resendApiKey string = ''
+
+@description('Optional sender email address for password reset email delivery.')
+param authResetFromEmail string = ''
+
+@description('Optional sender display name for password reset email delivery.')
+param authResetFromName string = ''
+
 @description('Application database name.')
 param databaseName string = 'tcgtracker'
 
@@ -57,10 +67,13 @@ module webapp './modules/webapp.bicep' = {
   params: {
     appCommandLine: appCommandLine
     appServicePlanSkuName: appServicePlanSkuName
+    authResetFromEmail: authResetFromEmail
+    authResetFromName: authResetFromName
     applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
     location: location
     logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
     nodeRuntime: nodeRuntime
+    resendApiKey: resendApiKey
     resourceToken: resourceToken
     serviceName: serviceName
     tags: commonTags

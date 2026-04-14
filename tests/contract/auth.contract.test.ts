@@ -4,6 +4,7 @@ import { POST as register } from "@/app/api/auth/register/route";
 import { POST as logout } from "@/app/api/auth/logout/route";
 
 const authSessionMocks = vi.hoisted(() => ({
+  attachCredentialToExistingAccount: vi.fn(),
   createAuthSession: vi.fn(),
   createUserAccountWithCredential: vi.fn(),
   findUserAccountByEmail: vi.fn(),
@@ -204,6 +205,49 @@ describe("auth contract", () => {
 
     expect(failureResponse.status).toBe(401);
     expect(failurePayload.error).toBe("Invalid email or password.");
+  });
+
+  it("recovers a legacy account that exists without a credential row", async () => {
+    authSessionMocks.getUserCredentialByEmail.mockResolvedValueOnce(null);
+    authSessionMocks.findUserAccountByEmail.mockResolvedValueOnce({
+      userId: "demo-user",
+      email: "collector@local.tcg",
+      displayName: "Collector"
+    });
+    authSessionMocks.attachCredentialToExistingAccount.mockResolvedValueOnce({
+      userId: "demo-user",
+      email: "collector@local.tcg",
+      displayName: "Collector"
+    });
+    passwordMocks.hashPassword.mockResolvedValueOnce("new-password-hash");
+
+    const response = await login(
+      new Request("http://localhost/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: " Collector@Local.Tcg ",
+          password: "password123"
+        })
+      })
+    );
+
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(authSessionMocks.findUserAccountByEmail).toHaveBeenCalledWith("collector@local.tcg");
+    expect(authSessionMocks.attachCredentialToExistingAccount).toHaveBeenCalledWith({
+      email: "collector@local.tcg",
+      passwordHash: "new-password-hash"
+    });
+    expect(passwordMocks.verifyPassword).not.toHaveBeenCalled();
+    expect(payload).toMatchObject({
+      userId: "demo-user",
+      email: "collector@local.tcg",
+      displayName: "Collector"
+    });
   });
 
   it("invalidates the current session on logout", async () => {
