@@ -76,6 +76,35 @@ describe("password reset contract", () => {
     expect(missingResponse.status).toBe(202);
     expect(existingPayload).toEqual(missingPayload);
     expect(deliveryMocks.deliverPasswordReset).toHaveBeenCalledTimes(1);
+    expect(passwordResetMocks.buildPasswordResetUrl).toHaveBeenCalledWith(
+      "reset-token",
+      "http://localhost"
+    );
+  });
+
+  it("prefers the forwarded request origin for password reset links", async () => {
+    passwordResetMocks.createPasswordResetRequest.mockResolvedValueOnce({
+      accepted: true,
+      email: "collector@example.com",
+      resetToken: "reset-token"
+    });
+
+    await requestReset(
+      new Request("http://internal/api/auth/password-reset/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-proto": "https",
+          "x-forwarded-host": "azappjzn32vflxpfjy.azurewebsites.net"
+        },
+        body: JSON.stringify({ email: "collector@example.com" })
+      })
+    );
+
+    expect(passwordResetMocks.buildPasswordResetUrl).toHaveBeenCalledWith(
+      "reset-token",
+      "https://azappjzn32vflxpfjy.azurewebsites.net"
+    );
   });
 
   it("completes a valid password reset", async () => {

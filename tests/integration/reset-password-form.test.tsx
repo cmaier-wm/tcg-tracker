@@ -39,7 +39,10 @@ describe("reset password form", () => {
       />
     );
 
-    expect(screen.getByRole("alert")).toHaveTextContent("invalid or has expired");
+    expect(toast.error).toHaveBeenCalledWith(
+      "This password reset link is invalid or has expired. Request a new reset link."
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Request New Reset Link" })).toBeInTheDocument();
   });
 
@@ -54,10 +57,8 @@ describe("reset password form", () => {
     await user.click(screen.getByRole("button", { name: "Update Password" }));
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Password must contain at least 8 characters."
-    );
     expect(toast.error).toHaveBeenCalledWith("Password must contain at least 8 characters.");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("redirects to login after a successful reset", async () => {

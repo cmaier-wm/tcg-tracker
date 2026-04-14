@@ -10,7 +10,6 @@ export function RegisterForm({ returnTo }: { returnTo: string | null }) {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -19,13 +18,11 @@ export function RegisterForm({ returnTo }: { returnTo: string | null }) {
 
     if (!parsed.success) {
       const nextError = parsed.error.issues[0]?.message ?? "Unable to register.";
-      setErrorMessage(nextError);
       toast.error(nextError);
       return;
     }
 
     startTransition(async () => {
-      setErrorMessage(null);
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
@@ -38,12 +35,10 @@ export function RegisterForm({ returnTo }: { returnTo: string | null }) {
 
       if (!response.ok) {
         const nextError = payload.error ?? "Unable to register.";
-        setErrorMessage(nextError);
         toast.error(nextError);
         return;
       }
 
-      setErrorMessage(null);
       toast.success("Account created");
       router.push(payload.returnTo ?? "/portfolio");
       router.refresh();
@@ -81,11 +76,6 @@ export function RegisterForm({ returnTo }: { returnTo: string | null }) {
           required
         />
       </label>
-      {errorMessage ? (
-        <p className="muted" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
       <button className="button" type="submit" disabled={isPending}>
         {isPending ? "Creating Account..." : "Create Account"}
       </button>
