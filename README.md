@@ -73,14 +73,17 @@ Local setup notes:
 - `npm run dev` now applies checked-in auth migrations automatically so the
   `UserCredential`, `AuthSession`, and `AuthAuditEvent` tables stay in sync
   without a separate manual migrate step.
-- `AUTH_RESET_EMAIL_ENDPOINT` is optional for local development. When it is
-  set, local reset requests POST `{ "email": "...", "resetUrl": "..." }` to
-  that endpoint so you can test real email delivery. When it is not set,
-  password reset requests log the recovery URL to the local server output.
-- For a concrete local email path with Resend, start the app with:
-  `AUTH_RESET_EMAIL_ENDPOINT='http://127.0.0.1:3000/api/dev/password-reset-email'`
-  plus `RESEND_API_KEY`, `AUTH_RESET_FROM_EMAIL`, and optionally
-  `AUTH_RESET_FROM_NAME`.
+- Password reset emails can be sent directly by the app when `RESEND_API_KEY`
+  and `AUTH_RESET_FROM_EMAIL` are set. `AUTH_RESET_FROM_NAME` is optional.
+- `AUTH_RESET_EMAIL_ENDPOINT` remains optional for local development when you
+  want to forward reset requests to another server-side delivery endpoint that
+  accepts `{ "email": "...", "resetUrl": "..." }`.
+- When neither Resend nor `AUTH_RESET_EMAIL_ENDPOINT` is configured locally,
+  password reset requests log the recovery URL to the server output.
+- For a concrete local Resend test path, start the app with
+  `RESEND_API_KEY`, `AUTH_RESET_FROM_EMAIL`, and optionally
+  `AUTH_RESET_FROM_NAME`. If you still prefer an internal callback path, set
+  `AUTH_RESET_EMAIL_ENDPOINT='http://127.0.0.1:3000/api/dev/password-reset-email'`.
 - `/cards` and card detail pages remain public while `/portfolio`, `/settings`,
   and the matching portfolio/settings APIs require authentication.
 - The first newly registered account claims any legacy demo portfolio/settings
@@ -143,6 +146,9 @@ Azure packaging note:
   deployment artifact contains
   `libquery_engine-debian-openssl-3.0.x.so.node` under
   `.next/standalone/node_modules/.prisma/client/`.
+- For deployed password reset emails, configure `RESEND_API_KEY`,
+  `AUTH_RESET_FROM_EMAIL`, and optionally `AUTH_RESET_FROM_NAME` in the Azure
+  app settings or Key Vault-backed references used by App Service.
 
 ## Verification
 

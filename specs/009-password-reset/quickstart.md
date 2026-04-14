@@ -13,7 +13,11 @@ portfolio or settings data.
    - `AUTH_SECRET`
    - `TEAMS_WEBHOOK_ENCRYPTION_KEY`
 3. Start the app with `npm run dev`.
-4. Use a local account that already has portfolio or settings data.
+4. If you want to test delivered emails instead of local log output, set either
+   `RESEND_API_KEY` plus `AUTH_RESET_FROM_EMAIL` (and optionally
+   `AUTH_RESET_FROM_NAME`) or set `AUTH_RESET_EMAIL_ENDPOINT` to a server-side
+   reset delivery endpoint.
+5. Use a local account that already has portfolio or settings data.
 
 ## Manual Verification
 
@@ -25,14 +29,15 @@ portfolio or settings data.
 4. Confirm the UI shows a generic success message.
 5. Submit a clearly unregistered email address.
 6. Confirm the UI shows the same generic success message as step 4.
-7. In local development, inspect the server log for the emitted reset URL and
-   copy the newest reset path for the registered account.
+7. If email delivery is configured, open the delivered reset email. Otherwise,
+   inspect the server log for the emitted reset URL and copy the newest reset
+   path for the registered account.
 
 Expected result:
 - Existing and non-existing accounts receive indistinguishable request
   confirmations.
-- Local development exposes the reset path only through the developer log, not
-  through a special UI response.
+- Local development exposes the reset path through the configured delivery
+  channel or the developer log, not through a special UI response.
 
 ### Story 2: Complete a reset successfully
 

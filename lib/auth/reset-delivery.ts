@@ -3,6 +3,11 @@ type DeliverPasswordResetInput = {
   resetUrl: string;
 };
 
+import {
+  canSendPasswordResetWithResend,
+  sendPasswordResetWithResend
+} from "@/lib/auth/resend-email";
+
 export async function deliverPasswordReset(input: DeliverPasswordResetInput) {
   const endpoint = process.env.AUTH_RESET_EMAIL_ENDPOINT?.trim();
 
@@ -22,6 +27,11 @@ export async function deliverPasswordReset(input: DeliverPasswordResetInput) {
     return;
   }
 
+  if (canSendPasswordResetWithResend()) {
+    await sendPasswordResetWithResend(input);
+    return;
+  }
+
   if (process.env.NODE_ENV !== "production") {
     console.info(
       `[password-reset] ${input.email} ${input.resetUrl}`
@@ -29,5 +39,7 @@ export async function deliverPasswordReset(input: DeliverPasswordResetInput) {
     return;
   }
 
-  throw new Error("Password reset email delivery is not configured.");
+  throw new Error(
+    "Password reset email delivery is not configured. Set AUTH_RESET_EMAIL_ENDPOINT or the Resend variables."
+  );
 }
