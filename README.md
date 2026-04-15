@@ -65,7 +65,7 @@ Local mobile workflow:
 
 1. Start the backend with the normal local web commands shown above.
 2. Use the debug base URL `http://127.0.0.1:3000` in Simulator.
-3. Open the Swift package or generated Xcode project under
+3. Generate the local Xcode project, then open the workspace under
    [`ios/TCGTracker/`](/Users/cmaier/.codex/worktrees/2b13/tcg-tracker/ios/TCGTracker).
 4. Run the native unit suite from the package root with:
 
@@ -74,12 +74,11 @@ cd ios
 swift test
 ```
 
-5. If full Xcode is installed locally, regenerate the package-backed Xcode
-   project when source structure changes:
+5. Regenerate the runnable Xcode project whenever the iOS source structure
+   changes:
 
 ```bash
-cd ios
-swift package generate-xcodeproj
+ruby ios/scripts/generate_xcodeproj.rb
 ```
 
 The native client reuses the existing Next.js app as its only backend. Mobile-

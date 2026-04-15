@@ -99,6 +99,62 @@ Repository impact:
 - The current iOS client implementation mirrors the two-tab mobile shell,
   detail push navigation, and settings entry from that Make file rather than
   deriving mobile UX only from the desktop web pages.
+- Figma MCP is best used together with iOS Simulator MCP during mobile UI
+  refinement so design intent can be compared against an actual running iPhone
+  build, not just static SwiftUI code.
+
+### iOS Simulator MCP
+
+Status: Available for native iOS development and verification workflows. Not
+required for shipped application runtime.
+
+Source:
+
+- https://github.com/joshuayoes/ios-simulator-mcp
+
+Underlying local prerequisites:
+
+- Full Xcode installation with Simulator support
+- `idb-companion` installed locally
+- `fb-idb` installed locally so the `idb` client is available
+
+Configured transport:
+
+- Codex global config uses `npx -y ios-simulator-mcp`
+- The current local setup points the MCP to the user-installed `idb` client at
+  `/Users/cmaier/Library/Python/3.9/bin/idb`
+- Screenshots and recordings default to `/Users/cmaier/Downloads`
+
+Primary uses:
+
+- Open the iOS Simulator and interact with a booted device directly from a
+  development session
+- Capture screenshots and videos of the native client while refining SwiftUI
+  implementation against the accepted Figma mobile reference
+- Inspect accessibility trees and on-screen UI state when debugging navigation,
+  tab layout, form flows, and card-detail presentation
+- Drive lightweight manual verification of the native app without needing to
+  rely only on `xcodebuild` logs or physical device testing
+
+Typical tool families exposed by this MCP:
+
+- Simulator lifecycle: `open_simulator`, `get_booted_sim_id`
+- Visual capture: `screenshot`, `record_video`, `stop_recording`
+- Accessibility and UI inspection: `ui_view`, `ui_describe_all`,
+  `ui_describe_point`
+- Interaction: `ui_tap`, `ui_swipe`, `ui_type`
+- App management: `install_app`, `launch_app`
+
+Repository impact:
+
+- No application code in this repository depends on iOS Simulator MCP at
+  runtime.
+- This MCP is a development convenience for the native SwiftUI client under
+  `ios/`.
+- It is especially useful after generating the local Xcode project and running
+  the app in Simulator from `ios/TCGTracker/TCGTracker.xcworkspace`.
+- It complements `swift test` and `xcodebuild` by making the rendered app
+  observable and automatable during development sessions.
 
 ### Postgres MCP
 

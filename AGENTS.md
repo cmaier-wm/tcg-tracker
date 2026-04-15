@@ -45,7 +45,7 @@
 - `npm run snapshots:run`
 - `npm run db:down`
 - `cd ios && swift test`
-- `cd ios && swift package generate-xcodeproj`
+- `ruby ios/scripts/generate_xcodeproj.rb`
 - `npm run azure:prepare`
 - `npm run azure:verify -- <deployed-url>`
 - `env AZD_CONFIG_DIR=/tmp/.azd azd env set POSTGRES_ADMIN_PASSWORD <url-safe-password>`
