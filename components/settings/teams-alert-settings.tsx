@@ -14,6 +14,7 @@ import type {
 } from "@/lib/teams/schemas";
 
 const initialState: TeamsAlertSettingsResponse = {
+  themeMode: "light",
   enabled: false,
   destinationLabel: null,
   triggerAmountUsd: 1000,

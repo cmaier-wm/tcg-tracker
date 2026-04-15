@@ -9,8 +9,10 @@ description: "Task list template for feature implementation"
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
 **Tests**: Verification tasks are REQUIRED. Prefer automated tests for logic,
-contracts, and regressions. If automation is not practical, include explicit
-manual verification tasks with commands, inputs, and expected outcomes.
+contracts, and regressions. Every user story MUST include web verification and
+iOS verification unless an approved constitution exception is documented. If
+automation is not practical, include explicit manual verification tasks with
+commands, inputs, and expected outcomes.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -25,6 +27,8 @@ manual verification tasks with commands, inputs, and expected outcomes.
 - **Single project**: `src/`, `tests/` at repository root
 - **Web app**: `backend/src/`, `frontend/src/`
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
+- This repository defaults to paired web and `ios/` tasks for every feature,
+  plus any shared backend/API work required to keep behavior aligned.
 - Paths shown below assume single project - adjust based on plan.md structure
 
 <!-- 
@@ -86,18 +90,18 @@ Examples of foundational tasks (adjust based on your project):
 > **NOTE: Define verification before implementation and ensure automated tests
 > fail before code changes when the behavior can be exercised that way.**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
-- [ ] T012 [US1] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
+- [ ] T010 [P] [US1] Contract test for shared backend/API behavior in tests/contract/test_[name].py
+- [ ] T011 [P] [US1] Web verification for [user journey] in tests/integration/test_[name].py
+- [ ] T012 [P] [US1] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
+- [ ] T013 [US1] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T014 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T015 [US1] Implement [Service] in src/services/[service].py (depends on T013, T014)
-- [ ] T016 [US1] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T014 [P] [US1] Implement shared backend/API support in src/[shared-location]/[file].py
+- [ ] T015 [P] [US1] Implement web client changes in src/[web-location]/[file].tsx
+- [ ] T016 [P] [US1] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
 - [ ] T017 [US1] Add validation and error handling
-- [ ] T018 [US1] Add logging for user story 1 operations
+- [ ] T018 [US1] Add logging or telemetry for user story 1 operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -111,16 +115,17 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T020 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
-- [ ] T021 [US2] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
+- [ ] T019 [P] [US2] Contract test for shared backend/API behavior in tests/contract/test_[name].py
+- [ ] T020 [P] [US2] Web verification for [user journey] in tests/integration/test_[name].py
+- [ ] T021 [P] [US2] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
+- [ ] T022 [US2] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
 
 ### Implementation for User Story 2
 
-- [ ] T022 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T023 [US2] Implement [Service] in src/services/[service].py
-- [ ] T024 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T025 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T023 [P] [US2] Implement shared backend/API support in src/[shared-location]/[file].py
+- [ ] T024 [P] [US2] Implement web client changes in src/[web-location]/[file].tsx
+- [ ] T025 [P] [US2] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
+- [ ] T026 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -134,15 +139,16 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3
 
-- [ ] T026 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T027 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
-- [ ] T028 [US3] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
+- [ ] T027 [P] [US3] Contract test for shared backend/API behavior in tests/contract/test_[name].py
+- [ ] T028 [P] [US3] Web verification for [user journey] in tests/integration/test_[name].py
+- [ ] T029 [P] [US3] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
+- [ ] T030 [US3] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T030 [US3] Implement [Service] in src/services/[service].py
-- [ ] T031 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T031 [P] [US3] Implement shared backend/API support in src/[shared-location]/[file].py
+- [ ] T032 [P] [US3] Implement web client changes in src/[web-location]/[file].tsx
+- [ ] T033 [P] [US3] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -251,7 +257,7 @@ With multiple developers:
 
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
+- Each user story should be independently completable and testable on both web and iOS
 - Verify automated tests fail before implementing when feasible
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently

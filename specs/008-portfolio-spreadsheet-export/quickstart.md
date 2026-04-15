@@ -49,7 +49,8 @@
 7. Confirm the file contains one row per holding and human-readable column
    headers.
 8. Confirm at least the following columns are present and populated when data
-   exists: category, set, card name, variation, quantity, and estimated value.
+   exists: category, set, card name, collector number, quantity, and estimated
+   value.
 9. Confirm holdings with no latest price data still appear with a clear blank or
    unavailable valuation field rather than being omitted.
 

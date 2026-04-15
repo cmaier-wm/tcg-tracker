@@ -13,6 +13,11 @@ All non-trivial work follows this path:
 3. Generate `tasks.md` with exact file paths and verification steps.
 4. Implement only after the planning artifacts are implementation-ready.
 
+By constitution, product features and behavior changes are required to ship on
+both the web application and the native iOS client in the same increment unless
+that rule is amended or a time-bound exception is explicitly approved in the
+plan.
+
 ## Stack
 
 The current application uses:

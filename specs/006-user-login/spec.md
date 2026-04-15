@@ -5,6 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "I want users to be able to log in. The current features associated to their user would be their portfolio and settings"
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: Keep registration, sign-in, sign-out, and account-protected portfolio/settings behavior available in the web app.
+- **iOS Impact**: Provide registration, sign-in, sign-out, and account-protected portfolio/settings behavior in the native iOS client.
+- **Shared Backend/API Impact**: Reuse the existing auth/session routes and account-backed data ownership model for both clients.
+- **Parity Expectation**: `web + iOS`, while public browsing remains unauthenticated on both platforms.
+
 ## Clarifications
 
 ### Session 2026-04-08
@@ -18,7 +25,7 @@
 - Q: Where does the user land after registration, sign-in, or sign-out? → A: Honor a validated `returnTo` destination for public pages; otherwise send successful auth to `/portfolio` and send sign-out to `/login`.
 - Q: How long does an authenticated session remain valid? → A: Keep the session active for up to 30 days of inactivity, refreshing the inactivity window on authenticated use.
 - Q: Are concurrent sessions for the same account allowed? → A: Yes. Multiple browser/device sessions may coexist, and sign-out ends only the current session.
-- Q: Which settings are account-backed in v1? → A: Teams alert preferences and Teams alert history are account-backed; browser-local theme stays device-local.
+- Q: Which settings are account-backed in v1? → A: Theme preference, Teams alert preferences, and Teams alert history are all account-backed.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -71,7 +78,7 @@ As a collector, I want my app settings to belong to my account so that my prefer
 1. **Given** a signed-in user, **When** they update account-scoped settings, **Then** those settings are saved to that user and restored on later sign-in.
 2. **Given** two different users, **When** they configure different settings values, **Then** each user later sees only their own saved settings.
 3. **Given** an unauthenticated visitor, **When** they try to access account settings, **Then** the system requires sign-in before showing or editing those settings.
-4. **Given** a newly registered user with no saved account-backed settings, **When** they open settings, **Then** the app shows default empty account-backed settings while leaving browser-local theme unchanged.
+4. **Given** a newly registered user with no saved account-backed settings, **When** they open settings, **Then** the app shows default account-backed theme and alert settings for that user.
 
 ---
 
@@ -110,7 +117,7 @@ As a collector, I want my app settings to belong to my account so that my prefer
 - **FR-004b**: A registered user with no holdings or valuation history MUST see an empty account-scoped portfolio state rather than shared legacy data.
 - **FR-005**: The system MUST scope portfolio reads and writes so that one authenticated user cannot access or mutate another user’s portfolio data through normal product routes.
 - **FR-006**: The system MUST scope server-backed account settings reads and writes to the authenticated user.
-- **FR-006a**: The account-backed settings surfaces in v1 MUST be limited to Teams alert preferences and Teams alert history; browser-local theme preferences remain device-local and are not synchronized through the account.
+- **FR-006a**: The account-backed settings surfaces in v1 MUST include theme preference, Teams alert preferences, and Teams alert history.
 - **FR-006b**: A registered user with no saved account-backed settings MUST see empty/default account-backed settings rather than another user’s or the legacy shared state.
 - **FR-007**: The system MUST require authentication before showing or mutating portfolio and server-backed settings features, redirecting unauthenticated page requests to sign in and rejecting unauthenticated API requests.
 - **FR-007a**: The system MUST continue allowing unauthenticated visitors to browse the card catalog and card detail pages.
@@ -146,5 +153,5 @@ As a collector, I want my app settings to belong to my account so that my prefer
 
 - The initial version will use first-party email/password authentication rather than OAuth or enterprise SSO.
 - Password reset, email verification, MFA, and profile editing are out of scope for the first authentication slice unless later specified.
-- The existing browser-only dark mode setting can remain browser-local for v1 and is not synchronized through the authenticated account, while Teams alert preferences and Teams alert history become the only account-backed settings surfaces in scope for this slice.
+- Theme preference, Teams alert preferences, and Teams alert history all become account-backed settings surfaces in scope for this slice.
 - Existing shared default-user data will be claimed by the first successfully registered account and will not be copied to later accounts.

@@ -115,7 +115,7 @@
 4. Update settings under `User B`.
 5. Sign back into `User A` and confirm `User A` still sees only their own settings.
 6. Register a user with no saved Teams settings and confirm settings show the
-   default empty account-backed state while browser-local theme remains local.
+   default empty account-backed state, including the saved theme preference.
 7. Expire or clear the current session, then attempt to save settings and
    confirm the app rejects the write and prompts for sign-in again.
 

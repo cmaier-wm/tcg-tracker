@@ -13,6 +13,10 @@ struct LoginResponse: Codable, Equatable, Sendable {
     let returnTo: String?
 }
 
+struct PasswordResetMessageResponse: Codable, Equatable, Sendable {
+    let message: String
+}
+
 struct MobileSession: Codable, Equatable, Sendable {
     let status: String
     let user: AuthenticatedUser
@@ -50,6 +54,36 @@ struct CardListItem: Codable, Equatable, Hashable, Identifiable, Sendable {
     let imageUrl: String?
     let currentPrice: Double?
     let variationCount: Int
+}
+
+enum CardSortOption: String, CaseIterable, Identifiable, Codable, Sendable {
+    case priceDesc = "price-desc"
+    case priceAsc = "price-asc"
+    case nameAsc = "name-asc"
+    case nameDesc = "name-desc"
+    case numberAsc = "number-asc"
+    case numberDesc = "number-desc"
+    case setAsc = "set-asc"
+    case setDesc = "set-desc"
+    case rarityAsc = "rarity-asc"
+    case rarityDesc = "rarity-desc"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .priceDesc: "Price: High to low"
+        case .priceAsc: "Price: Low to high"
+        case .nameAsc: "Name: A to Z"
+        case .nameDesc: "Name: Z to A"
+        case .numberAsc: "Number: Low to high"
+        case .numberDesc: "Number: High to low"
+        case .setAsc: "Set: A to Z"
+        case .setDesc: "Set: Z to A"
+        case .rarityAsc: "Rarity: Low to high"
+        case .rarityDesc: "Rarity: High to low"
+        }
+    }
 }
 
 struct CardDetail: Codable, Equatable, Sendable {
@@ -138,6 +172,7 @@ struct HoldingUpdateRequest: Codable, Equatable, Sendable {
 }
 
 struct TeamsAlertSettings: Codable, Equatable, Sendable {
+    let themeMode: ThemeMode
     let enabled: Bool
     let destinationLabel: String?
     let triggerAmountUsd: Int
@@ -152,10 +187,30 @@ struct TeamsAlertSettings: Codable, Equatable, Sendable {
 }
 
 struct TeamsAlertSettingsUpdate: Codable, Equatable, Sendable {
-    let enabled: Bool
-    let destinationLabel: String
-    let triggerAmountUsd: Int
+    let themeMode: ThemeMode?
+    let enabled: Bool?
+    let destinationLabel: String?
+    let triggerAmountUsd: Int?
     let webhookUrl: String?
+}
+
+struct TeamsAlertHistoryResponse: Codable, Equatable, Sendable {
+    let items: [TeamsAlertHistoryEntry]
+    let page: Int
+    let pageSize: Int
+    let totalItems: Int
+    let totalPages: Int
+}
+
+struct TeamsAlertHistoryEntry: Codable, Equatable, Identifiable, Sendable {
+    let id: String
+    let capturedAt: String
+    let portfolioValue: Double
+    let baselineValue: Double
+    let gainAmount: Double
+    let status: String
+    let responseCode: Int?
+    let failureMessage: String?
 }
 
 struct APIErrorResponse: Codable, Equatable, Sendable {

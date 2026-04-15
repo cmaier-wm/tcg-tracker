@@ -5,12 +5,14 @@
 
 ## Summary
 
-Build a full-stack web application that lets collectors browse Pokemon cards
-and their variations, inspect current and historical pricing, and track a
-personal portfolio with current and historical valuation. The recommended stack is a
-single TypeScript web app using Next.js for UI and server routes, PostgreSQL
-for relational portfolio and snapshot storage, Prisma ORM for data access, and
-Vitest plus Playwright for verification.
+Build a full-stack product surface that lets collectors browse Pokemon cards,
+inspect current and historical pricing, and track a personal portfolio with
+current and historical valuation across web and iOS. Internal variation records
+may remain in the data model, but variant-specific UX is not part of the
+intended product. The recommended stack is a single TypeScript web app using
+Next.js for UI and server routes, PostgreSQL for relational portfolio and
+snapshot storage, Prisma ORM for data access, and Vitest plus Playwright for
+verification, with the native iOS client consuming the same backend contracts.
 
 ## Technical Context
 
@@ -20,16 +22,18 @@ TanStack Query, Recharts, Zod, Docker Compose for local database services
 **Storage**: PostgreSQL 17 for application data and time-series snapshots,
 run locally via Docker Compose by default  
 **Testing**: Vitest, React Testing Library, Playwright  
-**Target Platform**: Responsive web application for modern desktop and mobile browsers  
-**Project Type**: Full-stack web application  
+**Client Scope**: web + iOS, with the portfolio celebration/fireworks effect as a documented desktop-only exception
+**Target Platform**: Responsive web application for modern desktop and mobile browsers plus a native iPhone client
+**Project Type**: Full-stack web application plus native iOS client
 **Performance Goals**: Catalog search results and card detail views render in
 under 2 seconds on typical broadband; portfolio summary renders in under 2
 seconds for portfolios up to 1,000 holdings  
 **Constraints**: Must tolerate missing external price history or image data,
-must preserve exact card-variation identity for holdings, must support daily
-snapshot ingestion without manual intervention, must remain simple enough to
-ship as a single deployable web app, and must not require manual local database
-installation for development  
+must support daily snapshot ingestion without manual intervention, must remain
+simple enough to ship as a single deployable web app plus native iOS client,
+must not require manual local database installation for development, and must
+keep variant-specific UX out of scope even if internal variation records remain
+necessary for pricing/storage
 **Scale/Scope**: Initial release targets a single collector account model,
 supports only Pokemon from the external source, and stores daily price and
 portfolio snapshots for tracked items
@@ -42,15 +46,46 @@ portfolio snapshots for tracked items
       not start implementation from placeholders alone.
 - [x] User stories remain independently valuable, priority-ordered, and
       independently testable.
-- [x] Verification is defined for each story and for any foundational work that
-      could block later validation.
+- [x] Web, iOS, and shared backend or API impact are defined for each story.
+- [x] Verification is defined for both web and iOS behavior in each story and
+      for any foundational work that could block later validation.
 - [x] Added complexity, dependencies, services, or directories are explicitly
       justified; simpler alternatives are noted when rejected.
 - [x] Any changes to stack, structure, or commands are reflected in `README.md`,
       `AGENTS.md`, and related guidance files in the same change set.
 
 Post-design re-check: PASS. The generated research, data model, contracts,
-quickstart, and synced guidance files remain consistent with the constitution.
+quickstart, and synced guidance files remain consistent with the constitution
+after retroactive parity amendments and explicit desktop-only exceptions.
+
+## Client Delivery Plan
+
+### Shared Backend/API Changes
+
+Retain the existing card, pricing, and portfolio APIs as the shared source of
+truth for both clients. Internal variation records may remain in the backend to
+support pricing fidelity, but variant-specific UX and user choices are no
+longer part of the product contract.
+
+### Web Delivery Surface
+
+Keep catalog browse, card detail, pricing history, and portfolio value/history
+available on the web app. Remove or avoid user-facing variant-specific language
+from the card detail and portfolio flows. Keep the portfolio celebration
+animation explicitly desktop-only.
+
+### iOS Delivery Surface
+
+Deliver the same browse, card detail, pricing history, and portfolio
+value/history behavior in the native iOS client without any variant-specific
+controls or copy.
+
+### Parity Verification
+
+Verify that both web and iOS support browse, card images, current price,
+historical price graph, portfolio holdings, total value, and portfolio value
+history. Verify separately that the web-only celebration effect remains absent
+from iOS.
 
 ## Project Structure
 

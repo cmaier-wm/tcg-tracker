@@ -35,8 +35,11 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
 
         await store.load()
         XCTAssertEqual(store.settings?.triggerAmountUsd, 1500)
+        XCTAssertEqual(store.currentThemeMode, .light)
+        XCTAssertEqual(store.history.count, 1)
 
         await store.save(
+            themeMode: .dark,
             destinationLabel: "Trading alerts",
             triggerAmountUsd: 2000,
             webhookURL: "https://example.com/new-hook",
@@ -44,7 +47,9 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
         )
 
         XCTAssertEqual(store.settings?.triggerAmountUsd, 2000)
+        XCTAssertEqual(store.settings?.themeMode, .dark)
         XCTAssertEqual(store.settings?.webhookUrl, "https://example.com/new-hook")
+        XCTAssertEqual(apiClient.settingsHistoryLoadCount, 2)
     }
 
     func testPortfolioHoldingMapsToDetailCardItem() throws {

@@ -14,6 +14,7 @@ type PortfolioPoint = {
 
 export type DemoTeamsAlertPreference = {
   id: string;
+  themeMode: "light" | "dark";
   enabled: boolean;
   destinationLabel: string | null;
   triggerAmountUsd: number;

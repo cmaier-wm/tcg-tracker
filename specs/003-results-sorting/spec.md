@@ -5,6 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "Add sorting to the results page. The default on the home page should be to sort by price from high to low" plus follow-up scope: "also allow sorting by number, set, and rarity. all sort options should allow descending or ascending"
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: Keep catalog sorting controls and default ordering in the browser experience.
+- **iOS Impact**: Deliver the same sort fields, directions, and default price-desc ordering in the native iOS browse experience.
+- **Shared Backend/API Impact**: Reuse the shared catalog sort query contract and values for both clients.
+- **Parity Expectation**: `web + iOS`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Change Result Order (Priority: P1)

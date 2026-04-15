@@ -5,18 +5,23 @@
 
 ## Summary
 
-Add a settings area that lets users toggle dark mode and keeps that preference on the same browser/device. The smallest viable implementation is a dedicated settings page, a shared theme preference layer that applies across the app, and browser-local persistence so returning users keep their chosen mode.
+Add a settings area that lets users toggle dark mode and keep that preference in their authenticated account. The smallest viable implementation is a dedicated settings page, a shared theme preference layer that applies across the app, and backend persistence so returning users keep their chosen mode across web and iOS.
+
+## Retroactive Parity Amendment
+
+This feature now requires equivalent appearance settings behavior on web and
+iOS. Theme persistence is account-backed and shared across both platforms.
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9 on Node.js 22 LTS  
 **Primary Dependencies**: Next.js 16, React 19, Prisma ORM, PostgreSQL 17, Vitest, React Testing Library, Playwright  
-**Storage**: Browser-local persisted user preference; no new server-side storage required for v1  
+**Storage**: PostgreSQL-backed authenticated account settings via the existing settings API
 **Testing**: Vitest for unit/integration logic, React Testing Library for page/component behavior, Playwright for end-to-end verification  
 **Target Platform**: Web application in modern browsers  
 **Project Type**: Web application  
 **Performance Goals**: Theme changes should be visible immediately, with preference restoration on initial load perceived as instantaneous  
-**Constraints**: Must preserve current app navigation and existing Pokemon browsing/portfolio flows; no account requirement for v1; preference must survive page reloads on the same browser/device  
+**Constraints**: Must preserve current app navigation and existing Pokemon browsing/portfolio flows; requires authentication because all settings are account-backed; preference must survive future sessions across both clients
 **Scale/Scope**: Single user-facing settings surface plus global theme application across the existing app shell
 
 ## Constitution Check
@@ -73,8 +78,7 @@ components/
 
 lib/
 └── settings/
-    ├── theme-preference.ts
-    └── theme-storage.ts
+    └── theme-preference.ts
 
 tests/
 ├── integration/

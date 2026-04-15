@@ -7,10 +7,12 @@ final class BrowseStoreTests: XCTestCase {
         let apiClient = MockAPIClient()
         let store = BrowseStore(apiClient: apiClient)
         store.query = "charizard"
+        store.selectedSort = .rarityDesc
 
         await store.search()
 
         XCTAssertEqual(store.cards.first?.name, "Charizard ex")
+        XCTAssertEqual(apiClient.lastBrowseSort, .rarityDesc)
     }
 
     func testSelectLoadsDetailAndHistory() async {

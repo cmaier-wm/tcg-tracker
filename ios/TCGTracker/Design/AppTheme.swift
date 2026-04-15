@@ -8,8 +8,7 @@ import AppKit
 private typealias PlatformColor = NSColor
 #endif
 
-enum ThemeMode: String, CaseIterable, Identifiable {
-    case system
+enum ThemeMode: String, CaseIterable, Identifiable, Codable, Sendable {
     case light
     case dark
 
@@ -17,7 +16,6 @@ enum ThemeMode: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .system: "System"
         case .light: "Light"
         case .dark: "Dark"
         }
@@ -25,7 +23,6 @@ enum ThemeMode: String, CaseIterable, Identifiable {
 
     var colorScheme: ColorScheme? {
         switch self {
-        case .system: nil
         case .light: .light
         case .dark: .dark
         }
@@ -33,7 +30,6 @@ enum ThemeMode: String, CaseIterable, Identifiable {
 
     var symbolName: String {
         switch self {
-        case .system: "circle.lefthalf.filled"
         case .light: "sun.max.fill"
         case .dark: "moon.fill"
         }

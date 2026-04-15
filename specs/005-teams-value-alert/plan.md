@@ -15,6 +15,12 @@ settings surface, reuse the current valuation snapshot flow as the alert
 trigger, and record delivery attempts so the product can prevent duplicates and
 show delivery status to the user.
 
+## Retroactive Parity Amendment
+
+This feature now requires the same Teams alert configuration, status, and
+delivery visibility in the native iOS settings experience using the existing
+account-backed APIs.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9 on Node.js 22 LTS  

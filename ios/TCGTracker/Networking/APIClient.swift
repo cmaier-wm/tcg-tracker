@@ -22,10 +22,13 @@ enum APIClientError: LocalizedError, Equatable, Sendable {
 
 protocol APIClientProtocol: Sendable {
     func signIn(email: String, password: String) async throws -> MobileSession
+    func register(email: String, password: String) async throws -> MobileSession
     func signOut() async throws
     func fetchSession() async throws -> MobileSession
     func fetchHome() async throws -> MobileHome
-    func browseCards(query: String) async throws -> [CardListItem]
+    func requestPasswordReset(email: String) async throws -> PasswordResetMessageResponse
+    func confirmPasswordReset(token: String, password: String) async throws -> PasswordResetMessageResponse
+    func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem]
     func fetchCardDetail(category: String, cardId: String) async throws -> CardDetail
     func fetchPriceHistory(category: String, cardId: String, variationId: String) async throws -> PriceHistory
     func fetchPortfolio() async throws -> PortfolioResponse
@@ -33,6 +36,7 @@ protocol APIClientProtocol: Sendable {
     func updateHolding(holdingId: String, quantity: Int) async throws
     func removeHolding(holdingId: String) async throws
     func fetchSettings() async throws -> TeamsAlertSettings
+    func fetchSettingsHistory(page: Int, pageSize: Int) async throws -> TeamsAlertHistoryResponse
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings
 }
 
@@ -65,8 +69,16 @@ actor APIClient: APIClientProtocol {
     }
 
     func signIn(email: String, password: String) async throws -> MobileSession {
+        try await authenticate(path: "/api/auth/login", email: email, password: password)
+    }
+
+    func register(email: String, password: String) async throws -> MobileSession {
+        try await authenticate(path: "/api/auth/register", email: email, password: password)
+    }
+
+    private func authenticate(path: String, email: String, password: String) async throws -> MobileSession {
         let payload = try await request(
-            path: "/api/auth/login",
+            path: path,
             method: "POST",
             body: AnyEncodable(LoginRequest(email: email, password: password)),
             expecting: LoginResponse.self
@@ -94,10 +106,31 @@ actor APIClient: APIClientProtocol {
         try await request(path: "/api/mobile/home", expecting: MobileHome.self)
     }
 
-    func browseCards(query: String) async throws -> [CardListItem] {
+    func requestPasswordReset(email: String) async throws -> PasswordResetMessageResponse {
+        try await request(
+            path: "/api/auth/password-reset/request",
+            method: "POST",
+            body: AnyEncodable(PasswordResetRequest(email: email)),
+            expecting: PasswordResetMessageResponse.self
+        )
+    }
+
+    func confirmPasswordReset(token: String, password: String) async throws -> PasswordResetMessageResponse {
+        try await request(
+            path: "/api/auth/password-reset/confirm",
+            method: "POST",
+            body: AnyEncodable(PasswordResetConfirmRequest(token: token, password: password)),
+            expecting: PasswordResetMessageResponse.self
+        )
+    }
+
+    func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem] {
         let items = try await request(
             path: "/api/cards",
-            queryItems: query.isEmpty ? [] : [URLQueryItem(name: "q", value: query)],
+            queryItems: [
+                query.isEmpty ? nil : URLQueryItem(name: "q", value: query),
+                URLQueryItem(name: "sort", value: sort.rawValue)
+            ].compactMap { $0 },
             expecting: CardListResponse.self
         )
 
@@ -150,6 +183,17 @@ actor APIClient: APIClientProtocol {
 
     func fetchSettings() async throws -> TeamsAlertSettings {
         try await request(path: "/api/settings/teams-alert", expecting: TeamsAlertSettings.self)
+    }
+
+    func fetchSettingsHistory(page: Int, pageSize: Int) async throws -> TeamsAlertHistoryResponse {
+        try await request(
+            path: "/api/settings/teams-alert/history",
+            queryItems: [
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "pageSize", value: String(pageSize))
+            ],
+            expecting: TeamsAlertHistoryResponse.self
+        )
     }
 
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings {
@@ -317,5 +361,14 @@ private struct AnyEncodable: Encodable {
 
 private struct LoginRequest: Encodable {
     let email: String
+    let password: String
+}
+
+private struct PasswordResetRequest: Encodable {
+    let email: String
+}
+
+private struct PasswordResetConfirmRequest: Encodable {
+    let token: String
     let password: String
 }

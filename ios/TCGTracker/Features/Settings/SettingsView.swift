@@ -2,12 +2,12 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var settingsStore: SettingsStore
-    @Binding var themeMode: ThemeMode
 
     @State private var destinationLabel = ""
     @State private var triggerAmountUsd = "1000"
     @State private var webhookURL = ""
     @State private var enabled = false
+    @State private var themeMode: ThemeMode = .light
 
     var body: some View {
         Form {
@@ -37,6 +37,33 @@ struct SettingsView: View {
                 }
             }
 
+            if !settingsStore.history.isEmpty {
+                Section("Recent Deliveries") {
+                    ForEach(settingsStore.history) { entry in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(entry.status.capitalized)
+                                    .font(.subheadline.weight(.semibold))
+                                Spacer()
+                                Text(entry.gainAmount, format: .currency(code: "USD"))
+                                    .foregroundStyle(AppTheme.accent)
+                            }
+
+                            Text(entry.capturedAt.replacingOccurrences(of: "T", with: " ").replacingOccurrences(of: ".000Z", with: " UTC"))
+                                .font(.caption)
+                                .foregroundStyle(AppTheme.textSecondary)
+
+                            if let failureMessage = entry.failureMessage, !failureMessage.isEmpty {
+                                Text(failureMessage)
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.negative)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+
             if let errorMessage = settingsStore.errorMessage {
                 Section {
                     Text(errorMessage)
@@ -50,6 +77,7 @@ struct SettingsView: View {
                 Button("Save") {
                     Task {
                         await settingsStore.save(
+                            themeMode: themeMode,
                             destinationLabel: destinationLabel,
                             triggerAmountUsd: Int(triggerAmountUsd) ?? 1000,
                             webhookURL: webhookURL.isEmpty ? nil : webhookURL,
@@ -78,5 +106,6 @@ struct SettingsView: View {
         triggerAmountUsd = String(settings.triggerAmountUsd)
         webhookURL = settings.webhookUrl ?? ""
         enabled = settings.enabled
+        themeMode = settings.themeMode
     }
 }

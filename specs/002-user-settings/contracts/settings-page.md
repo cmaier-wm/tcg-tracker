@@ -24,4 +24,4 @@ Define the expected user-facing behavior of the settings area for the initial re
 ## Acceptance Notes
 
 - A user can change the setting without leaving the settings page.
-- Reloading the app on the same browser/device preserves the chosen theme.
+- Reloading the app while authenticated preserves the chosen theme from the account-backed settings record.

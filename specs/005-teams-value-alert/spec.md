@@ -5,6 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "Create a Microsoft Teams integration so that whenever my portfolio value goes up by more than $1,000, I get a message"
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: Keep Teams alert configuration, status, and delivery visibility available in web settings.
+- **iOS Impact**: Provide the same Teams alert configuration, status, and delivery visibility in native iOS settings.
+- **Shared Backend/API Impact**: Reuse the existing account-backed Teams alert settings and history APIs as the shared source of truth.
+- **Parity Expectation**: `web + iOS`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Receive a gain alert in Teams (Priority: P1)

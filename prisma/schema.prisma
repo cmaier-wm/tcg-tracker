@@ -187,6 +187,7 @@ model PortfolioValuationSnapshot {
 model TeamsAlertPreference {
   id                  String               @id @default(cuid())
   userId              String               @unique
+  themeMode           String               @default("light")
   enabled             Boolean              @default(false)
   destinationLabel    String?
   triggerAmountUsd    Int                  @default(1000)

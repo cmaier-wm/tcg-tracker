@@ -13,6 +13,12 @@ parameter, shared sorting logic in the catalog access layer, and targeted
 contract/integration coverage for both server-rendered and infinite-scroll
 result loading.
 
+## Retroactive Parity Amendment
+
+This feature now requires the same sort fields, directions, and default
+price-desc ordering in the native iOS browse experience using the existing
+catalog sort contract.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9 on Node.js 22 LTS  

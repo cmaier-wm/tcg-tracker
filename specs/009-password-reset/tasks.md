@@ -5,6 +5,9 @@
 
 **Tests**: Verification is required for each story. Prefer automated unit, integration, contract, and e2e coverage; keep `quickstart.md` aligned for explicit manual verification.
 
+**Retroactive Parity Note**: Add native iOS verification and implementation for
+password-reset request and completion behavior.
+
 **Organization**: Tasks are grouped by user story so each slice can be implemented and validated independently.
 
 ## Format: `[ID] [P?] [Story] Description`

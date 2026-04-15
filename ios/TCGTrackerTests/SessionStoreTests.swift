@@ -26,4 +26,33 @@ final class SessionStoreTests: XCTestCase {
         XCTAssertFalse(store.isAuthenticated)
         XCTAssertNil(store.home)
     }
+
+    func testRegisterLoadsHomeSummary() async {
+        let apiClient = MockAPIClient()
+        let store = SessionStore(apiClient: apiClient)
+
+        let result = await store.register(email: "collector@example.com", password: "password123")
+
+        XCTAssertTrue(result)
+        XCTAssertEqual(store.session?.user.email, "collector@example.com")
+        XCTAssertEqual(store.home?.holdingCount, 1)
+    }
+
+    func testPasswordResetRequestReturnsMessage() async {
+        let apiClient = MockAPIClient()
+        let store = SessionStore(apiClient: apiClient)
+
+        let message = await store.requestPasswordReset(email: "collector@example.com")
+
+        XCTAssertEqual(message, "If an account exists for that email, a password reset link has been sent.")
+    }
+
+    func testPasswordResetConfirmReturnsMessage() async {
+        let apiClient = MockAPIClient()
+        let store = SessionStore(apiClient: apiClient)
+
+        let message = await store.confirmPasswordReset(token: "reset-token", password: "new-password-123")
+
+        XCTAssertEqual(message, "If an account exists for that email, a password reset link has been sent.")
+    }
 }

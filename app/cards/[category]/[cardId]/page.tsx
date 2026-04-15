@@ -59,7 +59,7 @@ export default async function CardDetailPage({
           <div className="section-heading">
             <div>
               <h2>Add to Portfolio</h2>
-              <p className="muted">Save this English card to your tracked holdings.</p>
+              <p className="muted">Save this card to your tracked holdings.</p>
             </div>
           </div>
           {selectedVariation && holding ? (
@@ -68,13 +68,9 @@ export default async function CardDetailPage({
               holdingId={holding.id}
               quantity={holding.quantity}
               cardName={card.name}
-              variationLabel="English"
             />
           ) : selectedVariation ? (
-            <AddToPortfolioButton
-              variationId={selectedVariation.id}
-              variationLabel="English"
-            />
+            <AddToPortfolioButton variationId={selectedVariation.id} />
           ) : null}
         </section>
       </div>

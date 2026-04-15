@@ -66,6 +66,17 @@
 
 [Add more user stories as needed, each with an assigned priority]
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: [Describe the required web app behavior, routes, states, and
+  UI surfaces]
+- **iOS Impact**: [Describe the required native iOS behavior, screens, states,
+  and UI surfaces]
+- **Shared Backend/API Impact**: [Describe the shared contracts, composition,
+  data, and service changes required to keep clients aligned]
+- **Parity Expectation**: [Default: `web + iOS` in the same increment; note any
+  approved, time-bound exception explicitly]
+
 ### Edge Cases
 
 <!--
@@ -91,6 +102,9 @@
   name it explicitly instead of deferring it to implementation.
 -->
 
+- **FR-000**: The feature MUST be implemented for both the web application and
+  the native iOS application in the same increment unless an approved,
+  time-bound exception is documented.
 - **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
 - **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
@@ -137,6 +151,6 @@
 -->
 
 - [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about scope boundaries, e.g., "Web and iOS clients are both in scope for this feature"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]

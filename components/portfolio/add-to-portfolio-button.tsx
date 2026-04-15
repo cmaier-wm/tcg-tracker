@@ -6,11 +6,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export function AddToPortfolioButton({
-  variationId,
-  variationLabel
+  variationId
 }: {
   variationId: string;
-  variationLabel: string;
 }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -44,7 +42,6 @@ export function AddToPortfolioButton({
   return (
     <form className="holding-form form-grid" onSubmit={onSubmit}>
       <h3>Add to portfolio</h3>
-      <p className="muted">{variationLabel}</p>
       <label className="field">
         Quantity
         <input

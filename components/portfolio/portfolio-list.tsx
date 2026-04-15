@@ -65,14 +65,12 @@ export function PortfolioList({ holdings }: { holdings: Holding[] }) {
                 ) : (
                   <h3>{holding.cardName}</h3>
                 )}
-                <p className="muted">English</p>
               </div>
               <HoldingForm
                 key={`${holding.id}:${holding.quantity}`}
                 holdingId={holding.id}
                 quantity={holding.quantity}
                 cardName={holding.cardName}
-                variationLabel="English"
                 compact
                 onQuantityCelebration={({ cardName, quantity }) => {
                   celebrationIdRef.current += 1;

@@ -25,10 +25,23 @@ export function SettingsPage({ initialThemeMode, isAuthenticated }: SettingsPage
         <div className="section-heading">
           <div>
             <h2>Appearance</h2>
-            <p className="muted">Control how the app looks on this browser and device.</p>
+            <p className="muted">Control how the app looks across your account.</p>
           </div>
         </div>
-        <ThemeToggle initialThemeMode={initialThemeMode} />
+        {isAuthenticated ? (
+          <ThemeToggle initialThemeMode={initialThemeMode} />
+        ) : (
+          <div className="stack">
+            <p className="muted">
+              Sign in to manage your account-backed appearance preferences.
+            </p>
+            <div className="button-row">
+              <Link href="/login" className="button secondary">
+                Sign In To Manage Appearance
+              </Link>
+            </div>
+          </div>
+        )}
       </section>
       <section className="surface-card stack">
         <div className="section-heading">
@@ -45,8 +58,7 @@ export function SettingsPage({ initialThemeMode, isAuthenticated }: SettingsPage
         ) : (
           <div className="stack">
             <p className="muted">
-              Sign in to manage account-backed Teams alerts. Theme preferences stay
-              available on this device even when signed out.
+              Sign in to manage your account-backed Teams alert settings.
             </p>
             <div className="button-row">
               <Link href="/login" className="button secondary">

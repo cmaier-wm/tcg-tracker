@@ -37,12 +37,11 @@ npm run catalog:sync
 2. Browse or search for a card in a supported category.
 3. Open a card detail page and verify:
    - The card image is visible when available.
-   - Variation options are visible, including language choices when available.
    - Current price and last update information are shown when available.
 4. Open the price history section and verify:
    - A chart appears when multiple price snapshots exist.
    - A clear empty state appears when history is unavailable.
-5. Add a card variation to the portfolio and verify:
+5. Add a card to the portfolio and verify:
    - The holding appears in the portfolio list.
    - Total estimated value updates after refresh.
 6. Open portfolio history and verify:
@@ -70,7 +69,7 @@ npm run db:down
   release.
 - `npm run snapshots:run` refreshes pricing and portfolio valuation for the
   Pokemon scope while keeping upstream request volume bounded.
-- Missing external image or pricing data is expected for some card variations
+- Missing external image or pricing data is expected for some tracked cards
   and must render as a supported empty state rather than an application error.
 - The app is expected to run natively during development; Docker is used for
   local infrastructure services only.

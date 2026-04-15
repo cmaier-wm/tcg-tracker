@@ -55,6 +55,47 @@ final class SessionStore {
         }
     }
 
+    func register(email: String, password: String) async -> Bool {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            session = try await apiClient.register(email: email, password: password)
+            home = try await apiClient.fetchHome()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func requestPasswordReset(email: String) async -> String? {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            return try await apiClient.requestPasswordReset(email: email).message
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
+    }
+
+    func confirmPasswordReset(token: String, password: String) async -> String? {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            return try await apiClient.confirmPasswordReset(token: token, password: password).message
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
+    }
+
     func signOut() async {
         isLoading = true
         defer { isLoading = false }

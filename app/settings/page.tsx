@@ -1,14 +1,11 @@
 import React from "react";
-import { cookies } from "next/headers";
 import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
 import { SettingsPage } from "@/components/settings/settings-page";
-import { normalizeThemeMode } from "@/lib/settings/theme-preference";
-import { themeCookieName } from "@/lib/settings/theme-storage";
+import { getAccountThemeMode } from "@/lib/teams/alert-preferences";
 
 export default async function SettingsRoute() {
-  const cookieStore = await cookies();
-  const initialThemeMode = normalizeThemeMode(cookieStore.get(themeCookieName)?.value);
   const authenticatedUser = await getOptionalAuthenticatedUser();
+  const initialThemeMode = await getAccountThemeMode(authenticatedUser?.userId);
 
   return (
     <SettingsPage

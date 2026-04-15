@@ -7,7 +7,6 @@ private enum AppTab: Hashable {
 
 struct SignedInShellView: View {
     @Bindable var appModel: AppModel
-    @Binding var themeMode: ThemeMode
     @State private var showingSettings = false
     @State private var showingSignIn = false
     @State private var selectedTab: AppTab = .browse
@@ -44,18 +43,6 @@ struct SignedInShellView: View {
                     }
 
                     ToolbarItemGroup {
-                        Menu {
-                            ForEach(ThemeMode.allCases) { mode in
-                                Button {
-                                    themeMode = mode
-                                } label: {
-                                    Label(mode.displayName, systemImage: mode.symbolName)
-                                }
-                            }
-                        } label: {
-                            Image(systemName: themeMode.symbolName)
-                        }
-
                         if appModel.sessionStore.isAuthenticated {
                             Button {
                                 showingSettings = true
@@ -118,7 +105,7 @@ struct SignedInShellView: View {
         }
         .sheet(isPresented: $showingSettings) {
             NavigationStack {
-                SettingsView(settingsStore: appModel.settingsStore, themeMode: $themeMode)
+                SettingsView(settingsStore: appModel.settingsStore)
                     .toolbar {
                         ToolbarItem {
                             Button("Close") {

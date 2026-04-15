@@ -15,6 +15,12 @@ stack based on Auth.js plus Prisma-backed user/session tables, gate protected
 routes at the server layer, and replace default-user portfolio/settings access
 with session-derived user ownership.
 
+## Retroactive Parity Amendment
+
+This feature now requires registration and account-auth flows in the native iOS
+client in addition to the existing web experience, while keeping public browse
+behavior unauthenticated on both platforms.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9 on Node.js 22 LTS  
@@ -24,7 +30,7 @@ with session-derived user ownership.
 **Target Platform**: Next.js web app running locally on Node.js 22 and on Azure App Service on Linux  
 **Project Type**: Full-stack web application with server-rendered UI and API routes  
 **Performance Goals**: Successful registration and sign-in submissions complete within 2 seconds once the page is loaded during local and production smoke checks, and protected-route session checks do not add noticeable latency beyond current portfolio/settings page loads  
-**Constraints**: Preserve current portfolio behavior and the browser-local theme behavior after login adoption, require auth for portfolio/settings access, normalize email identifiers before comparison, avoid plain-text password storage, keep v1 limited to email/password auth, support only Teams alert preferences/history as account-backed settings, define an explicit atomic migration/bootstrap rule for existing shared data, allow concurrent sessions with current-session-only sign-out, and keep the deployed Azure App Service configuration limited to app-owned secrets and PostgreSQL connectivity without adding Microsoft Entra as a v1 dependency  
+**Constraints**: Preserve current portfolio behavior, require auth for portfolio/settings access, normalize email identifiers before comparison, avoid plain-text password storage, keep v1 limited to email/password auth, support theme preference plus Teams alert preferences/history as account-backed settings, define an explicit atomic migration/bootstrap rule for existing shared data, allow concurrent sessions with current-session-only sign-out, and keep the deployed Azure App Service configuration limited to app-owned secrets and PostgreSQL connectivity without adding Microsoft Entra as a v1 dependency
 **Scale/Scope**: Multi-user support for account creation and sessions, per-user holdings and valuation snapshots, per-user Teams settings, and concurrent browser/device authenticated sessions for initial release
 
 ## Constitution Check

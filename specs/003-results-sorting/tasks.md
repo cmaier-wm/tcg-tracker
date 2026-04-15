@@ -6,6 +6,9 @@
 **Tests**: Verification tasks are REQUIRED. Prefer automated tests for the sort
 logic, browse UI behavior, and catalog contract handling.
 
+**Retroactive Parity Note**: Add iOS browse-sort verification and implementation
+alongside the existing web behavior.
+
 **Organization**: Tasks are grouped by user story to enable independent
 implementation and testing of each story.
 

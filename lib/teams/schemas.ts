@@ -1,16 +1,38 @@
 import { z } from "zod";
 
-export const teamsAlertSettingsPayloadSchema = z.object({
-  enabled: z.boolean(),
-  destinationLabel: z.string().trim().min(1).max(120),
-  triggerAmountUsd: z.number().int().min(1).max(1_000_000),
-  webhookUrl: z
-    .union([z.string(), z.null(), z.undefined()])
-    .transform((value) => (typeof value === "string" ? value.trim() : null))
-    .refine((value) => value === null || z.string().url().safeParse(value).success, {
-      message: "Invalid url"
-    })
-});
+export const themeModeSchema = z.enum(["light", "dark"]);
+export type ThemeMode = z.infer<typeof themeModeSchema>;
+
+export const teamsAlertSettingsPayloadSchema = z
+  .object({
+    themeMode: themeModeSchema.optional(),
+    enabled: z.boolean().optional(),
+    destinationLabel: z
+      .union([z.string(), z.null(), z.undefined()])
+      .transform((value) => (typeof value === "string" ? value.trim() : value))
+      .refine(
+        (value) => value === undefined || value === null || (typeof value === "string" && value.length >= 1 && value.length <= 120),
+        { message: "Destination label must be between 1 and 120 characters." }
+      ),
+    triggerAmountUsd: z.number().int().min(1).max(1_000_000).optional(),
+    webhookUrl: z
+      .union([z.string(), z.null(), z.undefined()])
+      .transform((value) => (typeof value === "string" ? value.trim() : value))
+      .refine((value) => value === undefined || value === null || z.string().url().safeParse(value).success, {
+        message: "Invalid url"
+      })
+  })
+  .refine(
+    (value) =>
+      value.themeMode !== undefined ||
+      value.enabled !== undefined ||
+      value.destinationLabel !== undefined ||
+      value.triggerAmountUsd !== undefined ||
+      value.webhookUrl !== undefined,
+    {
+      message: "At least one settings field must be provided."
+    }
+  );
 
 export type TeamsAlertSettingsPayload = z.infer<typeof teamsAlertSettingsPayloadSchema>;
 export type TeamsAlertDeliveryStatus = "idle" | "sent" | "failed";
@@ -34,6 +56,7 @@ export type TeamsAlertHistoryResponse = {
 };
 
 export type TeamsAlertSettingsResponse = {
+  themeMode: ThemeMode;
   enabled: boolean;
   destinationLabel: string | null;
   triggerAmountUsd: number;

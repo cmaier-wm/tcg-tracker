@@ -48,6 +48,7 @@ final class AppModel {
         portfolioStore.portfolio = nil
         portfolioStore.errorMessage = nil
         settingsStore.settings = nil
+        settingsStore.history = []
         settingsStore.errorMessage = nil
     }
 }

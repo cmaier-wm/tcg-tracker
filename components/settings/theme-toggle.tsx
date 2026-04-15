@@ -1,42 +1,49 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  applyThemeMode,
-  toggleThemeMode,
-  type ThemeMode
-} from "@/lib/settings/theme-preference";
-import {
-  readStoredThemeModeSnapshot,
-  writeStoredThemeMode
-} from "@/lib/settings/theme-storage";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { applyThemeMode, toggleThemeMode, type ThemeMode } from "@/lib/settings/theme-preference";
 
 type ThemeToggleProps = {
   initialThemeMode: ThemeMode;
 };
 
 export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    const storedThemeMode = readStoredThemeModeSnapshot();
-    return storedThemeMode ?? initialThemeMode;
-  });
+  const router = useRouter();
+  const [themeMode, setThemeMode] = useState<ThemeMode>(initialThemeMode);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isDarkMode = themeMode === "dark";
 
   useEffect(() => {
     applyThemeMode(themeMode);
-    const storedThemeMode = readStoredThemeModeSnapshot();
-
-    if (storedThemeMode === null) {
-      writeStoredThemeMode(themeMode);
-    }
   }, [themeMode]);
 
-  function handleThemeChange() {
+  async function handleThemeChange() {
+    const previousThemeMode = themeMode;
     const nextThemeMode = toggleThemeMode(themeMode);
-    writeStoredThemeMode(nextThemeMode);
-    applyThemeMode(nextThemeMode);
+
     setThemeMode(nextThemeMode);
+    setIsSaving(true);
+
+    const response = await fetch("/api/settings/teams-alert", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ themeMode: nextThemeMode })
+    });
+
+    setIsSaving(false);
+
+    if (!response.ok) {
+      setThemeMode(previousThemeMode);
+      toast.error("Unable to save appearance settings.");
+      return;
+    }
+
+    router.refresh();
   }
 
   return (
@@ -54,7 +61,8 @@ export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
           type="checkbox"
           checked={isDarkMode}
           aria-label="Dark mode toggle"
-          onChange={handleThemeChange}
+          disabled={isSaving}
+          onChange={() => void handleThemeChange()}
         />
         <span className="theme-toggle-switch-track" aria-hidden="true">
           <span className="theme-toggle-switch-track-label">☼</span>
@@ -64,7 +72,7 @@ export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
         <span className="theme-toggle-switch-copy">
           <span className="theme-toggle-switch-label">Dark mode</span>
           <span className="theme-toggle-switch-state">
-            {isDarkMode ? "Enabled" : "Disabled"}
+            {isSaving ? "Saving..." : isDarkMode ? "Enabled" : "Disabled"}
           </span>
         </span>
       </label>

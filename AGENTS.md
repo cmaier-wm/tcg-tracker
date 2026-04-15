@@ -13,6 +13,10 @@
 - Follow the constitution in `.specify/memory/constitution.md`.
 - Use the spec-driven workflow: `spec.md -> plan.md -> supporting design docs ->
   tasks.md -> implementation`.
+- All features and behavior changes are in scope for both the web app and the
+  native iOS app by default. Treat cross-platform parity as mandatory unless
+  the constitution is explicitly amended or a time-bound exception is approved
+  in the plan.
 - Use the current Figma Make file as the default UI reference for visual
   alignment work: `https://www.figma.com/make/6ao1OMigGMRBj68UqBEOWA/TCG-Card-Tracker-App?p=f&t=XknWAY1aATbX7RHT-0`
 - Organize work as independently valuable user stories with exact file-path
@@ -85,7 +89,7 @@
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod
-- 002-user-settings: Added a browser-local settings surface with dark mode support and persistent theme selection
+- 002-user-settings: Added an account-backed settings surface with persistent light/dark theme selection shared across web and iOS
 - 004-azure-deploy: Added Azure App Service + PostgreSQL Flexible Server deployment scaffolding with Azure Developer CLI and Bicep
 - 005-teams-value-alert: Added persisted Microsoft Teams workflow alerts with encrypted webhook storage, snapshot-triggered threshold delivery, and duplicate suppression
 - 006-user-login: Added email/password registration, session-backed login/logout, protected portfolio/settings routes, account-owned portfolio data, and account-owned Teams alert settings

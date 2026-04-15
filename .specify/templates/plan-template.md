@@ -21,6 +21,7 @@
 **Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
 **Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
 **Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Client Scope**: [web + iOS REQUIRED, or documented constitution exception]
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
 **Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
 **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
@@ -35,12 +36,35 @@
       not start implementation from placeholders alone.
 - [ ] User stories remain independently valuable, priority-ordered, and
       independently testable.
-- [ ] Verification is defined for each story and for any foundational work that
-      could block later validation.
+- [ ] Web, iOS, and shared backend or API impact are defined for each story.
+- [ ] Verification is defined for both web and iOS behavior in each story and
+      for any foundational work that could block later validation.
 - [ ] Added complexity, dependencies, services, or directories are explicitly
       justified; simpler alternatives are noted when rejected.
 - [ ] Any changes to stack, structure, or commands are reflected in `README.md`,
       `AGENTS.md`, and related guidance files in the same change set.
+
+## Client Delivery Plan
+
+### Shared Backend/API Changes
+
+[Describe the shared contracts, composition, data, and service changes required
+to keep both clients aligned]
+
+### Web Delivery Surface
+
+[Describe the web routes, components, states, and tests required for this
+feature]
+
+### iOS Delivery Surface
+
+[Describe the iOS screens, flows, shared models, and tests required for this
+feature]
+
+### Parity Verification
+
+[Describe how behavior parity will be verified across web and iOS, including
+automated coverage and any required manual smoke checks]
 
 ## Project Structure
 

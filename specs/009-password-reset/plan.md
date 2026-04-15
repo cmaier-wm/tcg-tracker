@@ -15,6 +15,12 @@ custom auth/session stack with database-backed reset tokens, reset request and
 completion surfaces, server-side reset delivery, and account-wide session
 revocation after successful password changes.
 
+## Retroactive Parity Amendment
+
+This feature now requires password-reset request and completion flows in the
+native iOS authentication experience using the same backend routes and token
+rules as web.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9 on Node.js 22 LTS  

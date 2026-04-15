@@ -26,6 +26,33 @@ struct BrowseView: View {
                             await browseStore.search()
                         }
                     }
+
+                Menu {
+                    Picker("Sort", selection: $browseStore.selectedSort) {
+                        ForEach(CardSortOption.allCases) { option in
+                            Text(option.label).tag(option)
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Label("Sort", systemImage: "arrow.up.arrow.down.circle")
+                        Spacer()
+                        Text(browseStore.selectedSort.label)
+                            .foregroundStyle(AppTheme.textSecondary)
+                            .lineLimit(1)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(AppTheme.inputBackground)
+                    )
+                }
+            }
+            .onChange(of: browseStore.selectedSort) { _, _ in
+                Task {
+                    await browseStore.search()
+                }
             }
 
             if browseStore.cards.isEmpty && !browseStore.isLoading {

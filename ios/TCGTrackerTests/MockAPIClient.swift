@@ -5,6 +5,8 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var browseCallCount = 0
     var portfolioLoadCount = 0
     var settingsLoadCount = 0
+    var settingsHistoryLoadCount = 0
+    var lastBrowseSort: CardSortOption?
     var sessionResult: Result<MobileSession, Error> = .success(
         MobileSession(
             status: "authenticated",
@@ -101,6 +103,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     )
     var settingsResult: Result<TeamsAlertSettings, Error> = .success(
         TeamsAlertSettings(
+            themeMode: .light,
             enabled: true,
             destinationLabel: "Trading alerts",
             triggerAmountUsd: 1500,
@@ -114,6 +117,29 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
             deliveryStatus: "idle"
         )
     )
+    var settingsHistoryResult: Result<TeamsAlertHistoryResponse, Error> = .success(
+        TeamsAlertHistoryResponse(
+            items: [
+                TeamsAlertHistoryEntry(
+                    id: "delivery-1",
+                    capturedAt: "2026-04-10T12:00:00.000Z",
+                    portfolioValue: 240,
+                    baselineValue: 90,
+                    gainAmount: 150,
+                    status: "sent",
+                    responseCode: 202,
+                    failureMessage: nil
+                )
+            ],
+            page: 1,
+            pageSize: 5,
+            totalItems: 1,
+            totalPages: 1
+        )
+    )
+    var passwordResetResult: Result<PasswordResetMessageResponse, Error> = .success(
+        PasswordResetMessageResponse(message: "If an account exists for that email, a password reset link has been sent.")
+    )
 
     var didSignOut = false
     var addedHoldingVariationID: String?
@@ -121,6 +147,10 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var removedHoldingID: String?
 
     func signIn(email: String, password: String) async throws -> MobileSession {
+        try sessionResult.get()
+    }
+
+    func register(email: String, password: String) async throws -> MobileSession {
         try sessionResult.get()
     }
 
@@ -136,8 +166,17 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         try homeResult.get()
     }
 
-    func browseCards(query: String) async throws -> [CardListItem] {
+    func requestPasswordReset(email: String) async throws -> PasswordResetMessageResponse {
+        try passwordResetResult.get()
+    }
+
+    func confirmPasswordReset(token: String, password: String) async throws -> PasswordResetMessageResponse {
+        try passwordResetResult.get()
+    }
+
+    func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem] {
         browseCallCount += 1
+        lastBrowseSort = sort
         return try cardsResult.get()
     }
 
@@ -205,14 +244,21 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         return try settingsResult.get()
     }
 
+    func fetchSettingsHistory(page: Int, pageSize: Int) async throws -> TeamsAlertHistoryResponse {
+        settingsHistoryLoadCount += 1
+        return try settingsHistoryResult.get()
+    }
+
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings {
+        let currentSettings = try settingsResult.get()
         settingsResult = .success(
             TeamsAlertSettings(
-                enabled: payload.enabled,
-                destinationLabel: payload.destinationLabel,
-                triggerAmountUsd: payload.triggerAmountUsd,
-                hasWebhookUrl: payload.webhookUrl != nil,
-                webhookUrl: payload.webhookUrl,
+                themeMode: payload.themeMode ?? currentSettings.themeMode,
+                enabled: payload.enabled ?? currentSettings.enabled,
+                destinationLabel: payload.destinationLabel ?? currentSettings.destinationLabel,
+                triggerAmountUsd: payload.triggerAmountUsd ?? currentSettings.triggerAmountUsd,
+                hasWebhookUrl: payload.webhookUrl != nil || currentSettings.hasWebhookUrl,
+                webhookUrl: payload.webhookUrl ?? currentSettings.webhookUrl,
                 baselineValue: 240,
                 lastEvaluatedAt: nil,
                 lastDeliveredAt: nil,

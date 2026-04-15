@@ -7,6 +7,7 @@ final class BrowseStore {
     private let apiClient: APIClientProtocol
 
     var query = ""
+    var selectedSort: CardSortOption = .priceDesc
     var cards: [CardListItem] = []
     var selectedCard: CardDetail?
     var selectedHistory: PriceHistory?
@@ -23,7 +24,10 @@ final class BrowseStore {
         defer { isLoading = false }
 
         do {
-            cards = try await apiClient.browseCards(query: query.trimmingCharacters(in: .whitespacesAndNewlines))
+            cards = try await apiClient.browseCards(
+                query: query.trimmingCharacters(in: .whitespacesAndNewlines),
+                sort: selectedSort
+            )
         } catch {
             errorMessage = error.localizedDescription
         }
