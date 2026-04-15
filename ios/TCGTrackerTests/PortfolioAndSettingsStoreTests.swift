@@ -17,6 +17,18 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
         XCTAssertTrue(didRefresh)
     }
 
+    func testUpdateHoldingAppliesLocalPortfolioState() async {
+        let apiClient = MockAPIClient()
+        let store = PortfolioStore(apiClient: apiClient)
+
+        await store.load()
+        await store.updateHolding("holding-1", quantity: 3)
+
+        XCTAssertEqual(apiClient.updatedHoldingQuantity, 3)
+        XCTAssertEqual(store.portfolio?.holdings.first?.quantity, 3)
+        XCTAssertEqual(store.portfolio?.holdings.first?.estimatedValue, 360)
+    }
+
     func testSettingsLoadAndSaveRoundTrip() async {
         let apiClient = MockAPIClient()
         let store = SettingsStore(apiClient: apiClient)
@@ -33,5 +45,28 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
 
         XCTAssertEqual(store.settings?.triggerAmountUsd, 2000)
         XCTAssertEqual(store.settings?.webhookUrl, "https://example.com/new-hook")
+    }
+
+    func testPortfolioHoldingMapsToDetailCardItem() throws {
+        let holding = PortfolioHolding(
+            id: "holding-1",
+            cardVariationId: "variation-1",
+            cardName: "Dark Magician",
+            variationLabel: "LOB Unlimited",
+            quantity: 2,
+            estimatedValue: 84,
+            cardId: "card-1",
+            category: "yugioh",
+            imageUrl: "https://example.com/card.png"
+        )
+
+        let card = try XCTUnwrap(holding.detailCardItem)
+
+        XCTAssertEqual(card.id, "card-1")
+        XCTAssertEqual(card.category, "yugioh")
+        XCTAssertEqual(card.name, "Dark Magician")
+        XCTAssertEqual(card.setName, "LOB Unlimited")
+        XCTAssertEqual(card.currentPrice, 42)
+        XCTAssertEqual(card.imageUrl, "https://example.com/card.png")
     }
 }

@@ -30,7 +30,7 @@ protocol APIClientProtocol: Sendable {
     func fetchPriceHistory(category: String, cardId: String, variationId: String) async throws -> PriceHistory
     func fetchPortfolio() async throws -> PortfolioResponse
     func addHolding(cardVariationId: String, quantity: Int) async throws -> PortfolioHolding
-    func updateHolding(holdingId: String, quantity: Int) async throws -> PortfolioHolding
+    func updateHolding(holdingId: String, quantity: Int) async throws
     func removeHolding(holdingId: String) async throws
     func fetchSettings() async throws -> TeamsAlertSettings
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings
@@ -68,7 +68,7 @@ actor APIClient: APIClientProtocol {
         let payload = try await request(
             path: "/api/auth/login",
             method: "POST",
-            body: LoginRequest(email: email, password: password),
+            body: AnyEncodable(LoginRequest(email: email, password: password)),
             expecting: LoginResponse.self
         )
 
@@ -124,17 +124,19 @@ actor APIClient: APIClientProtocol {
         try await request(
             path: "/api/portfolio",
             method: "POST",
-            body: HoldingWriteRequest(cardVariationId: cardVariationId, quantity: quantity),
+            body: AnyEncodable(
+                HoldingWriteRequest(cardVariationId: cardVariationId, quantity: quantity)
+            ),
             expecting: PortfolioHolding.self
         )
     }
 
-    func updateHolding(holdingId: String, quantity: Int) async throws -> PortfolioHolding {
-        try await request(
+    func updateHolding(holdingId: String, quantity: Int) async throws {
+        try await requestWithoutResponse(
             path: "/api/portfolio/\(holdingId)",
             method: "PATCH",
-            body: HoldingUpdateRequest(quantity: quantity),
-            expecting: PortfolioHolding.self
+            body: AnyEncodable(HoldingUpdateRequest(quantity: quantity)),
+            expectedStatusCodes: [200]
         )
     }
 
@@ -154,7 +156,7 @@ actor APIClient: APIClientProtocol {
         try await request(
             path: "/api/settings/teams-alert",
             method: "PUT",
-            body: payload,
+            body: AnyEncodable(payload),
             expecting: TeamsAlertSettings.self
         )
     }
@@ -163,10 +165,35 @@ actor APIClient: APIClientProtocol {
         path: String,
         method: String = "GET",
         queryItems: [URLQueryItem] = [],
-        body: some Encodable? = nil,
         expecting: Response.Type
     ) async throws -> Response {
-        let request = try buildRequest(path: path, method: method, queryItems: queryItems, body: body)
+        let request = try buildRequest(path: path, method: method, queryItems: queryItems)
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIClientError.invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw try mapError(data: data, statusCode: httpResponse.statusCode)
+        }
+
+        return try decoder.decode(Response.self, from: data)
+    }
+
+    private func request<Response: Decodable>(
+        path: String,
+        method: String,
+        queryItems: [URLQueryItem] = [],
+        body: AnyEncodable,
+        expecting: Response.Type
+    ) async throws -> Response {
+        let request = try buildRequest(
+            path: path,
+            method: method,
+            queryItems: queryItems,
+            body: body
+        )
         let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -186,7 +213,31 @@ actor APIClient: APIClientProtocol {
         queryItems: [URLQueryItem] = [],
         expectedStatusCodes: Set<Int>
     ) async throws {
-        let request = try buildRequest(path: path, method: method, queryItems: queryItems, body: Optional<String>.none)
+        let request = try buildRequest(path: path, method: method, queryItems: queryItems)
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIClientError.invalidResponse
+        }
+
+        guard expectedStatusCodes.contains(httpResponse.statusCode) else {
+            throw try mapError(data: data, statusCode: httpResponse.statusCode)
+        }
+    }
+
+    private func requestWithoutResponse(
+        path: String,
+        method: String,
+        queryItems: [URLQueryItem] = [],
+        body: AnyEncodable,
+        expectedStatusCodes: Set<Int>
+    ) async throws {
+        let request = try buildRequest(
+            path: path,
+            method: method,
+            queryItems: queryItems,
+            body: body
+        )
         let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -201,8 +252,7 @@ actor APIClient: APIClientProtocol {
     private func buildRequest(
         path: String,
         method: String,
-        queryItems: [URLQueryItem],
-        body: (some Encodable)?
+        queryItems: [URLQueryItem]
     ) throws -> URLRequest {
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
             throw APIClientError.invalidBaseURL
@@ -219,17 +269,26 @@ actor APIClient: APIClientProtocol {
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        if let body {
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try encode(body)
-        }
+        return request
+    }
+
+    private func buildRequest(
+        path: String,
+        method: String,
+        queryItems: [URLQueryItem],
+        body: AnyEncodable
+    ) throws -> URLRequest {
+        var request = try buildRequest(path: path, method: method, queryItems: queryItems)
+
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try encode(body)
 
         return request
     }
 
-    private func encode(_ value: some Encodable) throws -> Data {
+    private func encode(_ value: AnyEncodable) throws -> Data {
         do {
-            return try encoder.encode(AnyEncodable(value))
+            return try encoder.encode(value)
         } catch {
             throw APIClientError.encodingFailed
         }

@@ -14,16 +14,14 @@ struct SignInView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Welcome back")
                             .font(.largeTitle.bold())
+                            .foregroundStyle(AppTheme.textPrimary)
 
-                        Text("Sign in to review your collection, browse cards, and manage holdings on iPhone.")
-                            .foregroundStyle(.secondary)
+                        Text("Sign in to track holdings, manage alerts, and sync your collection on iPhone.")
+                            .foregroundStyle(AppTheme.textSecondary)
                     }
 
                     VStack(spacing: 16) {
                         TextField("Email", text: $email)
-                            .keyboardType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
                             .textFieldStyle(.roundedBorder)
 
                         SecureField("Password", text: $password)
@@ -64,6 +62,10 @@ struct SignInView: View {
                         RoundedRectangle(cornerRadius: 24, style: .continuous)
                             .fill(AppTheme.surface)
                     )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(AppTheme.border, lineWidth: 1)
+                    }
                 }
                 .padding(20)
             }

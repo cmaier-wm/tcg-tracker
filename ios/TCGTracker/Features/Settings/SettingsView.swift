@@ -2,22 +2,29 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var settingsStore: SettingsStore
+    @Binding var themeMode: ThemeMode
 
     @State private var destinationLabel = ""
-    @State private var triggerAmountUsd = 1000
+    @State private var triggerAmountUsd = "1000"
     @State private var webhookURL = ""
     @State private var enabled = false
 
     var body: some View {
         Form {
+            Section("Appearance") {
+                Picker("Theme", selection: $themeMode) {
+                    ForEach(ThemeMode.allCases) { mode in
+                        Label(mode.displayName, systemImage: mode.symbolName)
+                            .tag(mode)
+                    }
+                }
+            }
+
             Section("Teams Alerts") {
                 Toggle("Enable alerts", isOn: $enabled)
                 TextField("Destination Label", text: $destinationLabel)
-                TextField("Trigger Amount (USD)", value: $triggerAmountUsd, format: .number)
-                    .keyboardType(.numberPad)
+                TextField("Trigger Amount (USD)", text: $triggerAmountUsd)
                 TextField("Webhook URL", text: $webhookURL)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
             }
 
             if let settings = settingsStore.settings {
@@ -39,12 +46,12 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem {
                 Button("Save") {
                     Task {
                         await settingsStore.save(
                             destinationLabel: destinationLabel,
-                            triggerAmountUsd: triggerAmountUsd,
+                            triggerAmountUsd: Int(triggerAmountUsd) ?? 1000,
                             webhookURL: webhookURL.isEmpty ? nil : webhookURL,
                             enabled: enabled
                         )
@@ -68,7 +75,7 @@ struct SettingsView: View {
         guard let settings = settingsStore.settings else { return }
 
         destinationLabel = settings.destinationLabel ?? ""
-        triggerAmountUsd = settings.triggerAmountUsd
+        triggerAmountUsd = String(settings.triggerAmountUsd)
         webhookURL = settings.webhookUrl ?? ""
         enabled = settings.enabled
     }

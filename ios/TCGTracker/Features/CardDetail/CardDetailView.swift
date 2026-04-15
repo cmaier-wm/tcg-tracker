@@ -3,50 +3,66 @@ import SwiftUI
 struct CardDetailView: View {
     @Bindable var browseStore: BrowseStore
     @Bindable var portfolioStore: PortfolioStore
+    @Bindable var sessionStore: SessionStore
     let card: CardListItem
 
     @State private var quantity = 1
+    @State private var showingAuthRequired = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 if let selectedCard = browseStore.selectedCard {
-                    VStack(alignment: .leading, spacing: 12) {
+                    RemoteCardImage(imageURL: selectedCard.imageUrl ?? card.imageUrl, aspectRatio: 0.72, cornerRadius: 24)
+                        .frame(maxWidth: 320)
+                        .frame(maxWidth: .infinity)
+
+                    VStack(alignment: .leading, spacing: 14) {
                         Text(selectedCard.name)
-                            .font(.largeTitle.bold())
+                            .font(.largeTitle.weight(.bold))
+                            .foregroundStyle(AppTheme.textPrimary)
                         Text("\(selectedCard.setName ?? card.setName)\(selectedCard.collectorNumber.map { " • \($0)" } ?? "")")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(AppTheme.textSecondary)
+
+                        if let rarity = selectedCard.rarity ?? card.rarity {
+                            Text(rarity)
+                                .font(.caption.weight(.semibold))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Capsule().fill(AppTheme.accentSoft))
+                                .foregroundStyle(AppTheme.accent)
+                        }
+                    }
+                    .padding(20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(AppTheme.surface)
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(AppTheme.border, lineWidth: 1)
                     }
 
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Variations")
+                        Text("Current Price")
                             .font(.headline)
-
-                        ForEach(selectedCard.variations) { variation in
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(variation.label ?? "Default")
-                                        .font(.body.weight(.semibold))
-                                    Text(
-                                        [variation.languageCode, variation.finish, variation.conditionCode]
-                                            .compactMap { $0 }
-                                            .joined(separator: " • ")
-                                    )
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                Text(variation.currentPrice.map { $0, format: .currency(code: "USD") } ?? "No price")
-                                    .foregroundStyle(AppTheme.accent)
-                            }
-                            .padding(14)
-                            .background(
-                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                    .fill(AppTheme.surface)
-                            )
-                        }
+                        Text(
+                            browseStore.preferredVariation(from: selectedCard)?.currentPrice?.formatted(.currency(code: "USD"))
+                            ?? card.currentPrice?.formatted(.currency(code: "USD"))
+                            ?? "No price"
+                        )
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .foregroundStyle(AppTheme.accent)
+                    }
+                    .padding(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(AppTheme.surface)
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(AppTheme.border, lineWidth: 1)
                     }
 
                     PriceHistoryChartView(
@@ -61,7 +77,12 @@ struct CardDetailView: View {
 
                         Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
 
-                        Button("Save Holding") {
+                        Button(sessionStore.isAuthenticated ? "Add to Portfolio" : "Sign In to Track") {
+                            guard sessionStore.isAuthenticated else {
+                                showingAuthRequired = true
+                                return
+                            }
+
                             Task {
                                 if let variationID = browseStore.preferredVariation(from: selectedCard)?.id {
                                     await portfolioStore.addHolding(
@@ -78,6 +99,10 @@ struct CardDetailView: View {
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
                             .fill(AppTheme.surface)
                     )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .stroke(AppTheme.border, lineWidth: 1)
+                    }
                 } else if browseStore.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -92,11 +117,15 @@ struct CardDetailView: View {
         }
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle(card.name)
-        .navigationBarTitleDisplayMode(.inline)
         .task {
             if browseStore.selectedCard?.id != card.id {
                 await browseStore.select(card: card)
             }
+        }
+        .alert("Sign in required", isPresented: $showingAuthRequired) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Browsing is public, but saving cards to your portfolio requires an account.")
         }
     }
 }

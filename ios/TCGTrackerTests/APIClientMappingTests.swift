@@ -1,6 +1,7 @@
 import XCTest
 @testable import TCGTracker
 
+@MainActor
 final class APIClientMappingTests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -71,6 +72,7 @@ final class APIClientMappingTests: XCTestCase {
     }
 }
 
+@MainActor
 final class MockURLProtocol: URLProtocol {
     static var handler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 

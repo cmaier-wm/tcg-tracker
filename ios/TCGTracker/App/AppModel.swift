@@ -22,10 +22,13 @@ final class AppModel {
 
     func start() async {
         await sessionStore.restoreSession()
-
-        guard sessionStore.isAuthenticated else { return }
-
         async let browseLoad: Void = browseStore.search()
+
+        guard sessionStore.isAuthenticated else {
+            _ = await browseLoad
+            return
+        }
+
         async let portfolioLoad: Void = portfolioStore.load()
         async let settingsLoad: Void = settingsStore.load()
         _ = await (browseLoad, portfolioLoad, settingsLoad)
@@ -39,5 +42,12 @@ final class AppModel {
         async let portfolioLoad: Void = portfolioStore.load()
         async let settingsLoad: Void = settingsStore.load()
         _ = await (homeLoad, browseLoad, portfolioLoad, settingsLoad)
+    }
+
+    func clearProtectedData() {
+        portfolioStore.portfolio = nil
+        portfolioStore.errorMessage = nil
+        settingsStore.settings = nil
+        settingsStore.errorMessage = nil
     }
 }

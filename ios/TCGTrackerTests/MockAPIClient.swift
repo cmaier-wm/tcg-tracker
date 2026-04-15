@@ -2,6 +2,9 @@ import Foundation
 @testable import TCGTracker
 
 final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
+    var browseCallCount = 0
+    var portfolioLoadCount = 0
+    var settingsLoadCount = 0
     var sessionResult: Result<MobileSession, Error> = .success(
         MobileSession(
             status: "authenticated",
@@ -134,7 +137,8 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     }
 
     func browseCards(query: String) async throws -> [CardListItem] {
-        try cardsResult.get()
+        browseCallCount += 1
+        return try cardsResult.get()
     }
 
     func fetchCardDetail(category: String, cardId: String) async throws -> CardDetail {
@@ -146,7 +150,8 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     }
 
     func fetchPortfolio() async throws -> PortfolioResponse {
-        try portfolioResult.get()
+        portfolioLoadCount += 1
+        return try portfolioResult.get()
     }
 
     func addHolding(cardVariationId: String, quantity: Int) async throws -> PortfolioHolding {
@@ -155,9 +160,40 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         return try portfolioResult.get().holdings[0]
     }
 
-    func updateHolding(holdingId: String, quantity: Int) async throws -> PortfolioHolding {
+    func updateHolding(holdingId: String, quantity: Int) async throws {
         updatedHoldingQuantity = quantity
-        return try portfolioResult.get().holdings[0]
+        let currentPortfolio = try portfolioResult.get()
+        let updatedHolding = currentPortfolio.holdings.first {
+            $0.id == holdingId
+        } ?? currentPortfolio.holdings[0]
+
+        let adjustedHolding = PortfolioHolding(
+            id: updatedHolding.id,
+            cardVariationId: updatedHolding.cardVariationId,
+            cardName: updatedHolding.cardName,
+            variationLabel: updatedHolding.variationLabel,
+            quantity: quantity,
+            estimatedValue: quantity > 0 ? (updatedHolding.estimatedValue / Double(updatedHolding.quantity)) * Double(quantity) : 0,
+            cardId: updatedHolding.cardId,
+            category: updatedHolding.category,
+            imageUrl: updatedHolding.imageUrl
+        )
+
+        let holdings = currentPortfolio.holdings.map { holding in
+            holding.id == holdingId ? adjustedHolding : holding
+        }
+
+        portfolioResult = .success(
+            PortfolioResponse(
+                holdings: holdings,
+                totalEstimatedValue: holdings.reduce(0) { $0 + $1.estimatedValue },
+                holdingCount: holdings.count,
+                page: currentPortfolio.page,
+                pageSize: currentPortfolio.pageSize,
+                totalPages: currentPortfolio.totalPages,
+                totalItems: currentPortfolio.totalItems
+            )
+        )
     }
 
     func removeHolding(holdingId: String) async throws {
@@ -165,7 +201,8 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     }
 
     func fetchSettings() async throws -> TeamsAlertSettings {
-        try settingsResult.get()
+        settingsLoadCount += 1
+        return try settingsResult.get()
     }
 
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings {

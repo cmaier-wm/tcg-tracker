@@ -39,7 +39,7 @@ struct CardListResponse: Codable, Equatable, Sendable {
     let items: [CardListItem]
 }
 
-struct CardListItem: Codable, Equatable, Identifiable, Sendable {
+struct CardListItem: Codable, Equatable, Hashable, Identifiable, Sendable {
     let id: String
     let category: String
     let categoryName: String?
@@ -107,6 +107,25 @@ struct PortfolioHolding: Codable, Equatable, Identifiable, Sendable {
     let cardId: String?
     let category: String?
     let imageUrl: String?
+}
+
+extension PortfolioHolding {
+    var detailCardItem: CardListItem? {
+        guard let cardId, let category else { return nil }
+
+        return CardListItem(
+            id: cardId,
+            category: category,
+            categoryName: nil,
+            setName: variationLabel ?? "Saved card",
+            name: cardName ?? "Tracked card",
+            collectorNumber: nil,
+            rarity: nil,
+            imageUrl: imageUrl,
+            currentPrice: quantity > 0 ? estimatedValue / Double(quantity) : estimatedValue,
+            variationCount: 1
+        )
+    }
 }
 
 struct HoldingWriteRequest: Codable, Equatable, Sendable {

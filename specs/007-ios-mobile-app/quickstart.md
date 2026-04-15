@@ -39,8 +39,8 @@
 
 ## Local iOS Setup
 
-1. Open `ios/TCGTracker/TCGTracker.xcworkspace` in Xcode, or open the Swift
-   package at `ios/Package.swift` directly if you prefer the package view.
+1. Run `ruby ios/scripts/generate_xcodeproj.rb`, then open
+   `ios/TCGTracker/TCGTracker.xcworkspace` in Xcode.
 2. Point the debug configuration at `http://127.0.0.1:3000` for the local
    backend when running in Simulator.
 3. Launch an iPhone simulator.
