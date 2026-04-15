@@ -39,6 +39,8 @@
 - [ ] Web, iOS, and shared backend or API impact are defined for each story.
 - [ ] Verification is defined for both web and iOS behavior in each story and
       for any foundational work that could block later validation.
+- [ ] Affected web routes and flows define browser console-clean verification
+      or a documented, approved exception.
 - [ ] Added complexity, dependencies, services, or directories are explicitly
       justified; simpler alternatives are noted when rejected.
 - [ ] Any changes to stack, structure, or commands are reflected in `README.md`,
@@ -55,6 +57,12 @@ to keep both clients aligned]
 
 [Describe the web routes, components, states, and tests required for this
 feature]
+
+### Web Console Verification
+
+[Describe the browser console checks, Playwright coverage, or manual
+verification steps required to confirm affected web routes remain free of
+console errors; document any approved exception explicitly]
 
 ### iOS Delivery Surface
 

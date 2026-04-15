@@ -38,7 +38,6 @@ describe("teams alert settings route", () => {
     const enabledPayload = await enableResponse.json();
 
     expect(enabledPayload).toMatchObject({
-      themeMode: "light",
       enabled: true,
       destinationLabel: "Trading alerts",
       triggerAmountUsd: 1500,
@@ -64,7 +63,6 @@ describe("teams alert settings route", () => {
     const disabledPayload = await disableResponse.json();
 
     expect(disabledPayload).toMatchObject({
-      themeMode: "light",
       enabled: false,
       triggerAmountUsd: 1500,
       hasWebhookUrl: true,
@@ -88,7 +86,6 @@ describe("teams alert settings route", () => {
     const reenabledPayload = await reenableResponse.json();
 
     expect(reenabledPayload).toMatchObject({
-      themeMode: "light",
       enabled: true,
       triggerAmountUsd: 1500,
       hasWebhookUrl: true,
@@ -99,7 +96,6 @@ describe("teams alert settings route", () => {
     const currentPayload = await currentResponse.json();
 
     expect(currentPayload).toMatchObject({
-      themeMode: "light",
       enabled: true,
       destinationLabel: "Trading alerts",
       triggerAmountUsd: 1500,
@@ -141,31 +137,8 @@ describe("teams alert settings route", () => {
     const disabledPayload = await disableResponse.json();
 
     expect(disabledPayload).toMatchObject({
-      themeMode: "light",
       enabled: false,
       baselineValue: 0
-    });
-  });
-
-  it("persists theme mode without requiring a full Teams alert payload", async () => {
-    const response = await PUT(
-      new Request("http://localhost/api/settings/teams-alert", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          themeMode: "dark"
-        })
-      })
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(payload).toMatchObject({
-      themeMode: "dark",
-      enabled: false,
-      triggerAmountUsd: 1000
     });
   });
 

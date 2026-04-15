@@ -6,18 +6,20 @@ import Observation
 final class SettingsStore {
     private let apiClient: APIClientProtocol
 
+    var accountSettings: AccountSettings?
     var settings: TeamsAlertSettings?
     var history: [TeamsAlertHistoryEntry] = []
     var isLoading = false
     var isSaving = false
     var errorMessage: String?
+    var previewThemeMode: ThemeMode?
 
     init(apiClient: APIClientProtocol) {
         self.apiClient = apiClient
     }
 
     var currentThemeMode: ThemeMode {
-        settings?.themeMode ?? .light
+        previewThemeMode ?? accountSettings?.themeMode ?? .dark
     }
 
     func load() async {
@@ -26,10 +28,13 @@ final class SettingsStore {
         defer { isLoading = false }
 
         do {
+            async let accountSettingsRequest = apiClient.fetchAccountSettings()
             async let settingsRequest = apiClient.fetchSettings()
             async let historyRequest = apiClient.fetchSettingsHistory(page: 1, pageSize: 5)
+            let fetchedAccountSettings = try await accountSettingsRequest
             let fetchedSettings = try await settingsRequest
             let fetchedHistory = try await historyRequest
+            accountSettings = fetchedAccountSettings
             settings = fetchedSettings
             history = fetchedHistory.items
         } catch {
@@ -49,19 +54,55 @@ final class SettingsStore {
         defer { isSaving = false }
 
         do {
-            settings = try await apiClient.updateSettings(
-                TeamsAlertSettingsUpdate(
-                    themeMode: themeMode,
-                    enabled: enabled,
-                    destinationLabel: destinationLabel,
-                    triggerAmountUsd: triggerAmountUsd,
-                    webhookUrl: webhookURL
+            if let themeMode, themeMode != accountSettings?.themeMode {
+                accountSettings = try await apiClient.updateAccountSettings(themeMode: themeMode)
+            }
+
+            if shouldUpdateTeamsSettings(
+                destinationLabel: destinationLabel,
+                triggerAmountUsd: triggerAmountUsd,
+                webhookURL: webhookURL,
+                enabled: enabled
+            ) {
+                settings = try await apiClient.updateSettings(
+                    TeamsAlertSettingsUpdate(
+                        enabled: enabled,
+                        destinationLabel: destinationLabel,
+                        triggerAmountUsd: triggerAmountUsd,
+                        webhookUrl: webhookURL
+                    )
                 )
-            )
-            let refreshedHistory = try await apiClient.fetchSettingsHistory(page: 1, pageSize: 5)
-            history = refreshedHistory.items
+                let refreshedHistory = try await apiClient.fetchSettingsHistory(page: 1, pageSize: 5)
+                history = refreshedHistory.items
+            }
+
+            previewThemeMode = nil
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func clearThemePreview() {
+        previewThemeMode = nil
+    }
+
+    private func shouldUpdateTeamsSettings(
+        destinationLabel: String?,
+        triggerAmountUsd: Int?,
+        webhookURL: String?,
+        enabled: Bool?
+    ) -> Bool {
+        let current = settings
+        let normalizedDestinationLabel = destinationLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let currentDestinationLabel = current?.destinationLabel ?? ""
+        let normalizedWebhookURL = webhookURL?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let currentWebhookURL = current?.webhookUrl
+        let nextEnabled = enabled ?? current?.enabled ?? false
+        let nextTriggerAmountUsd = triggerAmountUsd ?? current?.triggerAmountUsd ?? 1000
+
+        return normalizedDestinationLabel != currentDestinationLabel ||
+            nextTriggerAmountUsd != (current?.triggerAmountUsd ?? 1000) ||
+            normalizedWebhookURL != currentWebhookURL ||
+            nextEnabled != (current?.enabled ?? false)
     }
 }

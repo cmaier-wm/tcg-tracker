@@ -16,8 +16,11 @@ describe("settings page contract", () => {
               totalItems: 0,
               totalPages: 1
             }
+          : url.includes("/api/settings/account")
+          ? {
+              themeMode: "dark"
+            }
           : {
-              themeMode: "light",
               enabled: false,
               destinationLabel: null,
               triggerAmountUsd: 1000,

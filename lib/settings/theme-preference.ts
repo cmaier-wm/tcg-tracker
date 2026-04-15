@@ -1,6 +1,6 @@
 export type ThemeMode = "light" | "dark";
 
-export const defaultThemeMode: ThemeMode = "light";
+export const defaultThemeMode: ThemeMode = "dark";
 
 export function isThemeMode(value: unknown): value is ThemeMode {
   return value === "light" || value === "dark";

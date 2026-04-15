@@ -72,6 +72,9 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .onChange(of: themeMode) { _, newValue in
+            settingsStore.previewThemeMode = newValue
+        }
         .toolbar {
             ToolbarItem {
                 Button("Save") {
@@ -89,13 +92,16 @@ struct SettingsView: View {
             }
         }
         .task {
-            if settingsStore.settings == nil {
+            if settingsStore.settings == nil || settingsStore.accountSettings == nil {
                 await settingsStore.load()
                 syncForm()
             }
         }
         .onChange(of: settingsStore.settings?.triggerAmountUsd) { _, _ in
             syncForm()
+        }
+        .onDisappear {
+            settingsStore.clearThemePreview()
         }
     }
 
@@ -106,6 +112,6 @@ struct SettingsView: View {
         triggerAmountUsd = String(settings.triggerAmountUsd)
         webhookURL = settings.webhookUrl ?? ""
         enabled = settings.enabled
-        themeMode = settings.themeMode
+        themeMode = settingsStore.accountSettings?.themeMode ?? .dark
     }
 }

@@ -6,6 +6,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var portfolioLoadCount = 0
     var settingsLoadCount = 0
     var settingsHistoryLoadCount = 0
+    var accountSettingsLoadCount = 0
     var lastBrowseSort: CardSortOption?
     var sessionResult: Result<MobileSession, Error> = .success(
         MobileSession(
@@ -101,9 +102,13 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
             totalItems: 1
         )
     )
+    var accountSettingsResult: Result<AccountSettings, Error> = .success(
+        AccountSettings(
+            themeMode: .light
+        )
+    )
     var settingsResult: Result<TeamsAlertSettings, Error> = .success(
         TeamsAlertSettings(
-            themeMode: .light,
             enabled: true,
             destinationLabel: "Trading alerts",
             triggerAmountUsd: 1500,
@@ -244,16 +249,25 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         return try settingsResult.get()
     }
 
+    func fetchAccountSettings() async throws -> AccountSettings {
+        accountSettingsLoadCount += 1
+        return try accountSettingsResult.get()
+    }
+
     func fetchSettingsHistory(page: Int, pageSize: Int) async throws -> TeamsAlertHistoryResponse {
         settingsHistoryLoadCount += 1
         return try settingsHistoryResult.get()
+    }
+
+    func updateAccountSettings(themeMode: ThemeMode) async throws -> AccountSettings {
+        accountSettingsResult = .success(AccountSettings(themeMode: themeMode))
+        return try accountSettingsResult.get()
     }
 
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings {
         let currentSettings = try settingsResult.get()
         settingsResult = .success(
             TeamsAlertSettings(
-                themeMode: payload.themeMode ?? currentSettings.themeMode,
                 enabled: payload.enabled ?? currentSettings.enabled,
                 destinationLabel: payload.destinationLabel ?? currentSettings.destinationLabel,
                 triggerAmountUsd: payload.triggerAmountUsd ?? currentSettings.triggerAmountUsd,

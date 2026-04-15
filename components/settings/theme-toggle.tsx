@@ -27,7 +27,7 @@ export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
     setThemeMode(nextThemeMode);
     setIsSaving(true);
 
-    const response = await fetch("/api/settings/teams-alert", {
+    const response = await fetch("/api/settings/account", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"

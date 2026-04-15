@@ -38,7 +38,6 @@ describe("teams alert settings contract", () => {
     const payload = await response.json();
 
     expect(payload).toMatchObject({
-      themeMode: expect.stringMatching(/light|dark/),
       enabled: expect.any(Boolean),
       destinationLabel: expect.any(String),
       triggerAmountUsd: expect.any(Number),
@@ -70,23 +69,5 @@ describe("teams alert settings contract", () => {
     const payload = await response.json();
 
     expect(payload.triggerAmountUsd).toBe(1500);
-  });
-
-  it("accepts theme-only account settings updates", async () => {
-    const response = await PUT(
-      new Request("http://localhost/api/settings/teams-alert", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          themeMode: "dark"
-        })
-      })
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(payload.themeMode).toBe("dark");
   });
 });

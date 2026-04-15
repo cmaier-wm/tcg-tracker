@@ -15,8 +15,7 @@ import {
   type TeamsAlertHistoryResponse,
   type TeamsAlertDeliveryStatus,
   type TeamsAlertSettingsPayload,
-  type TeamsAlertSettingsResponse,
-  type ThemeMode
+  type TeamsAlertSettingsResponse
 } from "@/lib/teams/schemas";
 
 type DeliveryPreferenceRecord = {
@@ -55,7 +54,6 @@ function getDeliveryStatus(preference: {
 
 function toSettingsResponse(
   preference: {
-    themeMode?: ThemeMode | null;
     enabled: boolean;
     destinationLabel: string | null;
     triggerAmountUsd: number;
@@ -70,7 +68,6 @@ function toSettingsResponse(
 ): TeamsAlertSettingsResponse {
   if (!preference) {
     return {
-      themeMode: "light",
       enabled: false,
       destinationLabel: null,
       triggerAmountUsd: 1000,
@@ -86,7 +83,6 @@ function toSettingsResponse(
   }
 
   return {
-    themeMode: preference.themeMode ?? "light",
     enabled: preference.enabled,
     destinationLabel: preference.destinationLabel,
     triggerAmountUsd: preference.triggerAmountUsd ?? 1000,
@@ -155,7 +151,6 @@ export async function getTeamsAlertSettings() {
       return toSettingsResponse(
         preference
           ? {
-              themeMode: (preference.themeMode as ThemeMode) ?? "light",
               enabled: preference.enabled,
               destinationLabel: preference.destinationLabel,
               triggerAmountUsd: preference.triggerAmountUsd ?? 1000,
@@ -190,7 +185,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       });
 
       let shouldResetBaseline = !existing;
-      const themeMode = input.themeMode ?? ((existing?.themeMode as ThemeMode | undefined) ?? "light");
       let encryptedWebhookUrl = existing?.encryptedWebhookUrl ?? null;
       let webhookUrlIv = existing?.webhookUrlIv ?? null;
       let destinationLabel = input.destinationLabel !== undefined
@@ -236,7 +230,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       const preference = await prisma.teamsAlertPreference.upsert({
         where: { userId: user.id },
         update: {
-          themeMode,
           enabled: nextEnabled,
           destinationLabel,
           triggerAmountUsd,
@@ -252,7 +245,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
         },
         create: {
           userId: user.id,
-          themeMode,
           enabled: nextEnabled,
           destinationLabel,
           triggerAmountUsd,
@@ -263,7 +255,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       });
 
       return toSettingsResponse({
-        themeMode: preference.themeMode as ThemeMode,
         enabled: preference.enabled,
         destinationLabel: preference.destinationLabel,
         triggerAmountUsd: preference.triggerAmountUsd,
@@ -280,7 +271,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       const user = await requireAuthenticatedUser();
       const store = getDemoUserState(user.userId);
       const previous = store.teamsAlertPreference;
-      const themeMode = input.themeMode ?? previous?.themeMode ?? "light";
       let nextPreference: DemoTeamsAlertPreference;
       const nextEnabled = input.enabled ?? previous?.enabled ?? false;
       const destinationLabel =
@@ -315,7 +305,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
 
         nextPreference = {
           id: previous?.id ?? generateStoreId("teams-pref"),
-          themeMode,
           enabled: true,
           destinationLabel,
           triggerAmountUsd,
@@ -341,7 +330,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
 
         nextPreference = {
           id: previous?.id ?? generateStoreId("teams-pref"),
-          themeMode,
           enabled: false,
           destinationLabel,
           triggerAmountUsd,
@@ -358,24 +346,6 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       store.teamsAlertPreference = nextPreference;
       return toSettingsResponse(nextPreference);
     }
-  );
-}
-
-export async function getAccountThemeMode(userId: string | null | undefined): Promise<ThemeMode> {
-  if (!userId) {
-    return "light";
-  }
-
-  return withDatabaseFallback(
-    async () => {
-      const preference = await prisma.teamsAlertPreference.findUnique({
-        where: { userId },
-        select: { themeMode: true }
-      });
-
-      return (preference?.themeMode as ThemeMode | undefined) ?? "light";
-    },
-    async () => getDemoUserState(userId).teamsAlertPreference?.themeMode ?? "light"
   );
 }
 

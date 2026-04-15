@@ -12,7 +12,9 @@ description: "Task list template for feature implementation"
 contracts, and regressions. Every user story MUST include web verification and
 iOS verification unless an approved constitution exception is documented. If
 automation is not practical, include explicit manual verification tasks with
-commands, inputs, and expected outcomes.
+commands, inputs, and expected outcomes. Every user story that changes web UI
+or browser behavior MUST also include a console-clean verification task unless
+an approved exception is documented.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -92,16 +94,17 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] T010 [P] [US1] Contract test for shared backend/API behavior in tests/contract/test_[name].py
 - [ ] T011 [P] [US1] Web verification for [user journey] in tests/integration/test_[name].py
-- [ ] T012 [P] [US1] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
-- [ ] T013 [US1] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
+- [ ] T012 [P] [US1] Web console-clean verification for [user journey] in tests/e2e/[name].spec.ts or specs/[###-feature-name]/quickstart.md
+- [ ] T013 [P] [US1] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
+- [ ] T014 [US1] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Implement shared backend/API support in src/[shared-location]/[file].py
-- [ ] T015 [P] [US1] Implement web client changes in src/[web-location]/[file].tsx
-- [ ] T016 [P] [US1] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
-- [ ] T017 [US1] Add validation and error handling
-- [ ] T018 [US1] Add logging or telemetry for user story 1 operations
+- [ ] T015 [P] [US1] Implement shared backend/API support in src/[shared-location]/[file].py
+- [ ] T016 [P] [US1] Implement web client changes in src/[web-location]/[file].tsx
+- [ ] T017 [P] [US1] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
+- [ ] T018 [US1] Add validation and error handling
+- [ ] T019 [US1] Add logging or telemetry for user story 1 operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -117,15 +120,16 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] T019 [P] [US2] Contract test for shared backend/API behavior in tests/contract/test_[name].py
 - [ ] T020 [P] [US2] Web verification for [user journey] in tests/integration/test_[name].py
-- [ ] T021 [P] [US2] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
-- [ ] T022 [US2] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
+- [ ] T021 [P] [US2] Web console-clean verification for [user journey] in tests/e2e/[name].spec.ts or specs/[###-feature-name]/quickstart.md
+- [ ] T022 [P] [US2] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
+- [ ] T023 [US2] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Implement shared backend/API support in src/[shared-location]/[file].py
-- [ ] T024 [P] [US2] Implement web client changes in src/[web-location]/[file].tsx
-- [ ] T025 [P] [US2] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
-- [ ] T026 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T024 [P] [US2] Implement shared backend/API support in src/[shared-location]/[file].py
+- [ ] T025 [P] [US2] Implement web client changes in src/[web-location]/[file].tsx
+- [ ] T026 [P] [US2] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
+- [ ] T027 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -141,14 +145,15 @@ Examples of foundational tasks (adjust based on your project):
 
 - [ ] T027 [P] [US3] Contract test for shared backend/API behavior in tests/contract/test_[name].py
 - [ ] T028 [P] [US3] Web verification for [user journey] in tests/integration/test_[name].py
-- [ ] T029 [P] [US3] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
-- [ ] T030 [US3] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
+- [ ] T029 [P] [US3] Web console-clean verification for [user journey] in tests/e2e/[name].spec.ts or specs/[###-feature-name]/quickstart.md
+- [ ] T030 [P] [US3] iOS verification for [user journey] in ios/TCGTrackerTests/[Name]Tests.swift
+- [ ] T031 [US3] Document manual verification in specs/[###-feature-name]/quickstart.md if automation is not practical
 
 ### Implementation for User Story 3
 
-- [ ] T031 [P] [US3] Implement shared backend/API support in src/[shared-location]/[file].py
-- [ ] T032 [P] [US3] Implement web client changes in src/[web-location]/[file].tsx
-- [ ] T033 [P] [US3] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
+- [ ] T032 [P] [US3] Implement shared backend/API support in src/[shared-location]/[file].py
+- [ ] T033 [P] [US3] Implement web client changes in src/[web-location]/[file].tsx
+- [ ] T034 [P] [US3] Implement iOS client changes in ios/TCGTracker/[Feature]/[File].swift
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -192,6 +197,8 @@ Examples of foundational tasks (adjust based on your project):
 
 - Verification MUST be defined before implementation
 - Automated tests for executable behavior MUST fail before implementation when feasible
+- Web console-clean verification MUST exist for any story that changes web UI or
+  browser behavior unless an approved exception is documented
 - Models before services
 - Services before endpoints
 - Core implementation before integration

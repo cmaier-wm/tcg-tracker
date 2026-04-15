@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 2.0.0
+- Version change: 2.0.0 -> 2.1.0
 - Modified principles:
   - Placeholder principle set -> I. Spec Before Code
   - Placeholder principle set -> II. Vertical Slice Delivery
@@ -8,6 +8,8 @@ Sync Impact Report
   - Placeholder principle set -> IV. Explicit Simplicity
   - Placeholder principle set -> V. Traceable Context Sync
 - Added sections:
+  - None
+- Expanded governance:
   - Engineering Standards
   - Workflow & Review Gates
 - Removed sections:
@@ -87,6 +89,13 @@ client, the iOS client, and any shared backend or API surfaces. Specs MUST
 declare parity expectations explicitly and default to both clients being in
 scope.
 
+User-facing web routes and flows MUST not emit browser console errors during
+supported user journeys. Any feature that changes web UI behavior MUST define
+how console cleanliness will be verified, preferably through automated browser
+checks and otherwise through explicit manual verification steps. Known
+exceptions are allowed only when documented in the plan with owner, reason, and
+follow-up path.
+
 Generated or maintained guidance files MUST reflect the currently adopted stack
 and commands. If the project is still pre-implementation, repo-level guidance
 MUST say so explicitly instead of presenting guessed commands or conventions as
@@ -103,7 +112,8 @@ Before implementation starts, reviewers MUST confirm:
 2. User stories are independently testable and priority-ordered.
 3. Web, iOS, and shared backend or API impact are defined for each story.
 4. Verification tasks are defined for both web and iOS behavior in each story.
-5. Project guidance files affected by the plan are updated or explicitly marked
+5. Web stories define console-clean verification or a documented exception.
+6. Project guidance files affected by the plan are updated or explicitly marked
    for follow-up.
 
 Before a change is considered complete, reviewers MUST confirm that the claimed
@@ -126,4 +136,4 @@ changes that touch behavior, structure, or workflow. Any temporary exception
 MUST be documented in the relevant plan under Complexity Tracking with a clear
 expiration or follow-up path.
 
-**Version**: 2.0.0 | **Ratified**: 2026-04-01 | **Last Amended**: 2026-04-15
+**Version**: 2.1.0 | **Ratified**: 2026-04-01 | **Last Amended**: 2026-04-15

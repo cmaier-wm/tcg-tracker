@@ -8,6 +8,7 @@ struct CardDetailView: View {
 
     @State private var quantity = 1
     @State private var showingAuthRequired = false
+    @State private var addConfirmationMessage: String?
 
     var body: some View {
         ScrollView {
@@ -85,14 +86,23 @@ struct CardDetailView: View {
 
                             Task {
                                 if let variationID = browseStore.preferredVariation(from: selectedCard)?.id {
-                                    await portfolioStore.addHolding(
+                                    let updatedHolding = await portfolioStore.addHolding(
                                         variationId: variationID,
                                         quantity: quantity
                                     )
+
+                                    if let updatedHolding {
+                                        addConfirmationMessage = makeAddConfirmationMessage(
+                                            cardName: selectedCard.name,
+                                            quantityAdded: quantity,
+                                            totalQuantity: updatedHolding.quantity
+                                        )
+                                    }
                                 }
                             }
                         }
                         .buttonStyle(.borderedProminent)
+                        .disabled(portfolioStore.isLoading)
                     }
                     .padding(18)
                     .background(
@@ -127,5 +137,27 @@ struct CardDetailView: View {
         } message: {
             Text("Browsing is public, but saving cards to your portfolio requires an account.")
         }
+        .alert("Added to portfolio", isPresented: Binding(
+            get: { addConfirmationMessage != nil },
+            set: { isPresented in
+                if !isPresented {
+                    addConfirmationMessage = nil
+                }
+            }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(addConfirmationMessage ?? "Your card was added to the portfolio.")
+        }
+    }
+
+    private func makeAddConfirmationMessage(
+        cardName: String,
+        quantityAdded: Int,
+        totalQuantity: Int
+    ) -> String {
+        let addedText = quantityAdded == 1 ? "1 copy" : "\(quantityAdded) copies"
+        let totalText = totalQuantity == 1 ? "1 copy" : "\(totalQuantity) copies"
+        return "Added \(addedText) of \(cardName). You now have \(totalText) in your portfolio."
     }
 }

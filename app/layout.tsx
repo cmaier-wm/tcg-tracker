@@ -6,7 +6,7 @@ import { BrandHomeLink } from "@/components/brand-home-link";
 import { DevOriginRedirect } from "@/components/dev-origin-redirect";
 import { SiteNav } from "@/components/site-nav";
 import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
-import { getAccountThemeMode } from "@/lib/teams/alert-preferences";
+import { getAccountSettings } from "@/lib/settings/account-settings";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,10 +20,10 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const authenticatedUser = await getOptionalAuthenticatedUser();
-  const theme = await getAccountThemeMode(authenticatedUser?.userId);
+  const { themeMode } = await getAccountSettings(authenticatedUser?.userId);
 
   return (
-    <html lang="en" data-theme={theme} suppressHydrationWarning>
+    <html lang="en" data-theme={themeMode} suppressHydrationWarning>
       <body>
         <DevOriginRedirect />
         <div className="app-shell">

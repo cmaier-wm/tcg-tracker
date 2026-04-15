@@ -15,7 +15,6 @@ vi.mock("sonner", () => ({
 
 function createSettingsResponse(overrides?: Partial<Record<string, unknown>>) {
   return {
-    themeMode: "light",
     enabled: false,
     destinationLabel: null,
     triggerAmountUsd: 1000,
@@ -89,7 +88,7 @@ describe("settings page", () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(createSettingsResponse({ themeMode: "light" })), {
+        new Response(JSON.stringify(createSettingsResponse()), {
           status: 200,
           headers: { "Content-Type": "application/json" }
         })
@@ -101,7 +100,7 @@ describe("settings page", () => {
         })
       )
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(createSettingsResponse({ themeMode: "dark" })), {
+        new Response(JSON.stringify({ themeMode: "dark" }), {
           status: 200,
           headers: { "Content-Type": "application/json" }
         })
@@ -118,9 +117,12 @@ describe("settings page", () => {
     await user.click(screen.getByRole("checkbox", { name: "Dark mode toggle" }));
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith("/api/settings/teams-alert", expect.objectContaining({
-        method: "PUT"
-      }));
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/settings/account",
+        expect.objectContaining({
+          method: "PUT"
+        })
+      );
       expect(document.documentElement.dataset.theme).toBe("dark");
     });
   });

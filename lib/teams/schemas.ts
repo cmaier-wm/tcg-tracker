@@ -1,11 +1,7 @@
 import { z } from "zod";
 
-export const themeModeSchema = z.enum(["light", "dark"]);
-export type ThemeMode = z.infer<typeof themeModeSchema>;
-
 export const teamsAlertSettingsPayloadSchema = z
   .object({
-    themeMode: themeModeSchema.optional(),
     enabled: z.boolean().optional(),
     destinationLabel: z
       .union([z.string(), z.null(), z.undefined()])
@@ -24,7 +20,6 @@ export const teamsAlertSettingsPayloadSchema = z
   })
   .refine(
     (value) =>
-      value.themeMode !== undefined ||
       value.enabled !== undefined ||
       value.destinationLabel !== undefined ||
       value.triggerAmountUsd !== undefined ||
@@ -56,7 +51,6 @@ export type TeamsAlertHistoryResponse = {
 };
 
 export type TeamsAlertSettingsResponse = {
-  themeMode: ThemeMode;
   enabled: boolean;
   destinationLabel: string | null;
   triggerAmountUsd: number;

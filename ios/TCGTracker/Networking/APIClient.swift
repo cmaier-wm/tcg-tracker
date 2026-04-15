@@ -35,6 +35,8 @@ protocol APIClientProtocol: Sendable {
     func addHolding(cardVariationId: String, quantity: Int) async throws -> PortfolioHolding
     func updateHolding(holdingId: String, quantity: Int) async throws
     func removeHolding(holdingId: String) async throws
+    func fetchAccountSettings() async throws -> AccountSettings
+    func updateAccountSettings(themeMode: ThemeMode) async throws -> AccountSettings
     func fetchSettings() async throws -> TeamsAlertSettings
     func fetchSettingsHistory(page: Int, pageSize: Int) async throws -> TeamsAlertHistoryResponse
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings
@@ -178,6 +180,19 @@ actor APIClient: APIClientProtocol {
             path: "/api/portfolio/\(holdingId)",
             method: "DELETE",
             expectedStatusCodes: [204]
+        )
+    }
+
+    func fetchAccountSettings() async throws -> AccountSettings {
+        try await request(path: "/api/settings/account", expecting: AccountSettings.self)
+    }
+
+    func updateAccountSettings(themeMode: ThemeMode) async throws -> AccountSettings {
+        try await request(
+            path: "/api/settings/account",
+            method: "PUT",
+            body: AnyEncodable(AccountSettings(themeMode: themeMode)),
+            expecting: AccountSettings.self
         )
     }
 

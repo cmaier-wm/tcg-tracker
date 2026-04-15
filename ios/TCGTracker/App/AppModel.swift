@@ -8,6 +8,7 @@ final class AppModel {
     let browseStore: BrowseStore
     let portfolioStore: PortfolioStore
     let settingsStore: SettingsStore
+    var isBootstrapping = true
 
     init(apiClient: APIClientProtocol = APIClient()) {
         sessionStore = SessionStore(apiClient: apiClient)
@@ -21,6 +22,7 @@ final class AppModel {
     }
 
     func start() async {
+        defer { isBootstrapping = false }
         await sessionStore.restoreSession()
         async let browseLoad: Void = browseStore.search()
 
@@ -47,8 +49,10 @@ final class AppModel {
     func clearProtectedData() {
         portfolioStore.portfolio = nil
         portfolioStore.errorMessage = nil
+        settingsStore.accountSettings = nil
         settingsStore.settings = nil
         settingsStore.history = []
+        settingsStore.previewThemeMode = nil
         settingsStore.errorMessage = nil
     }
 }

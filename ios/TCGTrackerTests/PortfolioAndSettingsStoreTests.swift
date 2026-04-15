@@ -11,9 +11,11 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
             didRefresh = true
         }
 
-        await store.addHolding(variationId: "variation-1", quantity: 2)
+        let addedHolding = await store.addHolding(variationId: "variation-1", quantity: 2)
 
         XCTAssertEqual(apiClient.addedHoldingVariationID, "variation-1")
+        XCTAssertEqual(addedHolding?.cardVariationId, "variation-1")
+        XCTAssertEqual(addedHolding?.quantity, 2)
         XCTAssertTrue(didRefresh)
     }
 
@@ -35,6 +37,7 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
 
         await store.load()
         XCTAssertEqual(store.settings?.triggerAmountUsd, 1500)
+        XCTAssertEqual(store.accountSettings?.themeMode, .light)
         XCTAssertEqual(store.currentThemeMode, .light)
         XCTAssertEqual(store.history.count, 1)
 
@@ -47,7 +50,8 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
         )
 
         XCTAssertEqual(store.settings?.triggerAmountUsd, 2000)
-        XCTAssertEqual(store.settings?.themeMode, .dark)
+        XCTAssertEqual(store.accountSettings?.themeMode, .dark)
+        XCTAssertEqual(store.currentThemeMode, .dark)
         XCTAssertEqual(store.settings?.webhookUrl, "https://example.com/new-hook")
         XCTAssertEqual(apiClient.settingsHistoryLoadCount, 2)
     }

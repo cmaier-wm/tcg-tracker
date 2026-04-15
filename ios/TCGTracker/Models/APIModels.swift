@@ -17,6 +17,10 @@ struct PasswordResetMessageResponse: Codable, Equatable, Sendable {
     let message: String
 }
 
+struct AccountSettings: Codable, Equatable, Sendable {
+    let themeMode: ThemeMode
+}
+
 struct MobileSession: Codable, Equatable, Sendable {
     let status: String
     let user: AuthenticatedUser
@@ -172,7 +176,6 @@ struct HoldingUpdateRequest: Codable, Equatable, Sendable {
 }
 
 struct TeamsAlertSettings: Codable, Equatable, Sendable {
-    let themeMode: ThemeMode
     let enabled: Bool
     let destinationLabel: String?
     let triggerAmountUsd: Int
@@ -187,7 +190,6 @@ struct TeamsAlertSettings: Codable, Equatable, Sendable {
 }
 
 struct TeamsAlertSettingsUpdate: Codable, Equatable, Sendable {
-    let themeMode: ThemeMode?
     let enabled: Bool?
     let destinationLabel: String?
     let triggerAmountUsd: Int?

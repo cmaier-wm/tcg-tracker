@@ -33,9 +33,9 @@ final class PortfolioStore {
         }
     }
 
-    func addHolding(variationId: String, quantity: Int) async {
+    func addHolding(variationId: String, quantity: Int) async -> PortfolioHolding? {
         await mutate {
-            _ = try await apiClient.addHolding(cardVariationId: variationId, quantity: quantity)
+            try await apiClient.addHolding(cardVariationId: variationId, quantity: quantity)
         }
     }
 
@@ -60,17 +60,19 @@ final class PortfolioStore {
         }
     }
 
-    private func mutate(_ operation: () async throws -> Void) async {
+    private func mutate<Result>(_ operation: () async throws -> Result) async -> Result? {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
 
         do {
-            try await operation()
+            let result = try await operation()
             portfolio = try await apiClient.fetchPortfolio()
             await onMutation?()
+            return result
         } catch {
             errorMessage = error.localizedDescription
+            return nil
         }
     }
 

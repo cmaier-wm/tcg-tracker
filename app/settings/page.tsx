@@ -1,15 +1,15 @@
 import React from "react";
 import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
 import { SettingsPage } from "@/components/settings/settings-page";
-import { getAccountThemeMode } from "@/lib/teams/alert-preferences";
+import { getAccountSettings } from "@/lib/settings/account-settings";
 
 export default async function SettingsRoute() {
   const authenticatedUser = await getOptionalAuthenticatedUser();
-  const initialThemeMode = await getAccountThemeMode(authenticatedUser?.userId);
+  const { themeMode } = await getAccountSettings(authenticatedUser?.userId);
 
   return (
     <SettingsPage
-      initialThemeMode={initialThemeMode}
+      initialThemeMode={themeMode}
       isAuthenticated={Boolean(authenticatedUser)}
     />
   );

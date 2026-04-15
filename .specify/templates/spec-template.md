@@ -76,6 +76,9 @@
   data, and service changes required to keep clients aligned]
 - **Parity Expectation**: [Default: `web + iOS` in the same increment; note any
   approved, time-bound exception explicitly]
+- **Web Console Verification**: [Describe how affected web routes and flows
+  will be verified to remain free of browser console errors, or document an
+  approved exception]
 
 ### Edge Cases
 
@@ -139,6 +142,8 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-005**: [For affected web flows, no browser console errors occur during
+  the supported user journey, or an approved exception is documented]
 
 ## Assumptions
 
