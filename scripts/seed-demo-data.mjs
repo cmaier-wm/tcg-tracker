@@ -163,14 +163,20 @@ for (const entry of cards) {
 
 await prisma.userAccount.upsert({
   where: { id: "demo-user" },
-  update: {},
+  update: {
+    email: "collector@local.tcg",
+    displayName: "Collector",
+    isLegacyDefault: true,
+    legacyClaimedAt: null
+  },
   create: {
     id: "demo-user",
     email: "collector@local.tcg",
-    displayName: "Collector"
+    displayName: "Collector",
+    isLegacyDefault: true,
+    legacyClaimedAt: null
   }
 });
 
 console.log("Seeded demo card data into PostgreSQL.");
 await prisma.$disconnect();
-

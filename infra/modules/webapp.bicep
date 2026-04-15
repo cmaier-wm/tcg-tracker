@@ -1,9 +1,13 @@
 param appCommandLine string
 param appServicePlanSkuName string
+param authResetFromEmail string
+param authResetFromName string
 param applicationInsightsConnectionString string
 param location string
 param logAnalyticsWorkspaceId string
 param nodeRuntime string
+@secure()
+param resendApiKey string
 param resourceToken string
 param serviceName string
 param tags object
@@ -12,6 +16,35 @@ var userAssignedIdentityName = 'azid${resourceToken}'
 var keyVaultName = 'azkv${resourceToken}'
 var appServicePlanName = 'azasp${resourceToken}'
 var webAppName = 'azapp${resourceToken}'
+var hasResendApiKey = !empty(resendApiKey)
+var hasAuthResetFromEmail = !empty(authResetFromEmail)
+var hasAuthResetFromName = !empty(authResetFromName)
+var passwordResetEmailAppSettings = concat(
+  hasResendApiKey
+    ? [
+        {
+          name: 'RESEND_API_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=resend-api-key)'
+        }
+      ]
+    : [],
+  hasAuthResetFromEmail
+    ? [
+        {
+          name: 'AUTH_RESET_FROM_EMAIL'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=auth-reset-from-email)'
+        }
+      ]
+    : [],
+  hasAuthResetFromName
+    ? [
+        {
+          name: 'AUTH_RESET_FROM_NAME'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=auth-reset-from-name)'
+        }
+      ]
+    : []
+)
 var appTags = union(tags, {
   'azd-service-name': serviceName
 })
@@ -71,6 +104,30 @@ resource keyVaultSecretsOfficerRoleAssignment 'Microsoft.Authorization/roleAssig
   }
 }
 
+resource resendApiKeySecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (hasResendApiKey) {
+  parent: keyVault
+  name: 'resend-api-key'
+  properties: {
+    value: resendApiKey
+  }
+}
+
+resource authResetFromEmailSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (hasAuthResetFromEmail) {
+  parent: keyVault
+  name: 'auth-reset-from-email'
+  properties: {
+    value: authResetFromEmail
+  }
+}
+
+resource authResetFromNameSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (hasAuthResetFromName) {
+  parent: keyVault
+  name: 'auth-reset-from-name'
+  properties: {
+    value: authResetFromName
+  }
+}
+
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: appServicePlanName
   location: location
@@ -118,7 +175,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState: 'Disabled'
       linuxFxVersion: nodeRuntime
       minTlsVersion: '1.2'
-      appSettings: [
+      appSettings: concat([
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
@@ -127,6 +184,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
           name: 'DATABASE_URL'
           value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-url)'
         }
+      ], passwordResetEmailAppSettings, [
         {
           name: 'NEXT_TELEMETRY_DISABLED'
           value: '1'
@@ -143,7 +201,11 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
-      ]
+        {
+          name: 'WEBSITE_WARMUP_PATH'
+          value: '/api/health'
+        }
+      ])
     }
   }
   dependsOn: [

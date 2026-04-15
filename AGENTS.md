@@ -36,9 +36,11 @@
 - `npm run db:up`
 - `npm run db:generate`
 - `npm run dev`
+- `npm run codex:sync-worktrees`
 - `npm run db:migrate`
 - `export AUTH_SECRET=<local-secret>`
 - `export TEAMS_WEBHOOK_ENCRYPTION_KEY=<local-secret>`
+- `export AUTH_RESET_EMAIL_ENDPOINT=<server-side-reset-delivery-endpoint>`
 - `npm run test:unit`
 - `npm run test:integration`
 - `npm run test:e2e`
@@ -55,6 +57,12 @@
   needed.
 - `npm run dev` automatically runs `prisma migrate deploy` and `prisma generate`
   before starting the local server on port `3000`.
+- `npm run codex:sync-worktrees` backfills the tracked Codex Desktop Run action
+  into older `tcg-tracker` worktrees under `$CODEX_HOME/worktrees` or
+  `~/.codex/worktrees`.
+- When `AUTH_RESET_EMAIL_ENDPOINT` is not set locally, password reset requests
+  log the reset URL in the server output for manual verification instead of
+  sending an email.
 
 ## Active Technologies
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod (001-card-portfolio-tracker)
@@ -70,6 +78,10 @@
 - PostgreSQL 17 for users, sessions, account-owned portfolio data, and account-owned Teams settings (006-user-login)
 - Swift 6 for the iOS client, TypeScript 5.9 on Node.js 22 LTS for backend additions + SwiftUI, Observation, Foundation networking, Swift Charts, existing Next.js 16, React 19, Prisma ORM, Auth.js, Zod backend stack (007-ios-mobile-app)
 - Existing PostgreSQL 17 through the Next.js backend for account-owned data; secure session cookies on device; no offline source-of-truth storage in v1 (007-ios-mobile-app)
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Auth.js session helpers, Zod, native `Response` and string handling for CSV output (008-portfolio-spreadsheet-export)
+- PostgreSQL 17 for authenticated portfolio holdings and latest price snapshots, with the existing in-memory demo-store fallback when the database is unavailable in non-production or test fallback paths (008-portfolio-spreadsheet-export)
+- TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Zod, `bcryptjs`, native Node `crypto`, existing app-owned auth/session helpers, and a transactional email delivery integration for production reset emails (009-password-reset)
+- PostgreSQL 17 for users, credentials, sessions, audit events, and new password reset token records (009-password-reset)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod
@@ -78,3 +90,4 @@
 - 005-teams-value-alert: Added persisted Microsoft Teams workflow alerts with encrypted webhook storage, snapshot-triggered threshold delivery, and duplicate suppression
 - 006-user-login: Added email/password registration, session-backed login/logout, protected portfolio/settings routes, account-owned portfolio data, and account-owned Teams alert settings
 - 007-ios-mobile-app: Added a package-backed native iOS client structure, mobile summary composition routes, and SwiftUI flows for auth, browse, portfolio, card detail, and settings
+- 008-portfolio-spreadsheet-export: Added authenticated CSV portfolio export, export API coverage, and Azure startup packaging updates for App Service deployment

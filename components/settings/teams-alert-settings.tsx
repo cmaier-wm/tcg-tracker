@@ -35,7 +35,6 @@ export function TeamsAlertSettings() {
   const [enabled, setEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<TeamsAlertHistoryResponse>({
     items: [],
     page: 1,
@@ -54,7 +53,7 @@ export function TeamsAlertSettings() {
     const payload = (await response.json()) as TeamsAlertHistoryResponse | { error?: string };
 
     if (!response.ok) {
-      setMessage((payload as { error?: string }).error ?? "Unable to load Teams alert history.");
+      toast.error((payload as { error?: string }).error ?? "Unable to load Teams alert history.");
       setIsHistoryLoading(false);
       return;
     }
@@ -77,7 +76,7 @@ export function TeamsAlertSettings() {
       }
 
       if (!response.ok) {
-        setMessage("Unable to load Teams alert settings.");
+        toast.error("Unable to load Teams alert settings.");
         setIsLoading(false);
         return;
       }
@@ -103,7 +102,6 @@ export function TeamsAlertSettings() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSaving(true);
-    setMessage(null);
 
     const response = await fetch("/api/settings/teams-alert", {
       method: "PUT",
@@ -225,18 +223,6 @@ export function TeamsAlertSettings() {
           </span>
         </span>
       </label>
-
-      {settings.lastFailureMessage ? (
-        <div className="teams-alert-message error" role="status">
-          {settings.lastFailureMessage}
-        </div>
-      ) : null}
-
-      {message ? (
-        <div className="teams-alert-message" role="status">
-          {message}
-        </div>
-      ) : null}
 
       <div className="button-row">
         <button className="button" type="submit" disabled={!canSubmit || isLoading}>

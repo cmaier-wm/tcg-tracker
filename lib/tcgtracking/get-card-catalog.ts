@@ -1,8 +1,10 @@
+import { unstable_cache } from "next/cache";
 import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoCards } from "@/lib/db/demo-store";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
 import { toCardListItem } from "@/lib/tcgtracking/mappers";
 import {
+  type CatalogSortValue,
   matchesSearchTokens,
   normalizeCatalogSort,
   sortCardListItems,
@@ -17,6 +19,16 @@ type CatalogOptions = {
   limit?: number;
   offset?: number;
 };
+
+type DatabaseCatalogOptions = Omit<CatalogOptions, "sort"> & {
+  sort: CatalogSortValue;
+};
+
+const getCachedDatabaseCardCatalog = unstable_cache(
+  async (options: DatabaseCatalogOptions) => getDatabaseCardCatalog(options),
+  ["db-card-catalog"],
+  { revalidate: 60 }
+);
 
 function normalizeFilter(value?: string | null) {
   const normalized = value?.trim().toLowerCase();
@@ -33,23 +45,22 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
 
   return withDatabaseFallback(
     async () => {
-      const cards = await getDatabaseCardCatalog({
+      const cards = await getCachedDatabaseCardCatalog({
         q: options.q,
         category,
         set,
-        sort
+        sort,
+        limit,
+        offset
       });
 
-      return sortCardListItems(
-        cards.map((card) => ({
-          ...card,
-          collectorNumber: card.collectorNumber ?? undefined,
-          rarity: card.rarity ?? undefined,
-          imageUrl: card.imageUrl ?? undefined,
-          currentPrice: card.currentPrice ?? undefined
-        })),
-        sort
-      ).slice(offset, limit ? offset + limit : undefined);
+      return cards.map((card) => ({
+        ...card,
+        collectorNumber: card.collectorNumber ?? undefined,
+        rarity: card.rarity ?? undefined,
+        imageUrl: card.imageUrl ?? undefined,
+        currentPrice: card.currentPrice ?? undefined
+      }));
     },
     async () =>
       sortCardListItems(
@@ -83,7 +94,6 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
           })
           .map(toCardListItem),
         sort
-      )
-        .slice(offset, limit ? offset + limit : undefined)
+      ).slice(offset, limit ? offset + limit : undefined)
   );
 }

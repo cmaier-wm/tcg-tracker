@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { getOptionalEnv } from "@/lib/db/env";
+import { refreshCardCatalogMetrics } from "@/lib/tcgtracking/refresh-card-catalog-metrics";
 import { tcgTrackingClient } from "@/lib/tcgtracking/client";
 import {
   upstreamCardSchema,
@@ -106,7 +107,9 @@ function getLanguagesFromCard(card: UpstreamCard) {
 
   for (const blueprint of card.cardtrader ?? []) {
     for (const language of blueprint.languages ?? []) {
-      languages.add(language.toUpperCase());
+      if (language.toUpperCase() === "EN") {
+        languages.add("EN");
+      }
     }
 
     for (const property of blueprint.properties ?? []) {
@@ -115,13 +118,16 @@ function getLanguagesFromCard(card: UpstreamCard) {
       }
 
       for (const value of property.possible_values ?? []) {
-        if (typeof value === "string") {
-          languages.add(value.toUpperCase());
+        if (typeof value === "string" && value.toUpperCase() === "EN") {
+          languages.add("EN");
         }
       }
 
-      if (typeof property.default_value === "string") {
-        languages.add(property.default_value.toUpperCase());
+      if (
+        typeof property.default_value === "string" &&
+        property.default_value.toUpperCase() === "EN"
+      ) {
+        languages.add("EN");
       }
     }
   }
@@ -358,6 +364,7 @@ export async function syncCatalog(
   let syncedSetCount = 0;
   let syncedCardCount = 0;
   let syncedVariationCount = 0;
+  const refreshedSetIds = new Set<string>();
 
   for (const category of categories) {
     const categorySlug = toSlug(category.name);
@@ -428,7 +435,7 @@ export async function syncCatalog(
       syncedCardCount += cards.length;
 
       for (const card of cards) {
-        await prisma.card.upsert({
+        const cardRecord = await prisma.card.upsert({
           where: {
             sourceProductId: card.id
           },
@@ -453,15 +460,17 @@ export async function syncCatalog(
           }
         });
 
-        const cardRecord = await prisma.card.findUniqueOrThrow({
-          where: {
-            sourceProductId: card.id
-          }
-        });
-
         syncedVariationCount += await syncCardVariations(cardRecord.id, card);
       }
+
+      refreshedSetIds.add(setRecord.id);
     }
+  }
+
+  if (refreshedSetIds.size) {
+    await refreshCardCatalogMetrics({
+      setIds: [...refreshedSetIds]
+    });
   }
 
   return {

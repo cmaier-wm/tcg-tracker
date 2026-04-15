@@ -31,3 +31,4 @@ DerivedData/
 Packages/
 xcuserdata/
 *.xcuserstate
+tsconfig.tsbuildinfo

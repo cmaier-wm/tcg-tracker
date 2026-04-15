@@ -52,6 +52,9 @@ Repository impact:
   Database for PostgreSQL Flexible Server 17 and Azure Key Vault.
 - Normal deployment commands live in `README.md` and use:
   `azd env new`, `azd env set`, `azd provision --preview`, and `azd up`.
+- Operational read-only reporting against production may use Azure CLI plus Key
+  Vault to fetch the dedicated `portfolio-summary-database-url` secret, then run
+  `npm run portfolio:summary:prod`.
 
 ### Figma MCP
 
@@ -221,6 +224,8 @@ Primary uses:
 - Check auth-gated flows such as `/login`, `/register`, `/portfolio`, and
   `/settings` when debugging redirects, session state, or public `returnTo`
   behavior from `/cards`.
+- Validate password reset request and completion flows against the same local
+  PostgreSQL-backed app state used by Playwright tests and local development.
 
 Typical tool families exposed by this MCP:
 
@@ -232,6 +237,9 @@ Repository impact:
 - No application code in this repository depends on Playwright MCP at runtime.
 - This MCP complements the repo's existing Playwright test framework by adding
   interactive browser verification for development sessions.
+- When password reset delivery is not wired to a live email endpoint locally,
+  development verification may rely on the server-log reset URL or direct DB
+  inspection alongside Playwright browser steps.
 
 ## What Is Not An MCP Here
 

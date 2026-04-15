@@ -48,6 +48,7 @@ npm run db:up
 npm run db:seed
 export AUTH_SECRET='replace-with-a-local-secret'
 export TEAMS_WEBHOOK_ENCRYPTION_KEY='replace-with-a-local-secret'
+export AUTH_RESET_EMAIL_ENDPOINT='https://your-reset-delivery-endpoint'
 npm run dev
 ```
 
@@ -59,14 +60,14 @@ where you are authoring a brand-new local migration.
 ## Native iOS Client
 
 The repository now includes an iPhone-first native client under
-[`ios/`](/Users/cmaier/.codex/worktrees/2b13/tcg-tracker/ios).
+[`ios/`](/Users/cmaier/Source/tcg-tracker/ios).
 
 Local mobile workflow:
 
 1. Start the backend with the normal local web commands shown above.
 2. Use the debug base URL `http://127.0.0.1:3000` in Simulator.
 3. Generate the local Xcode project, then open the workspace under
-   [`ios/TCGTracker/`](/Users/cmaier/.codex/worktrees/2b13/tcg-tracker/ios/TCGTracker).
+   [`ios/TCGTracker/`](/Users/cmaier/Source/tcg-tracker/ios/TCGTracker).
 4. Run the native unit suite from the package root with:
 
 ```bash
@@ -85,6 +86,11 @@ The native client reuses the existing Next.js app as its only backend. Mobile-
 specific backend additions are limited to `/api/mobile/session` and
 `/api/mobile/home` for signed-in bootstrap and portfolio summary composition.
 
+If Codex Desktop worktrees are missing the `Run` action, run
+`npm run codex:sync-worktrees` from this checkout to copy the tracked
+environment file into each `tcg-tracker` worktree under `$CODEX_HOME/worktrees`
+or `~/.codex/worktrees`.
+
 ## User Login
 
 The app now supports local email-and-password registration and sign-in for
@@ -97,6 +103,17 @@ Local setup notes:
 - `npm run dev` now applies checked-in auth migrations automatically so the
   `UserCredential`, `AuthSession`, and `AuthAuditEvent` tables stay in sync
   without a separate manual migrate step.
+- Password reset emails can be sent directly by the app when `RESEND_API_KEY`
+  and `AUTH_RESET_FROM_EMAIL` are set. `AUTH_RESET_FROM_NAME` is optional.
+- `AUTH_RESET_EMAIL_ENDPOINT` remains optional for local development when you
+  want to forward reset requests to another server-side delivery endpoint that
+  accepts `{ "email": "...", "resetUrl": "..." }`.
+- When neither Resend nor `AUTH_RESET_EMAIL_ENDPOINT` is configured locally,
+  password reset requests log the recovery URL to the server output.
+- For a concrete local Resend test path, start the app with
+  `RESEND_API_KEY`, `AUTH_RESET_FROM_EMAIL`, and optionally
+  `AUTH_RESET_FROM_NAME`. If you still prefer an internal callback path, set
+  `AUTH_RESET_EMAIL_ENDPOINT='http://127.0.0.1:3000/api/dev/password-reset-email'`.
 - `/cards` and card detail pages remain public while `/portfolio`, `/settings`,
   and the matching portfolio/settings APIs require authentication.
 - The first newly registered account claims any legacy demo portfolio/settings
@@ -150,12 +167,18 @@ Azure packaging note:
   `prisma/schema.prisma` configured with
   `binaryTargets = ["native", "debian-openssl-3.0.x"]` so the packaged
   standalone build includes Prisma's Linux query engine.
+- Azure deployments start through `node azure-start.mjs`, which runs
+  `prisma migrate deploy` against the packaged `prisma/` directory before
+  booting Next.js. Keep the checked-in migrations current before `azd up`.
 - After changing Prisma versions or generator settings, rerun
   `npm run db:generate` before `npm run build` and `npm run azure:package`.
 - If Azure serves demo fallback data while the database is populated, verify the
   deployment artifact contains
   `libquery_engine-debian-openssl-3.0.x.so.node` under
   `.next/standalone/node_modules/.prisma/client/`.
+- For deployed password reset emails, configure `RESEND_API_KEY`,
+  `AUTH_RESET_FROM_EMAIL`, and optionally `AUTH_RESET_FROM_NAME` in the Azure
+  app settings or Key Vault-backed references used by App Service.
 
 ## Verification
 

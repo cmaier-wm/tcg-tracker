@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { Toaster } from "sonner";
+import { BrandHomeLink } from "@/components/brand-home-link";
 import { DevOriginRedirect } from "@/components/dev-origin-redirect";
 import { SiteNav } from "@/components/site-nav";
 import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
@@ -11,7 +11,7 @@ import { themeCookieName } from "@/lib/settings/theme-storage";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TCG Tracker",
+  title: "Pokemon TCG Tracker",
   description: "Track TCG cards, price history, and portfolio value."
 };
 
@@ -32,7 +32,7 @@ export default async function RootLayout({
           <header className="site-header">
             <div className="site-header-inner">
               <div className="brand-lockup">
-                <Link href="/" className="brand-mark" aria-label="Go to home page">
+                <BrandHomeLink className="brand-mark" aria-label="Go to home page">
                   <svg
                     className="brand-mark-icon"
                     viewBox="0 0 64 64"
@@ -48,11 +48,11 @@ export default async function RootLayout({
                     <circle cx="32" cy="32" r="8" fill="#ffffff" stroke="#111827" strokeWidth="3" />
                     <circle cx="32" cy="32" r="3" fill="#f8fafc" stroke="#111827" strokeWidth="2" />
                   </svg>
-                </Link>
+                </BrandHomeLink>
                 <div>
-                  <Link href="/" className="brand">
-                    TCG Tracker
-                  </Link>
+                  <BrandHomeLink className="brand">
+                    Pokemon TCG Tracker
+                  </BrandHomeLink>
                   <p className="eyebrow">Trading Card Database</p>
                 </div>
               </div>
@@ -62,7 +62,7 @@ export default async function RootLayout({
           <main className="page-shell">{children}</main>
           <footer className="site-footer">
             <div className="site-footer-inner">
-              <p>TCG Tracker</p>
+              <p>Pokemon TCG Tracker</p>
               <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
             </div>
           </footer>

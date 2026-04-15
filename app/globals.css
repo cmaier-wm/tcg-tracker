@@ -351,6 +351,39 @@ textarea:focus {
   align-items: start;
 }
 
+.portfolio-actions {
+  justify-content: end;
+  align-items: start;
+}
+
+.portfolio-export-control {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
+.button.secondary.portfolio-export-button {
+  gap: 8px;
+  border-color: #1e3a8a;
+  background: #1e3a8a;
+  color: #f8fafc;
+}
+
+.button.secondary.portfolio-export-button:hover {
+  background: #1e40af;
+  border-color: #1e40af;
+}
+
+.portfolio-export-button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.portfolio-export-note {
+  max-width: 260px;
+  text-align: right;
+}
+
 .button-row {
   display: flex;
   gap: 12px;
@@ -830,6 +863,59 @@ html[data-theme="dark"] .pokeball-spinner-button {
 
 .confirm-dialog-actions {
   justify-content: flex-end;
+}
+
+.portfolio-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.portfolio-celebration-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 112%, rgba(251, 191, 36, 0.12), transparent 36%),
+    radial-gradient(circle at 50% 16%, rgba(255, 248, 231, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.32), rgba(2, 6, 23, 0.74));
+  animation: portfolio-celebration-fade 2.2s ease-out forwards;
+}
+
+.portfolio-celebration-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.portfolio-celebration-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.portfolio-celebration-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@keyframes portfolio-celebration-fade {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.96;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 .theme-toggle-card {

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { getOptionalEnv } from "@/lib/db/env";
+import { refreshCardCatalogMetrics } from "@/lib/tcgtracking/refresh-card-catalog-metrics";
 import { tcgTrackingClient } from "@/lib/tcgtracking/client";
 import {
   upstreamPricingSetSchema,
@@ -274,6 +275,7 @@ export async function syncPriceSnapshots(
 
   let syncedSnapshots = 0;
   let processedSets = 0;
+  const refreshedSetIds = new Set<string>();
 
   for (const set of sets) {
     const latestLocalSnapshot = set.cards
@@ -290,6 +292,7 @@ export async function syncPriceSnapshots(
     ]);
 
     processedSets += 1;
+    refreshedSetIds.add(set.id);
 
     const cardsBySourceProductId = new Map(
       set.cards.map((card) => [card.sourceProductId, card])
@@ -311,6 +314,11 @@ export async function syncPriceSnapshots(
 
       for (const [skuId, sku] of Object.entries(skus ?? {})) {
         const languageCode = normalizeLanguageCode(sku.lng);
+
+        if (languageCode && languageCode !== "en") {
+          continue;
+        }
+
         const finish = normalizeFinish(sku.var);
         const conditionCode = sku.cnd ?? null;
         const variation = await getOrCreateVariation({
@@ -358,6 +366,12 @@ export async function syncPriceSnapshots(
         syncedSnapshots += 1;
       }
     }
+  }
+
+  if (refreshedSetIds.size) {
+    await refreshCardCatalogMetrics({
+      setIds: [...refreshedSetIds]
+    });
   }
 
   return {

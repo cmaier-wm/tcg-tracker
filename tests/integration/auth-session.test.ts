@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  attachCredentialToExistingAccount,
   createAuthSession,
   createUserAccountWithCredential,
   findUserAccountByEmail,
@@ -72,6 +73,24 @@ describe("auth session integration", () => {
     expect(sessions).toHaveLength(2);
     expect(new Date(first.expiresAt).getTime()).toBeGreaterThan(Date.now());
     expect(new Date(second.expiresAt).getTime()).toBeGreaterThan(Date.now());
+  });
+
+  it("attaches a credential to an existing legacy account without creating a second user", async () => {
+    const passwordHash = await hashPassword("password123");
+
+    const existingUser = await findUserAccountByEmail("collector@local.tcg");
+    const attachedUser = await attachCredentialToExistingAccount({
+      email: " Collector@Local.Tcg ",
+      passwordHash
+    });
+    const credential = await getUserCredentialByEmail("collector@local.tcg");
+
+    expect(existingUser).not.toBeNull();
+    expect(attachedUser).toEqual(existingUser);
+    expect(getDemoStore().users).toHaveLength(1);
+    expect(getDemoStore().credentials).toHaveLength(1);
+    expect(credential?.user).toEqual(existingUser);
+    expect(credential?.passwordHash).toBe(passwordHash);
   });
 
   it("validates malformed and partial credentials through the request schemas", () => {
