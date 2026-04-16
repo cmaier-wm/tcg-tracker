@@ -82,8 +82,11 @@ jobs:
           azd env set AZURE_SUBSCRIPTION_ID "$AZURE_SUBSCRIPTION_ID"
           azd env refresh "$AZURE_ENV_NAME" --no-prompt
 
+      - name: Package Azure deployment artifact
+        run: npm run azure:package
+
       - name: Deploy application
-        run: azd deploy web --no-prompt
+        run: azd deploy web --from-package .azuredist --no-prompt
 
       - name: Verify deployment
         run: npm run azure:verify -- "$(azd env get-value SERVICE_WEB_URI)"
