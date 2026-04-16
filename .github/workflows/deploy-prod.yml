@@ -56,8 +56,11 @@ jobs:
       - name: Run integration and contract tests
         run: npm run test:integration
 
-      - name: Set up Azure Developer CLI
-        uses: Azure/setup-azd@v1.0.0
+      - name: Install Azure Developer CLI
+        run: |
+          curl -fsSL https://aka.ms/install-azd.sh | bash
+          echo "$HOME/.azd/bin" >> "$GITHUB_PATH"
+          "$HOME/.azd/bin/azd" version
 
       - name: Sign in to Azure with OIDC
         uses: azure/login@v2
