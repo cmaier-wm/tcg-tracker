@@ -11,9 +11,27 @@ if (!url) {
   process.exit(1);
 }
 
+const baseUrl = url.replace(/\/$/, "");
+
 const targets = [
-  { label: "health API", url: `${url.replace(/\/$/, "")}/api/health` },
-  { label: "cards API", url: `${url.replace(/\/$/, "")}/api/cards?offset=0&limit=1` }
+  {
+    label: "homepage",
+    url: `${baseUrl}/`,
+    validate(body) {
+      return (
+        body.includes("Pokémon Card Browser") &&
+        body.includes("catalog-card")
+      );
+    }
+  },
+  { label: "health API", url: `${baseUrl}/api/health` },
+  {
+    label: "cards API",
+    url: `${baseUrl}/api/cards?offset=0&limit=1`,
+    validate(body) {
+      return body.includes("\"items\"") || body.includes('"items"');
+    }
+  }
 ];
 
 const VERIFY_ATTEMPTS = 5;
@@ -38,12 +56,17 @@ for (const target of targets) {
       });
 
       if (response.ok) {
-        console.log(`Verified ${target.label}: ${target.url}`);
-        lastErrorMessage = "";
-        break;
-      }
+        const body = await response.text();
+        if (!target.validate || target.validate(body)) {
+          console.log(`Verified ${target.label}: ${target.url}`);
+          lastErrorMessage = "";
+          break;
+        }
 
-      lastErrorMessage = `${response.status} ${response.statusText}`;
+        lastErrorMessage = "response did not include expected content";
+      } else {
+        lastErrorMessage = `${response.status} ${response.statusText}`;
+      }
     } catch (error) {
       lastErrorMessage = error instanceof Error ? error.message : String(error);
     }
