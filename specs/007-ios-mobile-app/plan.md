@@ -26,7 +26,7 @@ native client online-first for the initial release.
 **Project Type**: Native mobile app plus incremental API expansion inside the existing full-stack web application  
 **Performance Goals**: Signed-in landing, browse, and card-detail mobile screens show useful content within 2 seconds on a normal local or production network after navigation; holding updates show visible confirmation within 2 seconds during smoke checks  
 **Constraints**: Preserve account-owned auth, portfolio, and Teams settings behavior from the current web app; keep the first release iPhone-only and portrait-first; avoid introducing a second backend service; keep the mobile app online-first without offline mutation queues; follow the supplied Figma Make mobile layouts for navigation and visual hierarchy; keep backend contract changes minimal and traceable  
-**Scale/Scope**: One new iOS app target, four mobile user stories, a two-tab primary mobile shell plus secondary settings navigation, current Pokemon-only catalog scope, and one signed-in collector account per session
+**Scale/Scope**: One new iOS app target, four mobile user stories, a three-tab primary mobile shell, current Pokémon-only catalog scope, and one signed-in collector account per session
 
 ## Constitution Check
 

@@ -150,6 +150,9 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var addedHoldingVariationID: String?
     var updatedHoldingQuantity: Int?
     var removedHoldingID: String?
+    var portfolioFetchPages: [Int?] = []
+    var portfolioPageResults: [Int: Result<PortfolioResponse, Error>] = [:]
+    var addHoldingResult: Result<PortfolioHolding, Error>?
 
     func signIn(email: String, password: String) async throws -> MobileSession {
         try sessionResult.get()
@@ -193,14 +196,23 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         try historyResult.get()
     }
 
-    func fetchPortfolio() async throws -> PortfolioResponse {
+    func fetchPortfolio(page: Int? = nil) async throws -> PortfolioResponse {
         portfolioLoadCount += 1
+        portfolioFetchPages.append(page)
+
+        if let page, let pageResult = portfolioPageResults[page] {
+            return try pageResult.get()
+        }
+
         return try portfolioResult.get()
     }
 
     func addHolding(cardVariationId: String, quantity: Int) async throws -> PortfolioHolding {
         addedHoldingVariationID = cardVariationId
         updatedHoldingQuantity = quantity
+        if let addHoldingResult {
+            return try addHoldingResult.get()
+        }
         return try portfolioResult.get().holdings[0]
     }
 

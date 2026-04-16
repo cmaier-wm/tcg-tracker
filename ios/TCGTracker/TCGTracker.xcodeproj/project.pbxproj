@@ -10,6 +10,7 @@
 		0FF9D164CFC90BC8D018FC7A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCA3DE90AF2C53250C5BC20 /* Foundation.framework */; };
 		13B726B0974AD964C69A4132 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631E5A94CD3479A02E4BAA67 /* AppTheme.swift */; };
 		1FD9137FE5F5316CFE51712C /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029BF85C18BC1B1609C57466 /* ContentStateView.swift */; };
+		225C9B0E4C4D4D4E9A1C2B3C /* ToastBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0F9A4F3E1D4A2E8C1D2E3F /* ToastBannerView.swift */; };
 		2B9E292E84E0539335B02842 /* CardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414822962DD15CF85C2EB4CC /* CardDetailView.swift */; };
 		446CD07628BD14B6B0C19E0F /* RemoteCardImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B41F5FDFBC9C9E4A1E3629 /* RemoteCardImage.swift */; };
 		484407292E882166E5CC950A /* AppModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B77682DDF1E9340700DE7EC /* AppModelTests.swift */; };
@@ -62,6 +63,7 @@
 		5A24AFF016210A273D48B7FB /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		631E5A94CD3479A02E4BAA67 /* AppTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		670B9291AC3FEBCFB6D1C665 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		6B0F9A4F3E1D4A2E8C1D2E3F /* ToastBannerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToastBannerView.swift; sourceTree = "<group>"; };
 		68CC7530D38D59A6A1B474CD /* PortfolioStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PortfolioStore.swift; sourceTree = "<group>"; };
 		6EC4EAB9D0307BF708153986 /* PriceHistoryChartView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PriceHistoryChartView.swift; sourceTree = "<group>"; };
 		6F62B9E7CEFC0001DB0EF926 /* PortfolioView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PortfolioView.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				4B9777F44D54C4F0C1F56D10 /* MetricCard.swift */,
 				6EC4EAB9D0307BF708153986 /* PriceHistoryChartView.swift */,
 				C0B41F5FDFBC9C9E4A1E3629 /* RemoteCardImage.swift */,
+				6B0F9A4F3E1D4A2E8C1D2E3F /* ToastBannerView.swift */,
 			);
 			name = Design;
 			path = Design;
@@ -387,6 +390,7 @@
 				D809F30A9F4A7ED0900F0D4C /* MetricCard.swift in Sources */,
 				56B675D4431D29518E64947D /* PriceHistoryChartView.swift in Sources */,
 				446CD07628BD14B6B0C19E0F /* RemoteCardImage.swift in Sources */,
+				225C9B0E4C4D4D4E9A1C2B3C /* ToastBannerView.swift in Sources */,
 				7167F991452E26C3930A09F8 /* SignInView.swift in Sources */,
 				B28305B21212B52CB9F1F274 /* BrowseView.swift in Sources */,
 				2B9E292E84E0539335B02842 /* CardDetailView.swift in Sources */,

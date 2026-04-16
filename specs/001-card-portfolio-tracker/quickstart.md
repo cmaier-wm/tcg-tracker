@@ -1,4 +1,4 @@
-# Quickstart: Pokemon Card Portfolio Tracker
+# Quickstart: Pokémon Card Portfolio Tracker
 
 ## Prerequisites
 
@@ -64,11 +64,11 @@ npm run db:down
   require seed or sync data before chart views become meaningful.
 - The current implementation ships with demo card, price, and portfolio data so
   the browse, pricing, and portfolio flows are testable immediately.
-- Full catalog search depends on importing upstream Pokemon card metadata into
+- Full catalog search depends on importing upstream Pokémon card metadata into
   PostgreSQL. `npm run catalog:sync` is the normal sync path for the first
   release.
 - `npm run snapshots:run` refreshes pricing and portfolio valuation for the
-  Pokemon scope while keeping upstream request volume bounded.
+  Pokémon scope while keeping upstream request volume bounded.
 - Missing external image or pricing data is expected for some tracked cards
   and must render as a supported empty state rather than an application error.
 - The app is expected to run natively during development; Docker is used for

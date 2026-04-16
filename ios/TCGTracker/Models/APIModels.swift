@@ -135,6 +135,33 @@ struct PortfolioResponse: Codable, Equatable, Sendable {
     let totalItems: Int?
 }
 
+extension PortfolioResponse {
+    var displayedHoldingCount: Int {
+        holdings.count
+    }
+
+    var allHoldingCount: Int {
+        totalItems ?? holdings.count
+    }
+
+    var showsPartialHoldingsList: Bool {
+        allHoldingCount > displayedHoldingCount
+    }
+
+    var currentPage: Int {
+        page ?? 1
+    }
+
+    var nextPage: Int? {
+        guard let totalPages, currentPage < totalPages else { return nil }
+        return currentPage + 1
+    }
+
+    var canLoadMore: Bool {
+        nextPage != nil
+    }
+}
+
 struct PortfolioHolding: Codable, Equatable, Identifiable, Sendable {
     let id: String
     let cardVariationId: String

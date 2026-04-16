@@ -31,7 +31,7 @@ protocol APIClientProtocol: Sendable {
     func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem]
     func fetchCardDetail(category: String, cardId: String) async throws -> CardDetail
     func fetchPriceHistory(category: String, cardId: String, variationId: String) async throws -> PriceHistory
-    func fetchPortfolio() async throws -> PortfolioResponse
+    func fetchPortfolio(page: Int?) async throws -> PortfolioResponse
     func addHolding(cardVariationId: String, quantity: Int) async throws -> PortfolioHolding
     func updateHolding(holdingId: String, quantity: Int) async throws
     func removeHolding(holdingId: String) async throws
@@ -40,6 +40,12 @@ protocol APIClientProtocol: Sendable {
     func fetchSettings() async throws -> TeamsAlertSettings
     func fetchSettingsHistory(page: Int, pageSize: Int) async throws -> TeamsAlertHistoryResponse
     func updateSettings(_ payload: TeamsAlertSettingsUpdate) async throws -> TeamsAlertSettings
+}
+
+extension APIClientProtocol {
+    func fetchPortfolio() async throws -> PortfolioResponse {
+        try await fetchPortfolio(page: nil)
+    }
 }
 
 struct APIEnvironment {
@@ -151,8 +157,13 @@ actor APIClient: APIClientProtocol {
         )
     }
 
-    func fetchPortfolio() async throws -> PortfolioResponse {
-        try await request(path: "/api/portfolio", expecting: PortfolioResponse.self)
+    func fetchPortfolio(page: Int? = nil) async throws -> PortfolioResponse {
+        let queryItems = page.map { [URLQueryItem(name: "page", value: String($0))] } ?? []
+        return try await request(
+            path: "/api/portfolio",
+            queryItems: queryItems,
+            expecting: PortfolioResponse.self
+        )
     }
 
     func addHolding(cardVariationId: String, quantity: Int) async throws -> PortfolioHolding {

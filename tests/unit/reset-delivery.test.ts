@@ -87,7 +87,7 @@ describe("reset delivery", () => {
   it("sends directly with Resend when configured", async () => {
     process.env.RESEND_API_KEY = "resend-test-key";
     process.env.AUTH_RESET_FROM_EMAIL = "noreply@example.com";
-    process.env.AUTH_RESET_FROM_NAME = "Pokemon TCG Tracker";
+    process.env.AUTH_RESET_FROM_NAME = "Pokémon TCG Tracker";
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true
     });

@@ -96,13 +96,13 @@ final class SettingsStore {
         let normalizedDestinationLabel = destinationLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let currentDestinationLabel = current?.destinationLabel ?? ""
         let normalizedWebhookURL = webhookURL?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let currentWebhookURL = current?.webhookUrl
         let nextEnabled = enabled ?? current?.enabled ?? false
         let nextTriggerAmountUsd = triggerAmountUsd ?? current?.triggerAmountUsd ?? 1000
+        let hasNewWebhookURL = !(normalizedWebhookURL?.isEmpty ?? true)
 
         return normalizedDestinationLabel != currentDestinationLabel ||
             nextTriggerAmountUsd != (current?.triggerAmountUsd ?? 1000) ||
-            normalizedWebhookURL != currentWebhookURL ||
+            hasNewWebhookURL ||
             nextEnabled != (current?.enabled ?? false)
     }
 }

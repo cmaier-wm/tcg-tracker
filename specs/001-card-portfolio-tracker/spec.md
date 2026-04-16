@@ -1,9 +1,9 @@
-# Feature Specification: Pokemon Card Portfolio Tracker
+# Feature Specification: Pokémon Card Portfolio Tracker
 
 **Feature Branch**: `001-card-portfolio-tracker`  
 **Created**: 2026-04-02  
 **Status**: Draft  
-**Input**: User description: "Build an application leveraging this API https://tcgtracking.com/tcgapi/?tab=docs to track TCG cards. I want to be able to view cards, see their current price and historical price graph, and see an image of the card. I also want to track my own portfolio of cards, including total value and historical value graph." Updated scope: first release is Pokemon only.
+**Input**: User description: "Build an application leveraging this API https://tcgtracking.com/tcgapi/?tab=docs to track TCG cards. I want to be able to view cards, see their current price and historical price graph, and see an image of the card. I also want to track my own portfolio of cards, including total value and historical value graph." Updated scope: first release is Pokémon only.
 
 ## Client Parity *(mandatory)*
 
@@ -16,7 +16,7 @@
 
 ### User Story 1 - Browse Cards (Priority: P1)
 
-As a collector, I want to browse supported Pokemon cards and inspect their
+As a collector, I want to browse supported Pokémon cards and inspect their
 identifying details and images so I can quickly understand what card I am
 looking at before deciding whether to track it.
 
@@ -108,7 +108,7 @@ value and a historical portfolio graph based on recorded valuations.
 ### Functional Requirements
 
 - **FR-001**: The system MUST let users browse and search a catalog of supported
-  Pokemon cards.
+  Pokémon cards.
 - **FR-002**: The system MUST show identifying card details for each catalog
   result, including enough information to distinguish cards with the same or
   similar names.
@@ -140,7 +140,7 @@ value and a historical portfolio graph based on recorded valuations.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Card**: A Pokemon card product users can browse, identified by set, name,
+- **Card**: A Pokémon card product users can browse, identified by set, name,
   collector identifier, rarity, and image metadata.
 - **Price Snapshot**: A dated record of a tracked card's observed market value
   used to show current pricing and historical price graphs.
@@ -168,9 +168,9 @@ value and a historical portfolio graph based on recorded valuations.
 
 - The first release is for a single collector's personal portfolio; multi-user
   sharing, social features, and marketplace transactions are out of scope.
-- The first release only supports Pokemon from the external card data source;
+- The first release only supports Pokémon from the external card data source;
   other TCG categories are out of scope unless requirements change later.
-- The external card data source provides Pokemon product identifiers, images,
+- The external card data source provides Pokémon product identifiers, images,
   and current market pricing for at least a meaningful subset of the cards
   users want to track.
 - Historical graphs are built from price and valuation snapshots collected after

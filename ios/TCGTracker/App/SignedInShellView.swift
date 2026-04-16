@@ -3,11 +3,11 @@ import SwiftUI
 private enum AppTab: Hashable {
     case browse
     case portfolio
+    case settings
 }
 
 struct SignedInShellView: View {
     @Bindable var appModel: AppModel
-    @State private var showingSettings = false
     @State private var showingSignIn = false
     @State private var selectedTab: AppTab = .browse
 
@@ -19,43 +19,6 @@ struct SignedInShellView: View {
                     portfolioStore: appModel.portfolioStore,
                     sessionStore: appModel.sessionStore
                 )
-                .toolbar {
-                    ToolbarItem {
-                        Label {
-                            Text("TCG Tracker")
-                                .font(.headline)
-                        } icon: {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [AppTheme.accent, .purple],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .frame(width: 34, height: 34)
-                                Image(systemName: "magnifyingglass")
-                                    .font(.headline.weight(.bold))
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                    }
-
-                    ToolbarItemGroup {
-                        if appModel.sessionStore.isAuthenticated {
-                            Button {
-                                showingSettings = true
-                            } label: {
-                                Image(systemName: "gearshape.fill")
-                            }
-                        } else {
-                            Button("Sign In") {
-                                showingSignIn = true
-                            }
-                        }
-                    }
-                }
             }
             .tabItem {
                 Label("Browse", systemImage: "magnifyingglass")
@@ -71,7 +34,10 @@ struct SignedInShellView: View {
                             browseStore: appModel.browseStore
                         )
                     } else {
-                        SignInRequiredView {
+                        SignInRequiredView(
+                            title: "Sign in to view your portfolio",
+                            detail: "Browsing cards stays public. Your saved holdings and alert settings remain account-protected."
+                        ) {
                             showingSignIn = true
                         }
                     }
@@ -102,25 +68,55 @@ struct SignedInShellView: View {
                 Label("Portfolio", systemImage: "wallet.pass")
             }
             .tag(AppTab.portfolio)
-        }
-        .sheet(isPresented: $showingSettings) {
+
             NavigationStack {
-                SettingsView(settingsStore: appModel.settingsStore)
-                    .toolbar {
-                        ToolbarItem {
-                            Button("Close") {
-                                showingSettings = false
+                Group {
+                    if appModel.sessionStore.isAuthenticated {
+                        SettingsView(settingsStore: appModel.settingsStore)
+                    } else {
+                        SignInRequiredView(
+                            title: "Sign in to manage settings",
+                            detail: "Theme and alert settings are account-backed and available after you sign in."
+                        ) {
+                            showingSignIn = true
+                        }
+                    }
+                }
+                .toolbar {
+                    ToolbarItem {
+                        Text("Settings")
+                            .font(.headline)
+                    }
+
+                    ToolbarItemGroup {
+                        if appModel.sessionStore.isAuthenticated {
+                            Button("Sign Out") {
+                                Task {
+                                    await appModel.sessionStore.signOut()
+                                    appModel.clearProtectedData()
+                                }
+                            }
+                        } else {
+                            Button("Sign In") {
+                                showingSignIn = true
                             }
                         }
                     }
+                }
             }
+            .tabItem {
+                Label("Settings", systemImage: "gearshape")
+            }
+            .tag(AppTab.settings)
         }
         .sheet(isPresented: $showingSignIn) {
             SignInView(sessionStore: appModel.sessionStore) {
                 await appModel.refreshProtectedData()
                 await MainActor.run {
                     showingSignIn = false
-                    selectedTab = .portfolio
+                    if selectedTab == .browse {
+                        selectedTab = .portfolio
+                    }
                 }
             }
         }
@@ -128,6 +124,8 @@ struct SignedInShellView: View {
 }
 
 private struct SignInRequiredView: View {
+    let title: String
+    let detail: String
     let onSignIn: () -> Void
 
     var body: some View {
@@ -136,11 +134,11 @@ private struct SignInRequiredView: View {
                 .font(.system(size: 42))
                 .foregroundStyle(AppTheme.accent)
 
-            Text("Sign in to view your portfolio")
+            Text(title)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(AppTheme.textPrimary)
 
-            Text("Browsing cards stays public. Your saved holdings and alert settings remain account-protected.")
+            Text(detail)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(AppTheme.textSecondary)
 

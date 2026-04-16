@@ -10,6 +10,7 @@ final class BrowseStore {
     var selectedSort: CardSortOption = .priceDesc
     var cards: [CardListItem] = []
     var selectedCard: CardDetail?
+    var selectedVariation: CardVariation?
     var selectedHistory: PriceHistory?
     var isLoading = false
     var errorMessage: String?
@@ -43,12 +44,14 @@ final class BrowseStore {
             selectedCard = detail
 
             if let preferredVariation = preferredVariation(from: detail) {
+                selectedVariation = preferredVariation
                 selectedHistory = try await apiClient.fetchPriceHistory(
                     category: detail.category,
                     cardId: detail.id,
                     variationId: preferredVariation.id
                 )
             } else {
+                selectedVariation = nil
                 selectedHistory = PriceHistory(variationId: "", points: [])
             }
         } catch {
@@ -58,12 +61,74 @@ final class BrowseStore {
 
     func clearSelection() {
         selectedCard = nil
+        selectedVariation = nil
         selectedHistory = nil
     }
 
     func preferredVariation(from detail: CardDetail) -> CardVariation? {
-        detail.variations.first(where: { $0.isDefault == true }) ??
-        detail.variations.first(where: { $0.currentPrice != nil }) ??
-        detail.variations.first
+        detail.variations.reduce(into: nil as CardVariation?) { bestVariation, variation in
+            guard let currentBest = bestVariation else {
+                bestVariation = variation
+                return
+            }
+
+            if isPreferredVariation(variation, over: currentBest) {
+                bestVariation = variation
+            }
+        }
+    }
+
+    private func isPreferredVariation(_ candidate: CardVariation, over currentBest: CardVariation) -> Bool {
+        let candidateRank = (
+            priceRank(candidate),
+            languageRank(candidate),
+            conditionRank(for: candidate.conditionCode),
+            candidate.isDefault == true ? 0 : 1,
+            -(candidate.currentPrice ?? -1)
+        )
+        let currentRank = (
+            priceRank(currentBest),
+            languageRank(currentBest),
+            conditionRank(for: currentBest.conditionCode),
+            currentBest.isDefault == true ? 0 : 1,
+            -(currentBest.currentPrice ?? -1)
+        )
+
+        return candidateRank < currentRank
+    }
+
+    private func priceRank(_ variation: CardVariation) -> Int {
+        variation.currentPrice != nil ? 0 : 1
+    }
+
+    private func languageRank(_ variation: CardVariation) -> Int {
+        if variation.languageCode?.lowercased() == "en" {
+            return 0
+        }
+
+        if variation.languageCode == nil {
+            return 1
+        }
+
+        return 2
+    }
+
+    private func conditionRank(for code: String?) -> Int {
+        switch code?.uppercased() {
+        case "NM":
+            return 0
+        case "LP":
+            return 1
+        case "MP":
+            return 2
+        case "HP":
+            return 3
+        case "DMG":
+            return 4
+        case nil:
+            return 5
+        default:
+            return 6
+        }
     }
 }

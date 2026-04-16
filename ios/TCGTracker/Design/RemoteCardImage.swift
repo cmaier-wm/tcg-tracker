@@ -4,6 +4,7 @@ struct RemoteCardImage: View {
     let imageURL: String?
     let aspectRatio: CGFloat
     var cornerRadius: CGFloat = 18
+    var maxHeight: CGFloat?
 
     var body: some View {
         Group {
@@ -13,7 +14,7 @@ struct RemoteCardImage: View {
                     case let .success(image):
                         image
                             .resizable()
-                            .scaledToFill()
+                            .scaledToFit()
                     case .failure:
                         placeholder
                     case .empty:
@@ -31,7 +32,8 @@ struct RemoteCardImage: View {
             }
         }
         .aspectRatio(aspectRatio, contentMode: .fit)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: maxHeight, alignment: .center)
+        .clipped()
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)

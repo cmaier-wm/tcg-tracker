@@ -1,11 +1,11 @@
-# Implementation Plan: Pokemon Card Portfolio Tracker
+# Implementation Plan: Pokémon Card Portfolio Tracker
 
 **Branch**: `001-card-portfolio-tracker` | **Date**: 2026-04-02 | **Spec**: [/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker/spec.md](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker/spec.md)
 **Input**: Feature specification from `/specs/001-card-portfolio-tracker/spec.md`
 
 ## Summary
 
-Build a full-stack product surface that lets collectors browse Pokemon cards,
+Build a full-stack product surface that lets collectors browse Pokémon cards,
 inspect current and historical pricing, and track a personal portfolio with
 current and historical valuation across web and iOS. Internal variation records
 may remain in the data model, but variant-specific UX is not part of the
@@ -35,7 +35,7 @@ must not require manual local database installation for development, and must
 keep variant-specific UX out of scope even if internal variation records remain
 necessary for pricing/storage
 **Scale/Scope**: Initial release targets a single collector account model,
-supports only Pokemon from the external source, and stores daily price and
+supports only Pokémon from the external source, and stores daily price and
 portfolio snapshots for tracked items
 
 ## Constitution Check

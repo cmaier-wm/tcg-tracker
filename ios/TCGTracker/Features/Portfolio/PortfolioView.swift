@@ -5,6 +5,7 @@ struct PortfolioView: View {
     @Bindable var portfolioStore: PortfolioStore
     @Bindable var browseStore: BrowseStore
     @State private var selectedCard: CardListItem?
+    @State private var confirmationMessage: String?
 
     var body: some View {
         ScrollView {
@@ -51,57 +52,74 @@ struct PortfolioView: View {
                     Text("Your Cards")
                         .font(.headline)
 
+                    if let portfolio = portfolioStore.portfolio, portfolio.canLoadMore {
+                        Text("Loaded \(portfolio.displayedHoldingCount) of \(portfolio.allHoldingCount) holdings. Keep scrolling to load the rest. Portfolio totals above include all saved cards.")
+                            .font(.subheadline)
+                            .foregroundStyle(AppTheme.textSecondary)
+                    }
+
                     if let holdings = portfolioStore.portfolio?.holdings, !holdings.isEmpty {
-                        ForEach(holdings) { holding in
-                            VStack(alignment: .leading, spacing: 10) {
-                                HoldingSummaryButton(holding: holding) {
-                                    guard let card = holding.detailCardItem else { return }
-                                    selectedCard = card
-                                }
+                        LazyVStack(spacing: 14) {
+                            ForEach(holdings) { holding in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    HoldingSummaryButton(holding: holding) {
+                                        guard let card = holding.detailCardItem else { return }
+                                        selectedCard = card
+                                    }
 
-                                Divider()
-                                    .overlay(AppTheme.border)
+                                    Divider()
+                                        .overlay(AppTheme.border)
 
-                                HStack(alignment: .center, spacing: 14) {
-                                    QuantityControl(
-                                        quantity: holding.quantity,
-                                        isLoading: portfolioStore.isLoading,
-                                        onIncrement: {
-                                            Task {
-                                                await portfolioStore.updateHolding(
-                                                    holding.id,
-                                                    quantity: holding.quantity + 1
-                                                )
+                                    HStack(alignment: .center, spacing: 14) {
+                                        QuantityControl(
+                                            quantity: holding.quantity,
+                                            isLoading: portfolioStore.isLoading,
+                                            onIncrement: {
+                                                Task {
+                                                    await portfolioStore.updateHolding(
+                                                        holding.id,
+                                                        quantity: holding.quantity + 1
+                                                    )
+                                                }
+                                            },
+                                            onDecrement: {
+                                                guard holding.quantity > 1 else { return }
+                                                Task {
+                                                    await portfolioStore.updateHolding(
+                                                        holding.id,
+                                                        quantity: holding.quantity - 1
+                                                    )
+                                                }
                                             }
-                                        },
-                                        onDecrement: {
-                                            guard holding.quantity > 1 else { return }
-                                            Task {
-                                                await portfolioStore.updateHolding(
-                                                    holding.id,
-                                                    quantity: holding.quantity - 1
-                                                )
-                                            }
-                                        }
-                                    )
-                                    .zIndex(1)
+                                        )
+                                        .zIndex(1)
 
-                                    Spacer()
-                                    Button("Remove", role: .destructive) {
-                                        Task {
-                                            await portfolioStore.removeHolding(holding.id)
+                                        Spacer()
+                                        Button("Remove", role: .destructive) {
+                                            Task {
+                                                await portfolioStore.removeHolding(holding.id)
+                                            }
                                         }
                                     }
                                 }
+                                .padding(18)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                        .fill(AppTheme.surface)
+                                )
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                        .stroke(AppTheme.border, lineWidth: 1)
+                                }
                             }
-                            .padding(18)
-                            .background(
-                                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                    .fill(AppTheme.surface)
-                            )
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                    .stroke(AppTheme.border, lineWidth: 1)
+
+                            if portfolioStore.portfolio?.canLoadMore == true {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .task {
+                                        await portfolioStore.loadMoreIfNeeded()
+                                    }
                             }
                         }
                     } else {
@@ -120,10 +138,21 @@ struct PortfolioView: View {
                 ProgressView()
             }
         }
+        .alert("Portfolio Updated", isPresented: confirmationBinding) {
+            Button("OK", role: .cancel) {
+                confirmationMessage = nil
+                portfolioStore.clearConfirmation()
+            }
+        } message: {
+            Text(confirmationMessage ?? "")
+        }
         .task {
             if sessionStore.isAuthenticated && portfolioStore.portfolio == nil {
                 await portfolioStore.load()
             }
+        }
+        .onChange(of: portfolioStore.confirmationMessage) { _, newValue in
+            confirmationMessage = newValue
         }
         .navigationDestination(item: $selectedCard) { card in
             CardDetailView(
@@ -133,6 +162,18 @@ struct PortfolioView: View {
                 card: card
             )
         }
+    }
+
+    private var confirmationBinding: Binding<Bool> {
+        Binding(
+            get: { confirmationMessage != nil },
+            set: { isPresented in
+                if !isPresented {
+                    confirmationMessage = nil
+                    portfolioStore.clearConfirmation()
+                }
+            }
+        )
     }
 }
 

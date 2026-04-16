@@ -21,7 +21,7 @@ iOS. Theme persistence is account-backed and shared across both platforms.
 **Target Platform**: Web application in modern browsers  
 **Project Type**: Web application  
 **Performance Goals**: Theme changes should be visible immediately, with preference restoration on initial load perceived as instantaneous  
-**Constraints**: Must preserve current app navigation and existing Pokemon browsing/portfolio flows; requires authentication because all settings are account-backed; preference must survive future sessions across both clients
+**Constraints**: Must preserve current app navigation and existing Pokémon browsing/portfolio flows; requires authentication because all settings are account-backed; preference must survive future sessions across both clients
 **Scale/Scope**: Single user-facing settings surface plus global theme application across the existing app shell
 
 ## Constitution Check

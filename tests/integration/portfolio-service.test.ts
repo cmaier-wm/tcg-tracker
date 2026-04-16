@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { getDemoUserState, resetDemoStore } from "@/lib/db/demo-store";
-import { POST } from "@/app/api/portfolio/route";
+import { GET, POST } from "@/app/api/portfolio/route";
 import { setTestAuthenticatedUser } from "@/lib/auth/auth-session";
 import { addHolding } from "@/lib/portfolio/add-holding";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
@@ -18,6 +18,28 @@ describe("portfolio service", () => {
     expect(
       portfolio.holdings.some((holding) => holding.cardVariationId === "onepiece-luffy-en-foil")
     ).toBe(true);
+  });
+
+  it("returns hydrated holding details from the portfolio add route", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/portfolio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          cardVariationId: "onepiece-luffy-en-foil",
+          quantity: 1
+        })
+      })
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.cardVariationId).toBe("onepiece-luffy-en-foil");
+    expect(payload.cardName).toContain("Luffy");
+    expect(payload.category).toContain("one");
+    expect(payload.estimatedValue).toBeGreaterThan(0);
   });
 
   it("sorts portfolio holdings by highest value first by default", async () => {
@@ -54,6 +76,26 @@ describe("portfolio service", () => {
     expect(firstPage.totalPages).toBe(2);
     expect(secondPage.holdings).toHaveLength(1);
     expect(secondPage.page).toBe(2);
+  });
+
+  it("returns the requested portfolio page from the api route", async () => {
+    const store = getDemoUserState("demo-user");
+
+    store.holdings.splice(0, store.holdings.length, ...[
+      { id: "holding-1", cardVariationId: "onepiece-luffy-en-foil", quantity: 1 },
+      { id: "holding-2", cardVariationId: "sv1-charizard-ex-en-nm-holo", quantity: 1 },
+      { id: "holding-3", cardVariationId: "lorcana-belle-en-coldfoil", quantity: 1 },
+      { id: "holding-4", cardVariationId: "sv1-charizard-ex-jp-nm-holo", quantity: 1 },
+      { id: "holding-5", cardVariationId: "onepiece-luffy-en-foil", quantity: 2 },
+      { id: "holding-6", cardVariationId: "lorcana-belle-en-coldfoil", quantity: 3 }
+    ]);
+
+    const response = await GET(new Request("http://localhost/api/portfolio?page=2"));
+    const portfolio = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(portfolio.page).toBe(2);
+    expect(portfolio.holdings).toHaveLength(1);
   });
 
   it("rejects portfolio writes when the current session is missing", async () => {

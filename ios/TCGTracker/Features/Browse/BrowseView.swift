@@ -8,24 +8,29 @@ struct BrowseView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                TextField("Search cards", text: $browseStore.query)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(AppTheme.inputBackground)
-                    )
-                    .overlay(alignment: .leading) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundStyle(AppTheme.textSecondary)
-                            .padding(.leading, 14)
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(AppTheme.textSecondary)
+
+                    TextField("Search cards", text: $browseStore.query)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(AppTheme.inputBackground)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(AppTheme.border, lineWidth: 1)
+                }
+                .onSubmit {
+                    Task {
+                        await browseStore.search()
                     }
-                    .padding(.leading, 26)
-                    .onSubmit {
-                        Task {
-                            await browseStore.search()
-                        }
-                    }
+                }
 
                 Menu {
                     Picker("Sort", selection: $browseStore.selectedSort) {
@@ -43,12 +48,14 @@ struct BrowseView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .fill(AppTheme.inputBackground)
                     )
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: browseStore.selectedSort) { _, _ in
                 Task {
                     await browseStore.search()
@@ -65,7 +72,7 @@ struct BrowseView: View {
                 LazyVStack(spacing: 14) {
                     ForEach(browseStore.cards) { card in
                         NavigationLink(value: card.id) {
-                            HStack(spacing: 14) {
+                            HStack(spacing: 22) {
                                 RemoteCardImage(imageURL: card.imageUrl, aspectRatio: 0.75, cornerRadius: 14)
                                     .frame(width: 96)
 

@@ -1,6 +1,6 @@
 # tcg-tracker
 
-This repository contains a Pokemon card and portfolio tracking web application
+This repository contains a Pokémon card and portfolio tracking web application
 built with Next.js. The working rules for the project live in
 `.specify/memory/constitution.md`.
 
@@ -212,10 +212,10 @@ npm run db:down
 - If PostgreSQL is configured and migrated, `npm run db:seed` loads the same
   starter card dataset into Prisma-backed storage.
 - To search beyond the starter dataset, run `npm run catalog:sync` while the
-  app server is running. That imports the upstream Pokemon catalog into
+  app server is running. That imports the upstream Pokémon catalog into
   PostgreSQL so `/cards` search covers the synchronized catalog instead of only
   demo data.
-- The first release is Pokemon-only. Full multi-category sync is intentionally
+- The first release is Pokémon-only. Full multi-category sync is intentionally
   not part of the normal workflow.
 - Static product data is refreshed only when a set is older than 7 days.
 - Pricing and SKU data are refreshed at most once per 24 hours per set and are

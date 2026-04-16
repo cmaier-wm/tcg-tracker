@@ -5,7 +5,7 @@
 
 ## Summary
 
-Add a user-visible sort control to the Pokemon browse experience, default the
+Add a user-visible sort control to the Pokémon browse experience, default the
 home page to highest price first, and support bidirectional sorting for price,
 name, number, set, and rarity while keeping output stable for mixed priced and
 unpriced result sets. The smallest implementation is a query-string-backed sort

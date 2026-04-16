@@ -15,7 +15,7 @@ test("registers, signs out, signs back in, and preserves public returnTo flows",
     returnTo: "/cards"
   });
   await expect(page).toHaveURL(/\/cards$/);
-  await expect(page.getByText("Pokemon Card Browser")).toBeVisible();
+  await expect(page.getByText("Pokémon Card Browser")).toBeVisible();
 
   await signOutWithUi(page);
   await expect(page.getByRole("heading", { name: "Sign In" })).toBeVisible();

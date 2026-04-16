@@ -8,6 +8,7 @@ struct SettingsView: View {
     @State private var webhookURL = ""
     @State private var enabled = false
     @State private var themeMode: ThemeMode = .light
+    @State private var saveConfirmationMessage: String?
 
     var body: some View {
         Form {
@@ -49,7 +50,7 @@ struct SettingsView: View {
                                     .foregroundStyle(AppTheme.accent)
                             }
 
-                            Text(entry.capturedAt.replacingOccurrences(of: "T", with: " ").replacingOccurrences(of: ".000Z", with: " UTC"))
+                            Text(formattedTimestamp(entry.capturedAt))
                                 .font(.caption)
                                 .foregroundStyle(AppTheme.textSecondary)
 
@@ -79,6 +80,16 @@ struct SettingsView: View {
             ToolbarItem {
                 Button("Save") {
                     Task {
+                        let trimmedDestinationLabel = destinationLabel.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let trimmedWebhookURL = webhookURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let currentTeamsSettings = settingsStore.settings
+                        let didChangeTheme = themeMode != settingsStore.accountSettings?.themeMode
+                        let didChangeTeamsSettings =
+                            trimmedDestinationLabel != (currentTeamsSettings?.destinationLabel ?? "") ||
+                            (Int(triggerAmountUsd) ?? 1000) != (currentTeamsSettings?.triggerAmountUsd ?? 1000) ||
+                            (trimmedWebhookURL.isEmpty ? nil : trimmedWebhookURL) != currentTeamsSettings?.webhookUrl ||
+                            enabled != (currentTeamsSettings?.enabled ?? false)
+
                         await settingsStore.save(
                             themeMode: themeMode,
                             destinationLabel: destinationLabel,
@@ -86,6 +97,13 @@ struct SettingsView: View {
                             webhookURL: webhookURL.isEmpty ? nil : webhookURL,
                             enabled: enabled
                         )
+
+                        if settingsStore.errorMessage == nil {
+                            showToast(makeSaveConfirmationMessage(
+                                changedTheme: didChangeTheme,
+                                changedTeamsSettings: didChangeTeamsSettings
+                            ))
+                        }
                     }
                 }
                 .disabled(settingsStore.isSaving)
@@ -94,14 +112,27 @@ struct SettingsView: View {
         .task {
             if settingsStore.settings == nil || settingsStore.accountSettings == nil {
                 await settingsStore.load()
-                syncForm()
             }
+            syncForm()
         }
         .onChange(of: settingsStore.settings?.triggerAmountUsd) { _, _ in
             syncForm()
         }
+        .onChange(of: settingsStore.accountSettings?.themeMode) { _, _ in
+            syncThemeMode()
+        }
+        .onAppear {
+            syncThemeMode()
+        }
         .onDisappear {
             settingsStore.clearThemePreview()
+        }
+        .alert("Settings Saved", isPresented: saveConfirmationBinding) {
+            Button("OK", role: .cancel) {
+                saveConfirmationMessage = nil
+            }
+        } message: {
+            Text(saveConfirmationMessage ?? "")
         }
     }
 
@@ -112,6 +143,47 @@ struct SettingsView: View {
         triggerAmountUsd = String(settings.triggerAmountUsd)
         webhookURL = settings.webhookUrl ?? ""
         enabled = settings.enabled
+        syncThemeMode()
+    }
+
+    private func syncThemeMode() {
         themeMode = settingsStore.accountSettings?.themeMode ?? .dark
+    }
+
+    private func makeSaveConfirmationMessage(
+        changedTheme: Bool,
+        changedTeamsSettings: Bool
+    ) -> String {
+        switch (changedTheme, changedTeamsSettings) {
+        case (true, true):
+            return "Your theme and Teams alert settings were saved."
+        case (true, false):
+            return "Your theme setting was saved."
+        case (false, true):
+            return "Your Teams alert settings were saved."
+        case (false, false):
+            return "Your settings were already up to date."
+        }
+    }
+
+    private func showToast(_ message: String) {
+        saveConfirmationMessage = message
+    }
+
+    private func formattedTimestamp(_ capturedAt: String) -> String {
+        capturedAt
+            .replacingOccurrences(of: "T", with: " ")
+            .replacingOccurrences(of: ".000Z", with: " UTC")
+    }
+
+    private var saveConfirmationBinding: Binding<Bool> {
+        Binding(
+            get: { saveConfirmationMessage != nil },
+            set: { isPresented in
+                if !isPresented {
+                    saveConfirmationMessage = nil
+                }
+            }
+        )
     }
 }

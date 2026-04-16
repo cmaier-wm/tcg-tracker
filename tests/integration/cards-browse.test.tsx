@@ -99,7 +99,7 @@ describe("cards browse pages", () => {
     const page = await CardsPage({ searchParams: Promise.resolve({}) });
     render(page);
 
-    expect(screen.getByText("Pokemon Card Browser")).toBeInTheDocument();
+    expect(screen.getByText("Pokémon Card Browser")).toBeInTheDocument();
     expect(screen.getByLabelText("Search cards")).toBeInTheDocument();
     expect(screen.getByLabelText("Set")).toBeInTheDocument();
     expect(screen.getByLabelText("Sort")).toHaveValue("price-desc");

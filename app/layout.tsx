@@ -10,7 +10,7 @@ import { getAccountSettings } from "@/lib/settings/account-settings";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pokemon TCG Tracker",
+  title: "Pokémon TCG Tracker",
   description: "Track TCG cards, price history, and portfolio value."
 };
 
@@ -50,9 +50,9 @@ export default async function RootLayout({
                   </BrandHomeLink>
                 </Suspense>
                 <div>
-                  <Suspense fallback={<span className="brand">Pokemon TCG Tracker</span>}>
+                  <Suspense fallback={<span className="brand">Pokémon TCG Tracker</span>}>
                     <BrandHomeLink className="brand">
-                      Pokemon TCG Tracker
+                      Pokémon TCG Tracker
                     </BrandHomeLink>
                   </Suspense>
                   <p className="eyebrow">Trading Card Database</p>
@@ -64,8 +64,8 @@ export default async function RootLayout({
           <main className="page-shell">{children}</main>
           <footer className="site-footer">
             <div className="site-footer-inner">
-              <p>Pokemon TCG Tracker</p>
-              <p>Browse Pokemon cards, inspect price history, and monitor portfolio value.</p>
+              <p>Pokémon TCG Tracker</p>
+              <p>Browse Pokémon cards, inspect price history, and monitor portfolio value.</p>
             </div>
           </footer>
           <Toaster
