@@ -124,7 +124,7 @@ export async function addHolding(cardVariationId: string, quantity: number) {
         ...addedHolding,
         cardId: card.id,
         category: card.category,
-        imageUrl: card.imageUrl
+        imageUrl: card.imageUrl ?? null
       };
     }
   );

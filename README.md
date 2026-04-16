@@ -194,6 +194,53 @@ Azure packaging note:
   `AUTH_RESET_FROM_EMAIL`, and optionally `AUTH_RESET_FROM_NAME` in the Azure
   app settings or Key Vault-backed references used by App Service.
 
+## CI/CD
+
+The repository now includes GitHub Actions workflows under
+[`/.github/workflows/`](/Users/cmaier/.codex/worktrees/9a5a/tcg-tracker/.github/workflows):
+
+- `ci.yml` runs lint, build, unit tests, and integration tests on pull requests
+  and non-`main` pushes.
+- `deploy-prod.yml` deploys the existing Azure App Service on every push to
+  `main` and supports manual runs through `workflow_dispatch`.
+
+Recommended release model:
+
+- Protect `main` with required status checks for the `CI` workflow.
+- Let merges to `main` trigger production deploys automatically.
+- Keep infrastructure changes deliberate by running `azd provision --preview`
+  and `azd provision` manually instead of reprovisioning on every application
+  deploy.
+
+One-time GitHub setup:
+
+1. Create a GitHub environment named `production`.
+2. Add environment secrets:
+   - `AZURE_CLIENT_ID`
+   - `AZURE_TENANT_ID`
+   - `AZURE_SUBSCRIPTION_ID`
+3. Add environment variables:
+   - `AZURE_ENV_NAME` set to the existing `azd` environment name, such as
+     `prod`
+   - `AZURE_LOCATION` set to the deployed region, such as `centralus`
+   - `AZURE_RESOURCE_GROUP` set to the existing production resource group name
+4. Configure GitHub-to-Azure OIDC trust for the `production` environment and
+   the `main` branch on the Microsoft Entra application used for deployment.
+5. Restrict the `production` environment to the `main` branch and add required
+   reviewers if you want an approval gate before deploy.
+
+Operational notes:
+
+- `azd deploy web` is the normal CD path for this repo. It updates the existing
+  App Service without reprovisioning Azure resources.
+- `azd up` remains the full reconcile path for first-time setup or infra
+  changes.
+- Azure packaging and smoke verification are now wired into the `azd` hook
+  lifecycle through [azure.yaml](/Users/cmaier/.codex/worktrees/9a5a/tcg-tracker/azure.yaml)
+  and [/.azure/hooks/](/Users/cmaier/.codex/worktrees/9a5a/tcg-tracker/.azure/hooks),
+  so local `azd deploy` and GitHub Actions follow the same build/package/verify
+  path.
+
 ## Verification
 
 Manual smoke check:

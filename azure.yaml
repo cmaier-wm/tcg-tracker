@@ -24,6 +24,9 @@ hooks:
   preprovision:
     shell: sh
     run: ./.azure/hooks/preprovision.sh
+  prepackage:
+    shell: sh
+    run: ./.azure/hooks/prepackage.sh
   postdeploy:
     shell: sh
     run: ./.azure/hooks/postdeploy.sh
