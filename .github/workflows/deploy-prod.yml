@@ -90,7 +90,16 @@ jobs:
           zip -rq ../.azuredist.zip .
 
       - name: Deploy application
-        run: azd deploy web --from-package .azuredist.zip --no-prompt
+        run: |
+          WEB_APP_NAME="$(azd env get-value SERVICE_WEB_NAME)"
+          az webapp deploy \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$WEB_APP_NAME" \
+            --src-path .azuredist.zip \
+            --type zip \
+            --restart true \
+            --track-status true \
+            --timeout 600000
 
       - name: Verify deployment
         run: npm run azure:verify -- "$(azd env get-value SERVICE_WEB_URI)"
