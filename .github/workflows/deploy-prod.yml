@@ -83,10 +83,14 @@ jobs:
           azd env refresh "$AZURE_ENV_NAME" --no-prompt
 
       - name: Package Azure deployment artifact
-        run: npm run azure:package
+        run: |
+          npm run azure:package
+          rm -f .azuredist.zip
+          cd .azuredist
+          zip -rq ../.azuredist.zip .
 
       - name: Deploy application
-        run: azd deploy web --from-package .azuredist --no-prompt
+        run: azd deploy web --from-package .azuredist.zip --no-prompt
 
       - name: Verify deployment
         run: npm run azure:verify -- "$(azd env get-value SERVICE_WEB_URI)"
