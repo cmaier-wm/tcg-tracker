@@ -30,6 +30,15 @@ The current application uses:
 - Vitest, React Testing Library, and Playwright
 - Swift 6 with SwiftUI, Observation, and Swift Charts for the native iOS client
 
+Third-party services currently used by the application or its supported
+deployment paths:
+
+- TCG Tracking API for card catalog and pricing data
+- Resend for password reset email delivery when configured
+- Microsoft Teams Workflows webhook endpoints for portfolio alert delivery
+- Azure App Service, Azure Database for PostgreSQL Flexible Server, and Azure
+  Key Vault for the documented production hosting target
+
 The primary feature specification and delivery artifacts live under
 [`specs/001-card-portfolio-tracker/`](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker).
 

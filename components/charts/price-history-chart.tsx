@@ -26,7 +26,7 @@ export function PriceHistoryChart({ points }: { points: PricePoint[] }) {
           <XAxis dataKey="capturedAt" tickFormatter={toCompactDate} />
           <YAxis tickFormatter={(value) => `$${value}`} />
           <Tooltip
-            formatter={(value: number) => toCurrency(value)}
+            formatter={(value: number) => [toCurrency(value), "Market Price"]}
             labelFormatter={(value: string) => toFullDateTime(value)}
           />
           <Line
