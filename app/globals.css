@@ -344,6 +344,12 @@ textarea:focus {
   align-items: start;
 }
 
+.detail-side-column {
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
 .section-heading {
   display: flex;
   justify-content: space-between;
@@ -354,6 +360,10 @@ textarea:focus {
 .portfolio-actions {
   justify-content: end;
   align-items: start;
+}
+
+.portfolio-section-heading {
+  margin-bottom: 16px;
 }
 
 .portfolio-export-control {
@@ -825,6 +835,17 @@ html[data-theme="dark"] .pokeball-spinner-button {
   gap: 12px;
 }
 
+.holding-edit-row {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+
+.holding-edit-row .field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .holding-form.compact {
   padding: 0;
   border: 0;
@@ -833,10 +854,21 @@ html[data-theme="dark"] .pokeball-spinner-button {
 }
 
 .holding-actions {
-  display: grid;
+  display: flex;
   gap: 10px;
-  grid-template-columns: minmax(120px, 160px) auto;
   align-items: end;
+}
+
+.holding-actions .field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.holding-delete-action {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .modal-backdrop {
@@ -1244,8 +1276,7 @@ html[data-theme="dark"] .teams-alert-toggle.active .theme-toggle-switch-track {
   .stats-grid,
   .dashboard-grid,
   .detail-grid,
-  .filter-grid,
-  .holding-actions {
+  .filter-grid {
     grid-template-columns: 1fr;
   }
 

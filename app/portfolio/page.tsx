@@ -66,7 +66,7 @@ export default async function PortfolioPage({
       </section>
       <div className="dashboard-grid">
         <section className="surface-card">
-          <div className="section-heading">
+          <div className="section-heading portfolio-section-heading">
             <div>
               <h2>Your Cards</h2>
               <p className="muted">Manage tracked cards and estimated values.</p>

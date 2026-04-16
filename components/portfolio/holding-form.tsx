@@ -25,7 +25,8 @@ export function HoldingForm({
     cardName?: string;
     quantity: number;
   }) => void;
-}) {
+  }) {
+  const quantityInputId = `holding-quantity-${holdingId}`;
   const router = useRouter();
   const [nextQuantity, setNextQuantity] = useState(quantity);
   const [isSaving, setIsSaving] = useState(false);
@@ -105,10 +106,11 @@ export function HoldingForm({
       ) : (
         <h3>Update a holding</h3>
       )}
-      <div className={compact ? "holding-actions" : "form-grid"}>
-        <label className="field">
+      <div className={compact ? "holding-actions" : "holding-edit-row"}>
+        <label className="field" htmlFor={quantityInputId}>
           Quantity
           <input
+            id={quantityInputId}
             type="number"
             min={1}
             value={nextQuantity}
@@ -124,7 +126,7 @@ export function HoldingForm({
             }}
           />
         </label>
-        <div className="button-row">
+        <div className="holding-delete-action">
           <button
             type="button"
             className="icon-button danger"

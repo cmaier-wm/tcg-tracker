@@ -39,41 +39,44 @@ export default async function CardDetailPage({
           Back to Browse
         </Link>
       </section>
-      <CardDetail card={card} selectedVariationId={selectedVariation?.id} />
-      <div className="dashboard-grid">
-        <section className="surface-card stack">
-          <CardPriceSummary
-            currentPrice={selectedVariation?.currentPrice}
-            lastUpdatedAt={selectedVariation?.lastUpdatedAt}
-          />
-          <div className="chart-panel">
-            <h2>Price History</h2>
-            {history.points.length > 1 ? (
-              <PriceHistoryChart points={history.points} />
-            ) : (
-              <CardPriceEmptyState body="Historical pricing will appear after more than one price snapshot has been recorded." />
-            )}
-          </div>
-        </section>
-        <section className="surface-card stack">
-          <div className="section-heading">
-            <div>
-              <h2>Add to Portfolio</h2>
-              <p className="muted">Save this card to your tracked holdings.</p>
+      <CardDetail
+        card={card}
+        selectedVariationId={selectedVariation?.id}
+        sideContent={
+          <section className="surface-card stack">
+            <div className="section-heading">
+              <div>
+                <h2>Add to Portfolio</h2>
+                <p className="muted">Save this card to your tracked holdings.</p>
+              </div>
             </div>
-          </div>
-          {selectedVariation && holding ? (
-            <HoldingForm
-              key={`${holding.id}:${holding.quantity}`}
-              holdingId={holding.id}
-              quantity={holding.quantity}
-              cardName={card.name}
-            />
-          ) : selectedVariation ? (
-            <AddToPortfolioButton variationId={selectedVariation.id} />
-          ) : null}
-        </section>
-      </div>
+            {selectedVariation && holding ? (
+              <HoldingForm
+                key={`${holding.id}:${holding.quantity}`}
+                holdingId={holding.id}
+                quantity={holding.quantity}
+                cardName={card.name}
+              />
+            ) : selectedVariation ? (
+              <AddToPortfolioButton variationId={selectedVariation.id} />
+            ) : null}
+          </section>
+        }
+      />
+      <section className="surface-card stack">
+        <CardPriceSummary
+          currentPrice={selectedVariation?.currentPrice}
+          lastUpdatedAt={selectedVariation?.lastUpdatedAt}
+        />
+        <div className="chart-panel">
+          <h2>Price History</h2>
+          {history.points.length > 1 ? (
+            <PriceHistoryChart points={history.points} />
+          ) : (
+            <CardPriceEmptyState body="Historical pricing will appear after more than one price snapshot has been recorded." />
+          )}
+        </div>
+      </section>
     </div>
   );
 }

@@ -23,6 +23,11 @@
   tasks.
 - Verification is mandatory for every behavior change. Prefer automated tests;
   if not practical, define explicit manual verification in `quickstart.md`.
+- When implementing any user-requested change, verify the resulting behavior in
+  the UI through the appropriate MCP before considering the work complete:
+  Playwright MCP for web changes and iOS Simulator MCP for native iOS changes.
+  Do not rely on code inspection alone when the requested outcome is visible in
+  the interface.
 - Keep repo guidance in sync with accepted plans when stack, structure, or
   commands change.
 - Keep MCP workflow documentation in `docs/development/mcps.md` in sync when

@@ -21,9 +21,10 @@ type CardDetailProps = {
     }>;
   };
   selectedVariationId?: string;
+  sideContent?: React.ReactNode;
 };
 
-export function CardDetail({ card, selectedVariationId }: CardDetailProps) {
+export function CardDetail({ card, selectedVariationId, sideContent }: CardDetailProps) {
   void selectedVariationId;
 
   return (
@@ -31,17 +32,20 @@ export function CardDetail({ card, selectedVariationId }: CardDetailProps) {
       <div className="surface-card detail-image-card">
         <CardImage name={card.name} imageUrl={card.imageUrl} />
       </div>
-      <div className="surface-card stack detail-content-card">
-        <div>
-          <h1>{card.name}</h1>
-          <p className="muted">
-            {card.setName}
-            {card.collectorNumber ? ` · #${card.collectorNumber}` : ""}
-          </p>
+      <div className="detail-side-column">
+        <div className="surface-card stack detail-content-card">
+          <div>
+            <h1>{card.name}</h1>
+            <p className="muted">
+              {card.setName}
+              {card.collectorNumber ? ` · #${card.collectorNumber}` : ""}
+            </p>
+          </div>
+          <div className="badge-row">
+            {card.rarity ? <span className="badge">{card.rarity}</span> : null}
+          </div>
         </div>
-        <div className="badge-row">
-          {card.rarity ? <span className="badge">{card.rarity}</span> : null}
-        </div>
+        {sideContent}
       </div>
     </div>
   );
