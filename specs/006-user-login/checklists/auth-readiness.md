@@ -11,7 +11,7 @@
 - [x] CHK001 Are registration requirements complete about which credentials are required beyond email and password, including any password policy expectations? [Completeness, Spec §FR-001, Gap]
 - [x] CHK002 Are sign-out requirements defined clearly enough to state where the user is returned and what signed-out UI state must be shown afterward? [Completeness, Spec §FR-002, Gap]
 - [x] CHK003 Are session-expiry requirements complete about which routes or actions must trigger re-authentication and whether unsaved portfolio/settings edits must be recoverable? [Completeness, Spec §FR-003, Edge Cases]
-- [x] CHK004 Are the requirements complete about which existing settings are account-backed versus intentionally browser-local in v1 beyond the dark-mode example? [Completeness, Spec §FR-006, Spec §Assumptions]
+- [x] CHK004 Are the requirements complete about which existing settings are account-backed in v1, including theme preference? [Completeness, Spec §FR-006, Spec §Assumptions]
 - [x] CHK005 Are requirements defined for how the first successful registration claims legacy shared data if two visitors attempt registration at nearly the same time? [Gap, Spec §FR-010, Edge Case]
 
 ## Requirement Clarity
@@ -55,7 +55,7 @@
 
 ## Dependencies & Assumptions
 
-- [x] CHK027 Is the assumption that browser-local dark mode stays outside account scope reflected consistently across requirements so reviewers can distinguish intentional local settings from missing server-backed settings? [Assumption, Spec §Assumptions, Spec §FR-006]
+- [x] CHK027 Is the assumption that theme preference is account-backed reflected consistently across requirements so reviewers can distinguish intentional server-backed settings scope from omissions? [Assumption, Spec §Assumptions, Spec §FR-006]
 - [x] CHK028 Are external dependency assumptions for Auth.js session persistence, PostgreSQL availability, and HTTPS in production documented as requirements where rollout would otherwise fail? [Dependency, Plan §Technical Context, Quickstart §Deployed Environment Setup]
 
 ## Ambiguities & Conflicts

@@ -7,6 +7,9 @@
 contracts, and regressions. If automation is not practical, include explicit
 manual verification tasks with commands, inputs, and expected outcomes.
 
+**Retroactive Parity Note**: Add iOS settings/history verification and
+implementation alongside the existing web Teams alert behavior.
+
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing.
 
 ## Format: `[ID] [P?] [Story] Description`

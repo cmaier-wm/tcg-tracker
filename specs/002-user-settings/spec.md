@@ -5,6 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "I want to add a user settings feature. One setting should be enabling dark mode."
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: Keep appearance settings and dark mode accessible from the web settings surface.
+- **iOS Impact**: Keep appearance settings and dark mode accessible from the native iOS settings surface.
+- **Shared Backend/API Impact**: Persist theme mode through the authenticated account settings API so web and iOS read the same saved preference.
+- **Parity Expectation**: `web + iOS`, with account-backed persistence required on both platforms.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Change Theme Preference (Priority: P1)
@@ -62,7 +69,7 @@ As a user, I want a visible settings entry point so I can find and change prefer
 - **FR-001**: The system MUST provide a settings area where users can view and change app preferences.
 - **FR-002**: The system MUST allow users to enable and disable dark mode.
 - **FR-003**: The system MUST apply the selected theme consistently across the app after the user changes the setting.
-- **FR-004**: The system MUST preserve the user’s selected theme between visits on the same device/browser.
+- **FR-004**: The system MUST preserve the user’s selected theme in the authenticated account so it is restored across future sessions on both web and iOS.
 - **FR-005**: The system MUST fall back to the default theme when no saved preference is available or when a saved preference cannot be loaded.
 - **FR-006**: The system MUST make the settings area discoverable from the main app navigation.
 
@@ -82,7 +89,7 @@ As a user, I want a visible settings entry point so I can find and change prefer
 
 ## Assumptions
 
-- The feature is available without requiring a user account.
-- Theme preference is saved per device/browser and not shared across devices.
+- The feature requires an authenticated account because all settings are account-backed.
+- Theme preference is saved per account and shared across web and iOS.
 - Only one preference is in scope for this release: dark mode on or off.
 - The settings area is part of the existing web app experience and does not require a separate product surface.

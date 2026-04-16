@@ -24,8 +24,7 @@ type CardDetailProps = {
 };
 
 export function CardDetail({ card, selectedVariationId }: CardDetailProps) {
-  const selectedVariation =
-    card.variations.find((variation) => variation.id === selectedVariationId) ?? card.variations[0];
+  void selectedVariationId;
 
   return (
     <div className="detail-grid">
@@ -42,9 +41,6 @@ export function CardDetail({ card, selectedVariationId }: CardDetailProps) {
         </div>
         <div className="badge-row">
           {card.rarity ? <span className="badge">{card.rarity}</span> : null}
-          <span className="badge subtle">
-            {selectedVariation?.languageCode?.toUpperCase() ?? "EN"}
-          </span>
         </div>
       </div>
     </div>

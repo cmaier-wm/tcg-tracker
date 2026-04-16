@@ -14,6 +14,12 @@ UI trigger, reuse the existing account-scoped portfolio logic to produce all
 holdings for the current user, and generate a CSV file with human-readable
 holding and valuation columns without introducing a workbook dependency for v1.
 
+## Retroactive Parity Amendment
+
+Spreadsheet export is now an explicit desktop-only exception. No native iOS
+implementation is required; parity is satisfied by documenting the exception
+rather than adding mobile export behavior.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9 on Node.js 22 LTS  

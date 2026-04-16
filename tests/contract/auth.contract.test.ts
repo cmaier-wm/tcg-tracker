@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as login } from "@/app/api/auth/login/route";
 import { POST as register } from "@/app/api/auth/register/route";
 import { POST as logout } from "@/app/api/auth/logout/route";
+import { GET as getMobileSession } from "@/app/api/mobile/session/route";
 
 const authSessionMocks = vi.hoisted(() => ({
   attachCredentialToExistingAccount: vi.fn(),
@@ -9,6 +10,7 @@ const authSessionMocks = vi.hoisted(() => ({
   createUserAccountWithCredential: vi.fn(),
   findUserAccountByEmail: vi.fn(),
   getUserCredentialByEmail: vi.fn(),
+  requireAuthenticatedUser: vi.fn(),
   invalidateCurrentAuthSession: vi.fn(),
   resolvePostAuthRedirect: vi.fn(),
   setAuthSessionCookie: vi.fn(),
@@ -47,6 +49,11 @@ describe("auth contract", () => {
     passwordMocks.verifyPassword.mockResolvedValue(true);
     legacyBootstrapMocks.claimLegacyBootstrapData.mockResolvedValue(true);
     auditLogMocks.recordAuthAuditEvent.mockResolvedValue(undefined);
+    authSessionMocks.requireAuthenticatedUser.mockResolvedValue({
+      userId: "user-1",
+      email: "collector@example.com",
+      displayName: "Collector"
+    });
   });
 
   it("registers with normalized email and returns the session payload shape", async () => {
@@ -256,5 +263,17 @@ describe("auth contract", () => {
     expect(response.status).toBe(204);
     expect(authSessionMocks.invalidateCurrentAuthSession).toHaveBeenCalledTimes(1);
     expect(authSessionMocks.clearAuthSessionCookie).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the same authenticated user shape for mobile session bootstrap", async () => {
+    const response = await getMobileSession();
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.user).toMatchObject({
+      userId: "user-1",
+      email: "collector@example.com",
+      displayName: "Collector"
+    });
   });
 });

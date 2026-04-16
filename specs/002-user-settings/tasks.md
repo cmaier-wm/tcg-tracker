@@ -5,6 +5,9 @@
 
 **Tests**: Include automated verification tasks because this feature changes persistent user-visible behavior.
 
+**Retroactive Parity Note**: Treat theme selection and dark mode as required on
+both web and iOS, with account-backed persistence required on each platform.
+
 **Organization**: Tasks are grouped by user story and ordered so each story remains independently shippable and testable.
 
 ## Phase 1: Setup
@@ -16,7 +19,7 @@
 
 ## Phase 2: Foundational
 
-- [x] T005 Define the browser-local theme preference contract in `lib/settings/theme-storage.ts`
+- [x] T005 Define the authenticated account-backed theme preference contract in `lib/settings/theme-preference.ts` and the shared settings API
 - [x] T006 Define the theme selection helper in `lib/settings/theme-preference.ts`
 - [x] T007 Wire the app shell to read the stored preference before first render in `app/layout.tsx`
 - [x] T008 Update global theme tokens and theme-specific styles in `app/globals.css`
@@ -36,12 +39,12 @@
 
 ## Phase 4: User Story 2 - Preserve Preference (Priority: P2)
 
-**Goal**: The selected theme remains in place after reloads and future visits on the same browser/device.
+**Goal**: The selected theme remains in place after reloads and future visits through the authenticated account on both web and iOS.
 
 **Independent Test**: Enable dark mode, reload the app, and confirm the same theme remains active.
 
-- [x] T015 [US2] Persist the selected theme value in browser-local storage through `lib/settings/theme-storage.ts`
-- [x] T016 [US2] Restore theme preference during app startup in `app/layout.tsx`
+- [x] T015 [US2] Persist the selected theme value through the authenticated settings API in `app/api/settings/teams-alert/route.ts`
+- [x] T016 [US2] Restore theme preference during app startup in `app/layout.tsx` and `ios/TCGTracker/App/RootView.swift`
 - [x] T017 [US2] Add unit coverage for theme preference save and restore behavior in `tests/unit/theme-preference.test.ts`
 - [x] T018 [US2] Add integration coverage for preference persistence across page reloads in `tests/integration/settings-page.test.tsx`
 

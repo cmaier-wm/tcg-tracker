@@ -187,16 +187,24 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       let shouldResetBaseline = !existing;
       let encryptedWebhookUrl = existing?.encryptedWebhookUrl ?? null;
       let webhookUrlIv = existing?.webhookUrlIv ?? null;
-      let destinationLabel = existing?.destinationLabel ?? null;
-      let triggerAmountUsd = input.triggerAmountUsd;
+      let destinationLabel = input.destinationLabel !== undefined
+        ? input.destinationLabel
+        : (existing?.destinationLabel ?? null);
+      let triggerAmountUsd = input.triggerAmountUsd ?? existing?.triggerAmountUsd ?? 1000;
+      const nextEnabled = input.enabled ?? existing?.enabled ?? false;
 
-      if (input.enabled) {
+      if (nextEnabled) {
         const nextWebhookUrl =
-          input.webhookUrl ??
-          tryDecryptWebhookUrl(existing?.encryptedWebhookUrl, existing?.webhookUrlIv);
+          input.webhookUrl !== undefined && input.webhookUrl !== null
+            ? input.webhookUrl
+            : tryDecryptWebhookUrl(existing?.encryptedWebhookUrl, existing?.webhookUrlIv);
 
         if (!nextWebhookUrl) {
           throw badRequest("A Teams workflow webhook URL is required when alerts are enabled.");
+        }
+
+        if (!destinationLabel) {
+          throw badRequest("A destination label is required when alerts are enabled.");
         }
 
         const encrypted = encryptWebhookUrl(nextWebhookUrl);
@@ -207,25 +215,29 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
 
         encryptedWebhookUrl = encrypted.encryptedWebhookUrl;
         webhookUrlIv = encrypted.webhookUrlIv;
-        destinationLabel = input.destinationLabel;
-        triggerAmountUsd = input.triggerAmountUsd;
         shouldResetBaseline =
           !existing ||
           !existing.enabled ||
-          existing.destinationLabel !== input.destinationLabel ||
-          existing.triggerAmountUsd !== input.triggerAmountUsd ||
+          existing.destinationLabel !== destinationLabel ||
+          existing.triggerAmountUsd !== triggerAmountUsd ||
           previousWebhookUrl !== nextWebhookUrl;
+      } else if (input.webhookUrl && input.webhookUrl.length > 0) {
+        const encrypted = encryptWebhookUrl(input.webhookUrl);
+        encryptedWebhookUrl = encrypted.encryptedWebhookUrl;
+        webhookUrlIv = encrypted.webhookUrlIv;
       }
 
       const preference = await prisma.teamsAlertPreference.upsert({
         where: { userId: user.id },
         update: {
-          enabled: input.enabled,
+          enabled: nextEnabled,
           destinationLabel,
           triggerAmountUsd,
           encryptedWebhookUrl,
           webhookUrlIv,
-          baselineValue: shouldResetBaseline
+          baselineValue: !nextEnabled
+            ? nextPortfolioValue
+            : shouldResetBaseline
             ? nextPortfolioValue
             : existing?.baselineValue ?? nextPortfolioValue,
           lastFailureAt: null,
@@ -233,9 +245,9 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
         },
         create: {
           userId: user.id,
-          enabled: input.enabled,
+          enabled: nextEnabled,
           destinationLabel,
-          triggerAmountUsd: input.triggerAmountUsd,
+          triggerAmountUsd,
           encryptedWebhookUrl,
           webhookUrlIv,
           baselineValue: nextPortfolioValue
@@ -260,14 +272,23 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
       const store = getDemoUserState(user.userId);
       const previous = store.teamsAlertPreference;
       let nextPreference: DemoTeamsAlertPreference;
+      const nextEnabled = input.enabled ?? previous?.enabled ?? false;
+      const destinationLabel =
+        input.destinationLabel !== undefined ? input.destinationLabel : previous?.destinationLabel ?? null;
+      const triggerAmountUsd = input.triggerAmountUsd ?? previous?.triggerAmountUsd ?? 1000;
 
-      if (input.enabled) {
+      if (nextEnabled) {
         const nextWebhookUrl =
-          input.webhookUrl ??
-          tryDecryptWebhookUrl(previous?.encryptedWebhookUrl, previous?.webhookUrlIv);
+          input.webhookUrl !== undefined && input.webhookUrl !== null
+            ? input.webhookUrl
+            : tryDecryptWebhookUrl(previous?.encryptedWebhookUrl, previous?.webhookUrlIv);
 
         if (!nextWebhookUrl) {
           throw badRequest("A Teams workflow webhook URL is required when alerts are enabled.");
+        }
+
+        if (!destinationLabel) {
+          throw badRequest("A destination label is required when alerts are enabled.");
         }
 
         const encrypted = encryptWebhookUrl(nextWebhookUrl);
@@ -278,15 +299,15 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
         const shouldResetBaseline =
           !previous ||
           !previous.enabled ||
-          previous.destinationLabel !== input.destinationLabel ||
-          previous.triggerAmountUsd !== input.triggerAmountUsd ||
+          previous.destinationLabel !== destinationLabel ||
+          previous.triggerAmountUsd !== triggerAmountUsd ||
           previousWebhookUrl !== nextWebhookUrl;
 
         nextPreference = {
           id: previous?.id ?? generateStoreId("teams-pref"),
           enabled: true,
-          destinationLabel: input.destinationLabel,
-          triggerAmountUsd: input.triggerAmountUsd,
+          destinationLabel,
+          triggerAmountUsd,
           encryptedWebhookUrl: encrypted.encryptedWebhookUrl,
           webhookUrlIv: encrypted.webhookUrlIv,
           baselineValue: shouldResetBaseline
@@ -298,13 +319,22 @@ export async function upsertTeamsAlertSettings(input: TeamsAlertSettingsPayload)
           lastFailureMessage: null
         };
       } else {
+        let encryptedWebhookUrl = previous?.encryptedWebhookUrl ?? null;
+        let webhookUrlIv = previous?.webhookUrlIv ?? null;
+
+        if (input.webhookUrl && input.webhookUrl.length > 0) {
+          const encrypted = encryptWebhookUrl(input.webhookUrl);
+          encryptedWebhookUrl = encrypted.encryptedWebhookUrl;
+          webhookUrlIv = encrypted.webhookUrlIv;
+        }
+
         nextPreference = {
           id: previous?.id ?? generateStoreId("teams-pref"),
           enabled: false,
-          destinationLabel: previous?.destinationLabel ?? input.destinationLabel,
-          triggerAmountUsd: input.triggerAmountUsd,
-          encryptedWebhookUrl: previous?.encryptedWebhookUrl ?? null,
-          webhookUrlIv: previous?.webhookUrlIv ?? null,
+          destinationLabel,
+          triggerAmountUsd,
+          encryptedWebhookUrl,
+          webhookUrlIv,
           baselineValue: nextPortfolioValue,
           lastEvaluatedAt: previous?.lastEvaluatedAt ?? null,
           lastDeliveredAt: previous?.lastDeliveredAt ?? null,

@@ -7,6 +7,9 @@
 contracts, and regressions. If automation is not practical, include explicit
 manual verification tasks with commands, inputs, and expected outcomes.
 
+**Retroactive Parity Note**: Verify export remains available on desktop web and
+absent from iOS as an approved exception.
+
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`

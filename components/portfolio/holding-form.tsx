@@ -12,7 +12,6 @@ export function HoldingForm({
   holdingId,
   quantity,
   cardName,
-  variationLabel,
   compact = false,
   onQuantityCelebration
 }: {
@@ -99,10 +98,9 @@ export function HoldingForm({
 
   return (
     <div className={compact ? "holding-form compact" : "surface-card holding-form"}>
-      {compact ? null : cardName || variationLabel ? (
+      {compact ? null : cardName ? (
         <div>
           <h3>{cardName ?? "Update a holding"}</h3>
-          {variationLabel ? <p className="muted">{variationLabel}</p> : null}
         </div>
       ) : (
         <h3>Update a holding</h3>

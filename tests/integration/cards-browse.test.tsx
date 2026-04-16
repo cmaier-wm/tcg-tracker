@@ -99,7 +99,7 @@ describe("cards browse pages", () => {
     const page = await CardsPage({ searchParams: Promise.resolve({}) });
     render(page);
 
-    expect(screen.getByText("Pokemon Card Browser")).toBeInTheDocument();
+    expect(screen.getByText("Pokémon Card Browser")).toBeInTheDocument();
     expect(screen.getByLabelText("Search cards")).toBeInTheDocument();
     expect(screen.getByLabelText("Set")).toBeInTheDocument();
     expect(screen.getByLabelText("Sort")).toHaveValue("price-desc");
@@ -154,5 +154,18 @@ describe("cards browse pages", () => {
         sort: "price-desc"
       })
     );
+  });
+
+  it("shows the documented empty state when search returns no cards", async () => {
+    mockGetCardCatalog.mockResolvedValueOnce([]);
+
+    const page = await CardsPage({
+      searchParams: Promise.resolve({
+        q: "missing-card"
+      })
+    });
+    render(page);
+
+    expect(screen.getByText("No cards found")).toBeInTheDocument();
   });
 });

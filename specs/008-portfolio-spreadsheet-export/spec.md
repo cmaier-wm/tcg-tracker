@@ -5,6 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "Generate and download a spreadsheet of my portfolio"
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: Keep spreadsheet export available from the desktop web portfolio experience.
+- **iOS Impact**: No native iOS implementation is required.
+- **Shared Backend/API Impact**: The export route remains web-facing and account-scoped.
+- **Parity Expectation**: Desktop-only exception approved. Spreadsheet export is intentionally not part of the native iOS feature set.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Download My Portfolio Spreadsheet (Priority: P1)

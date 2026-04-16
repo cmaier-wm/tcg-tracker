@@ -4,10 +4,14 @@ import { requireApiAuth } from "@/lib/auth/route-guards";
 import { addHolding } from "@/lib/portfolio/add-holding";
 import { getPortfolio } from "@/lib/portfolio/get-portfolio";
 
-export async function GET() {
+export async function GET(request: Request) {
   return withRouteHandler(async () => {
     await requireApiAuth();
-    return getPortfolio();
+    const url = new URL(request.url);
+    return getPortfolio({
+      page: url.searchParams.get("page"),
+      sort: url.searchParams.get("sort")
+    });
   });
 }
 

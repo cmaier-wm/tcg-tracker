@@ -85,6 +85,7 @@ export type DemoPasswordResetToken = {
 };
 
 type DemoUserState = {
+  themeMode: "light" | "dark";
   holdings: Holding[];
   portfolioHistory: PortfolioPoint[];
   teamsAlertPreference: DemoTeamsAlertPreference | null;
@@ -112,6 +113,7 @@ const LEGACY_USER_ID = "demo-user";
 
 function createEmptyUserState(): DemoUserState {
   return {
+    themeMode: "dark",
     holdings: [],
     portfolioHistory: [],
     teamsAlertPreference: null,
@@ -121,6 +123,7 @@ function createEmptyUserState(): DemoUserState {
 
 function createLegacyUserState(): DemoUserState {
   return {
+    themeMode: "dark",
     holdings: [...demoPortfolio],
     portfolioHistory: [...demoPortfolioHistory],
     teamsAlertPreference: null,

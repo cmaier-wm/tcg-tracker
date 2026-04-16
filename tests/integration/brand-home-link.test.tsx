@@ -30,9 +30,9 @@ describe("brand home link", () => {
     mockPathname.mockReturnValue("/cards");
     mockSearchParams.mockReturnValue(new URLSearchParams("q=charizard&set=151&sort=name-asc"));
 
-    render(<BrandHomeLink>Pokemon TCG Tracker</BrandHomeLink>);
+    render(<BrandHomeLink>Pokémon TCG Tracker</BrandHomeLink>);
 
-    await user.click(screen.getByRole("link", { name: "Pokemon TCG Tracker" }));
+    await user.click(screen.getByRole("link", { name: "Pokémon TCG Tracker" }));
 
     expect(mockPush).toHaveBeenCalledWith("/");
   });
@@ -43,9 +43,9 @@ describe("brand home link", () => {
     mockPathname.mockReturnValue("/");
     mockSearchParams.mockReturnValue(new URLSearchParams());
 
-    render(<BrandHomeLink>Pokemon TCG Tracker</BrandHomeLink>);
+    render(<BrandHomeLink>Pokémon TCG Tracker</BrandHomeLink>);
 
-    await user.click(screen.getByRole("link", { name: "Pokemon TCG Tracker" }));
+    await user.click(screen.getByRole("link", { name: "Pokémon TCG Tracker" }));
 
     expect(mockPush).not.toHaveBeenCalled();
   });

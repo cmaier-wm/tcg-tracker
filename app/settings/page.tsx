@@ -1,18 +1,15 @@
 import React from "react";
-import { cookies } from "next/headers";
 import { getOptionalAuthenticatedUser } from "@/lib/auth/auth-session";
 import { SettingsPage } from "@/components/settings/settings-page";
-import { normalizeThemeMode } from "@/lib/settings/theme-preference";
-import { themeCookieName } from "@/lib/settings/theme-storage";
+import { getAccountSettings } from "@/lib/settings/account-settings";
 
 export default async function SettingsRoute() {
-  const cookieStore = await cookies();
-  const initialThemeMode = normalizeThemeMode(cookieStore.get(themeCookieName)?.value);
   const authenticatedUser = await getOptionalAuthenticatedUser();
+  const { themeMode } = await getAccountSettings(authenticatedUser?.userId);
 
   return (
     <SettingsPage
-      initialThemeMode={initialThemeMode}
+      initialThemeMode={themeMode}
       isAuthenticated={Boolean(authenticatedUser)}
     />
   );

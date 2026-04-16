@@ -1,18 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
-import {
-  defaultThemeMode,
-  normalizeThemeMode,
-  toggleThemeMode
-} from "@/lib/settings/theme-preference";
-import {
-  clearStoredThemeMode,
-  readStoredThemeModeSnapshot,
-  readStoredThemeMode,
-  writeStoredThemeMode
-} from "@/lib/settings/theme-storage";
+import { applyThemeMode, defaultThemeMode, normalizeThemeMode, toggleThemeMode } from "@/lib/settings/theme-preference";
 
 afterEach(() => {
-  clearStoredThemeMode();
   document.documentElement.dataset.theme = "";
   document.documentElement.style.colorScheme = "";
 });
@@ -29,13 +18,10 @@ describe("theme preference helpers", () => {
     expect(toggleThemeMode("dark")).toBe("light");
   });
 
-  it("reads and writes the stored preference", () => {
-    writeStoredThemeMode("dark");
+  it("applies the theme mode to the document", () => {
+    applyThemeMode("dark");
 
-    expect(readStoredThemeMode()).toBe("dark");
-  });
-
-  it("returns null when no explicit preference is stored", () => {
-    expect(readStoredThemeModeSnapshot()).toBeNull();
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(document.documentElement.style.colorScheme).toBe("dark");
   });
 });

@@ -1,0 +1,544 @@
+openapi: 3.1.0
+info:
+  title: TCG Tracker Mobile API
+  version: 0.1.0
+  description: >
+    Contract for the native iOS client. Existing auth, cards, portfolio, and
+    Teams settings routes are reused where possible, with a minimal mobile
+    composition layer added for signed-in bootstrap and summary data.
+paths:
+  /api/auth/login:
+    post:
+      summary: Start an authenticated mobile session
+      operationId: loginMobileUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated user session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticatedUser"
+        "400":
+          description: Validation failed
+        "401":
+          description: Invalid credentials
+  /api/auth/logout:
+    post:
+      summary: End the current mobile session
+      operationId: logoutMobileUser
+      responses:
+        "204":
+          description: Session ended
+  /api/mobile/session:
+    get:
+      summary: Resolve current mobile session state
+      operationId: getMobileSession
+      responses:
+        "200":
+          description: Authenticated session payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileSession"
+        "401":
+          description: No authenticated session
+  /api/mobile/home:
+    get:
+      summary: Fetch the signed-in landing summary payload
+      operationId: getMobileHome
+      responses:
+        "200":
+          description: Composed mobile summary payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileHome"
+        "401":
+          description: Authentication required
+  /api/cards:
+    get:
+      summary: Browse or search cards for mobile browse views
+      operationId: browseCards
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: set
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Card list response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CardListItem"
+  /api/cards/{category}/{cardId}:
+    get:
+      summary: Fetch card detail for mobile detail views
+      operationId: getCardDetail
+      parameters:
+        - $ref: "#/components/parameters/Category"
+        - $ref: "#/components/parameters/CardId"
+      responses:
+        "200":
+          description: Card detail response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDetail"
+        "404":
+          description: Card not found
+  /api/cards/{category}/{cardId}/history:
+    get:
+      summary: Fetch price history for a selected variation
+      operationId: getCardHistory
+      parameters:
+        - $ref: "#/components/parameters/Category"
+        - $ref: "#/components/parameters/CardId"
+        - in: query
+          name: variationId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price history response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceHistory"
+        "400":
+          description: Missing variation id
+  /api/portfolio:
+    get:
+      summary: Fetch portfolio holdings for mobile portfolio views
+      operationId: getPortfolio
+      responses:
+        "200":
+          description: Portfolio response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Portfolio"
+        "401":
+          description: Authentication required
+    post:
+      summary: Add a new holding from mobile
+      operationId: addHolding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HoldingWrite"
+      responses:
+        "200":
+          description: Updated holding response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioHolding"
+        "401":
+          description: Authentication required
+  /api/portfolio/{holdingId}:
+    patch:
+      summary: Update an existing holding quantity
+      operationId: updateHolding
+      parameters:
+        - $ref: "#/components/parameters/HoldingId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HoldingUpdate"
+      responses:
+        "200":
+          description: Updated holding response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioHolding"
+        "401":
+          description: Authentication required
+    delete:
+      summary: Remove an existing holding
+      operationId: deleteHolding
+      parameters:
+        - $ref: "#/components/parameters/HoldingId"
+      responses:
+        "204":
+          description: Holding removed
+        "401":
+          description: Authentication required
+  /api/portfolio/history:
+    get:
+      summary: Fetch historical portfolio value data
+      operationId: getPortfolioHistory
+      responses:
+        "200":
+          description: Portfolio history response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioHistory"
+        "401":
+          description: Authentication required
+  /api/settings/teams-alert:
+    get:
+      summary: Load account-backed alert settings for mobile settings
+      operationId: getTeamsAlertSettings
+      responses:
+        "200":
+          description: Teams alert settings response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamsAlertSettings"
+        "401":
+          description: Authentication required
+    put:
+      summary: Update account-backed alert settings from mobile
+      operationId: updateTeamsAlertSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamsAlertSettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamsAlertSettings"
+        "400":
+          description: Validation failed
+        "401":
+          description: Authentication required
+components:
+  parameters:
+    Category:
+      in: path
+      name: category
+      required: true
+      schema:
+        type: string
+    CardId:
+      in: path
+      name: cardId
+      required: true
+      schema:
+        type: string
+    HoldingId:
+      in: path
+      name: holdingId
+      required: true
+      schema:
+        type: string
+  schemas:
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+    AuthenticatedUser:
+      type: object
+      additionalProperties: false
+      required: [userId, email, displayName]
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+    MobileSession:
+      type: object
+      additionalProperties: false
+      required: [status, user]
+      properties:
+        status:
+          type: string
+          enum: [authenticated]
+        user:
+          $ref: "#/components/schemas/AuthenticatedUser"
+    MobileHome:
+      type: object
+      additionalProperties: false
+      required:
+        - displayName
+        - totalEstimatedValue
+        - todayProfitLoss
+        - holdingCount
+        - totalCardQuantity
+        - historyPreview
+        - emptyState
+      properties:
+        displayName:
+          type: string
+        totalEstimatedValue:
+          type: number
+        todayProfitLoss:
+          type: number
+        holdingCount:
+          type: integer
+        totalCardQuantity:
+          type: integer
+        historyPreview:
+          type: array
+          items:
+            $ref: "#/components/schemas/PortfolioHistoryPoint"
+        emptyState:
+          type: boolean
+    CardListItem:
+      type: object
+      additionalProperties: false
+      required: [id, category, name, setName]
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        name:
+          type: string
+        setName:
+          type: string
+        collectorNumber:
+          type: string
+        rarity:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        currentPrice:
+          type: number
+        variationCount:
+          type: integer
+    CardDetail:
+      type: object
+      additionalProperties: false
+      required: [id, category, name, variations]
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        name:
+          type: string
+        setName:
+          type: string
+        collectorNumber:
+          type: string
+        rarity:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        variations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardVariation"
+    CardVariation:
+      type: object
+      additionalProperties: false
+      required: [id]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        languageCode:
+          type: string
+        finish:
+          type: string
+        conditionCode:
+          type: string
+        currentPrice:
+          type: number
+        lastUpdatedAt:
+          type: string
+          format: date-time
+    PriceHistory:
+      type: object
+      additionalProperties: false
+      required: [variationId, points]
+      properties:
+        variationId:
+          type: string
+        points:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceHistoryPoint"
+    PriceHistoryPoint:
+      type: object
+      additionalProperties: false
+      required: [capturedAt, marketPrice]
+      properties:
+        capturedAt:
+          type: string
+          format: date-time
+        marketPrice:
+          type: number
+    Portfolio:
+      type: object
+      additionalProperties: false
+      required: [holdings, totalEstimatedValue, holdingCount]
+      properties:
+        holdings:
+          type: array
+          items:
+            $ref: "#/components/schemas/PortfolioHolding"
+        totalEstimatedValue:
+          type: number
+        holdingCount:
+          type: integer
+    PortfolioHolding:
+      type: object
+      additionalProperties: false
+      required: [id, cardVariationId, quantity]
+      properties:
+        id:
+          type: string
+        cardVariationId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        estimatedValue:
+          type: number
+    HoldingWrite:
+      type: object
+      additionalProperties: false
+      required: [cardVariationId, quantity]
+      properties:
+        cardVariationId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+    HoldingUpdate:
+      type: object
+      additionalProperties: false
+      required: [quantity]
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+    PortfolioHistory:
+      type: object
+      additionalProperties: false
+      required: [points]
+      properties:
+        points:
+          type: array
+          items:
+            $ref: "#/components/schemas/PortfolioHistoryPoint"
+    PortfolioHistoryPoint:
+      type: object
+      additionalProperties: false
+      required: [capturedAt, totalValue]
+      properties:
+        capturedAt:
+          type: string
+          format: date-time
+        totalValue:
+          type: number
+    TeamsAlertSettings:
+      type: object
+      additionalProperties: false
+      required:
+        - enabled
+        - triggerAmountUsd
+        - hasWebhookUrl
+        - baselineValue
+        - deliveryStatus
+      properties:
+        enabled:
+          type: boolean
+        destinationLabel:
+          type: string
+          nullable: true
+        triggerAmountUsd:
+          type: integer
+        hasWebhookUrl:
+          type: boolean
+        webhookUrl:
+          type: string
+          format: uri
+          nullable: true
+        baselineValue:
+          type: number
+          nullable: true
+        lastEvaluatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastDeliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastFailureAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastFailureMessage:
+          type: string
+          nullable: true
+        deliveryStatus:
+          type: string
+          enum: [idle, sent, failed]
+    TeamsAlertSettingsUpdate:
+      type: object
+      additionalProperties: false
+      required: [enabled, destinationLabel, triggerAmountUsd]
+      properties:
+        enabled:
+          type: boolean
+        destinationLabel:
+          type: string
+        triggerAmountUsd:
+          type: integer
+          minimum: 1
+        webhookUrl:
+          type: string
+          format: uri
+          nullable: true

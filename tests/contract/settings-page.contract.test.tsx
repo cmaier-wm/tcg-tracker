@@ -16,6 +16,10 @@ describe("settings page contract", () => {
               totalItems: 0,
               totalPages: 1
             }
+          : url.includes("/api/settings/account")
+          ? {
+              themeMode: "dark"
+            }
           : {
               enabled: false,
               destinationLabel: null,
@@ -52,10 +56,11 @@ describe("settings page contract", () => {
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Appearance" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "Dark mode toggle" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Alerts" })).toBeInTheDocument();
 
     await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Sign In To Manage Appearance" })).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Sign In To Manage Alerts" })).toBeInTheDocument();
     });
   });

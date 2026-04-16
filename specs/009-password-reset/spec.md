@@ -5,6 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "password reset"
 
+## Client Parity *(mandatory)*
+
+- **Web Impact**: Keep password reset request and completion flows available from the signed-out web authentication experience.
+- **iOS Impact**: Provide password reset request and completion flows in the native iOS authentication experience.
+- **Shared Backend/API Impact**: Reuse the existing password-reset request and confirm routes for both clients.
+- **Parity Expectation**: `web + iOS`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Request a reset link (Priority: P1)

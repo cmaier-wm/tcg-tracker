@@ -25,4 +25,10 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+.build/
+DerivedData/
+*.swiftpm/
+Packages/
+xcuserdata/
+*.xcuserstate
 tsconfig.tsbuildinfo

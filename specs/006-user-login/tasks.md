@@ -5,6 +5,9 @@
 
 **Tests**: Verification is required for each story. Prefer automated unit, integration, contract, and e2e coverage; keep `quickstart.md` aligned for explicit manual and production-smoke verification.
 
+**Retroactive Parity Note**: Add native iOS verification and implementation for
+registration plus shared auth lifecycle behavior where parity is required.
+
 **Organization**: Tasks are grouped by user story so each slice can be implemented and validated independently.
 
 ## Format: `[ID] [P?] [Story] Description`
@@ -123,7 +126,7 @@
 
 - [X] T048 [US3] Replace default-user Teams preference resolution with session-derived ownership in /Users/cmaier/Source/tcg-tracker/lib/teams/alert-preferences.ts
 - [X] T049 [US3] Scope Teams alert evaluation and delivery reads to the authenticated owner in /Users/cmaier/Source/tcg-tracker/lib/teams/evaluate-portfolio-alert.ts
-- [X] T050 [US3] Gate the settings page behind auth while preserving browser-local theme behavior in /Users/cmaier/Source/tcg-tracker/app/settings/page.tsx
+- [X] T050 [US3] Gate the settings page behind auth and ensure all settings, including theme, are account-backed in /Users/cmaier/Source/tcg-tracker/app/settings/page.tsx
 - [X] T051 [US3] Update settings page composition for signed-in account-backed settings behavior in /Users/cmaier/Source/tcg-tracker/components/settings/settings-page.tsx
 - [X] T052 [US3] Update Teams settings UI to load and save the authenticated user’s data only in /Users/cmaier/Source/tcg-tracker/components/settings/teams-alert-settings.tsx
 - [X] T053 [US3] Enforce session-based access for Teams settings routes in /Users/cmaier/Source/tcg-tracker/app/api/settings/teams-alert/route.ts

@@ -4,7 +4,7 @@
 
 Decision: Store the dark mode preference on the user’s browser/device and restore it on subsequent visits.
 
-Rationale: The feature request only asks for a user settings capability with dark mode, and the spec assumptions already allow a device-local preference. This delivers the requested value without introducing account management or backend persistence.
+Rationale: The feature request asks for user settings with dark mode, and the accepted cross-platform parity rules now require account-backed persistence. This delivers a single source of truth for both web and iOS instead of duplicating per-device state.
 
 Alternatives considered:
 - Server-side user settings tied to an account. Rejected because it adds scope the feature did not request.

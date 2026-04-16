@@ -1,6 +1,6 @@
 # tcg-tracker
 
-This repository contains a Pokemon card and portfolio tracking web application
+This repository contains a Pokémon card and portfolio tracking web application
 built with Next.js. The working rules for the project live in
 `.specify/memory/constitution.md`.
 
@@ -13,6 +13,11 @@ All non-trivial work follows this path:
 3. Generate `tasks.md` with exact file paths and verification steps.
 4. Implement only after the planning artifacts are implementation-ready.
 
+By constitution, product features and behavior changes are required to ship on
+both the web application and the native iOS client in the same increment unless
+that rule is amended or a time-bound exception is explicitly approved in the
+plan.
+
 ## Stack
 
 The current application uses:
@@ -23,6 +28,7 @@ The current application uses:
 - Docker Compose for local PostgreSQL
 - TanStack Query, Recharts, and Zod
 - Vitest, React Testing Library, and Playwright
+- Swift 6 with SwiftUI, Observation, and Swift Charts for the native iOS client
 
 The primary feature specification and delivery artifacts live under
 [`specs/001-card-portfolio-tracker/`](/Users/cmaier/Source/tcg-tracker/specs/001-card-portfolio-tracker).
@@ -55,6 +61,35 @@ npm run dev
 `prisma migrate deploy` and refreshes the generated Prisma client before the
 server starts on port `3000`. Keep `npm run db:migrate` for the separate case
 where you are authoring a brand-new local migration.
+
+## Native iOS Client
+
+The repository now includes an iPhone-first native client under
+[`ios/`](/Users/cmaier/Source/tcg-tracker/ios).
+
+Local mobile workflow:
+
+1. Start the backend with the normal local web commands shown above.
+2. Use the debug base URL `http://127.0.0.1:3000` in Simulator.
+3. Generate the local Xcode project, then open the workspace under
+   [`ios/TCGTracker/`](/Users/cmaier/Source/tcg-tracker/ios/TCGTracker).
+4. Run the native unit suite from the package root with:
+
+```bash
+cd ios
+swift test
+```
+
+5. Regenerate the runnable Xcode project whenever the iOS source structure
+   changes:
+
+```bash
+ruby ios/scripts/generate_xcodeproj.rb
+```
+
+The native client reuses the existing Next.js app as its only backend. Mobile-
+specific backend additions are limited to `/api/mobile/session` and
+`/api/mobile/home` for signed-in bootstrap and portfolio summary composition.
 
 If Codex Desktop worktrees are missing the `Run` action, run
 `npm run codex:sync-worktrees` from this checkout to copy the tracked
@@ -177,10 +212,10 @@ npm run db:down
 - If PostgreSQL is configured and migrated, `npm run db:seed` loads the same
   starter card dataset into Prisma-backed storage.
 - To search beyond the starter dataset, run `npm run catalog:sync` while the
-  app server is running. That imports the upstream Pokemon catalog into
+  app server is running. That imports the upstream Pokémon catalog into
   PostgreSQL so `/cards` search covers the synchronized catalog instead of only
   demo data.
-- The first release is Pokemon-only. Full multi-category sync is intentionally
+- The first release is Pokémon-only. Full multi-category sync is intentionally
   not part of the normal workflow.
 - Static product data is refreshed only when a set is older than 7 days.
 - Pricing and SKU data are refreshed at most once per 24 hours per set and are

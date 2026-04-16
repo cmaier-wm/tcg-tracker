@@ -52,23 +52,23 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 ---
 
-## Phase 3: User Story 1 - Browse Cards and Variants (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Browse Cards (Priority: P1) 🎯 MVP
 
-**Goal**: Users can browse the card catalog, open card detail pages, inspect available variants, and view card images.
+**Goal**: Users can browse the card catalog, open card detail pages, and view card images without any variant-specific UX.
 
-**Independent Test**: Start the app, browse to `/cards`, search for a card, open a detail page, and confirm the page shows identifying details, image, and language or variant options without using portfolio features.
+**Independent Test**: Start the app, browse to `/cards`, search for a card, open a detail page, and confirm the page shows identifying details and images without using portfolio features.
 
 ### Verification for User Story 1
 
 - [x] T012 [P] [US1] Add contract tests for catalog and card detail endpoints in `tests/contract/cards-search.contract.test.ts` and `tests/contract/card-detail.contract.test.ts`
 - [x] T013 [P] [US1] Add integration tests for catalog browse and card detail flows in `tests/integration/cards-browse.test.tsx` and `tests/integration/card-detail.test.tsx`
-- [x] T014 [US1] Add Playwright coverage for browsing and variant selection in `tests/e2e/cards-browse.spec.ts`
+- [x] T014 [US1] Add Playwright coverage for browsing and card detail in `tests/e2e/cards-browse.spec.ts`
 
 ### Implementation for User Story 1
 
 - [x] T015 [P] [US1] Implement catalog query and card detail services in `lib/tcgtracking/get-card-catalog.ts` and `lib/tcgtracking/get-card-detail.ts`
 - [x] T016 [P] [US1] Implement catalog and card detail API routes in `app/api/cards/route.ts` and `app/api/cards/[category]/[cardId]/route.ts`
-- [x] T017 [P] [US1] Build shared card list, card detail, and variant selector components in `components/cards/card-list.tsx`, `components/cards/card-detail.tsx`, and `components/cards/variant-selector.tsx`
+- [x] T017 [P] [US1] Build shared card list and card detail components in `components/cards/card-list.tsx` and `components/cards/card-detail.tsx`
 - [x] T018 [US1] Implement the catalog page in `app/cards/page.tsx`
 - [x] T019 [US1] Implement the card detail page in `app/cards/[category]/[cardId]/page.tsx`
 - [x] T020 [US1] Add empty states and missing-image handling in `components/cards/card-empty-state.tsx` and `components/cards/card-image.tsx`
@@ -79,9 +79,9 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 ## Phase 4: User Story 2 - Inspect Card Pricing History (Priority: P1)
 
-**Goal**: Users can view current card prices and historical price charts for a selected card variation.
+**Goal**: Users can view current card prices and historical price charts for a selected card.
 
-**Independent Test**: Open a card detail page for a tracked variation, confirm the latest price and timestamp appear, and verify the history chart or empty state renders without using the portfolio pages.
+**Independent Test**: Open a card detail page for a tracked card, confirm the latest price and timestamp appear, and verify the history chart or empty state renders without using the portfolio pages.
 
 ### Verification for User Story 2
 
@@ -103,15 +103,16 @@ description: "Task list for TCG Card Portfolio Tracker implementation"
 
 ## Phase 5: User Story 3 - Track Personal Portfolio Value (Priority: P1)
 
-**Goal**: Users can add card variations to a portfolio, view current portfolio value, and review historical portfolio value.
+**Goal**: Users can add cards to a portfolio, view current portfolio value, and review historical portfolio value.
 
-**Independent Test**: Add a card variation to the portfolio, load `/portfolio`, verify holdings and total value appear, and confirm the historical portfolio chart or empty state renders using saved valuation snapshots.
+**Independent Test**: Add a card to the portfolio, load `/portfolio`, verify holdings and total value appear, and confirm the historical portfolio chart or empty state renders using saved valuation snapshots.
 
 ### Verification for User Story 3
 
 - [x] T029 [P] [US3] Add contract tests for portfolio endpoints in `tests/contract/portfolio.contract.test.ts` and `tests/contract/portfolio-history.contract.test.ts`
 - [x] T030 [P] [US3] Add integration tests for portfolio CRUD and valuation updates in `tests/integration/portfolio-page.test.tsx` and `tests/integration/portfolio-service.test.ts`
 - [x] T031 [US3] Add Playwright coverage for add-to-portfolio and portfolio history flows in `tests/e2e/portfolio.spec.ts`
+- [ ] T031a [US3] Verify the portfolio celebration/fireworks effect remains web-only and is not implemented in `ios/TCGTracker`
 
 ### Implementation for User Story 3
 

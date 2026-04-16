@@ -35,10 +35,10 @@ the product and avoids creating a second, diverging portfolio-value job.
 
 ## Decision: Persist Teams alert state in PostgreSQL, not browser storage
 
-**Rationale**: Alert preferences, baseline value, and delivery history drive
-  server-side message delivery and must be available when the snapshot route
-  runs. Browser-local storage is sufficient for theme settings but cannot power
-  server-side threshold evaluation or delivery retries.
+**Rationale**: Alert preferences, baseline value, delivery history, and account
+  theme settings drive server-side behavior and must be available when the
+  snapshot route runs. Browser-local storage cannot power server-side threshold
+  evaluation, delivery retries, or cross-platform settings parity.
 
 **Alternatives considered**:
 

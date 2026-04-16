@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toast } from "sonner";
 import { SettingsPage } from "@/components/settings/settings-page";
-import { clearStoredThemeMode, readStoredThemeMode } from "@/lib/settings/theme-storage";
 
 const originalFetch = global.fetch;
 
@@ -64,7 +63,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  clearStoredThemeMode();
   document.documentElement.dataset.theme = "";
   document.documentElement.style.colorScheme = "";
   vi.restoreAllMocks();
@@ -73,15 +71,44 @@ afterEach(() => {
 });
 
 describe("settings page", () => {
-  it("renders the settings area and toggles dark mode", async () => {
-    const user = userEvent.setup();
-
+  it("requires authentication before rendering account-backed settings controls", async () => {
     render(<SettingsPage initialThemeMode="light" isAuthenticated={false} />);
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Appearance" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
-    expect(screen.getByText("Sign in to manage account-backed Teams alerts. Theme preferences stay available on this device even when signed out.")).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "Dark mode toggle" })).not.toBeInTheDocument();
+    expect(screen.getByText("Sign in to manage your account-backed appearance preferences.")).toBeInTheDocument();
+    expect(screen.getByText("Sign in to manage your account-backed Teams alert settings.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sign In To Manage Appearance" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sign In To Manage Alerts" })).toBeInTheDocument();
+  });
+
+  it("saves dark mode through the backend", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(createSettingsResponse()), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(createHistoryResponse()), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ themeMode: "dark" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        })
+      );
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={true} />);
 
     await waitFor(() => {
       expect(document.documentElement.dataset.theme).toBe("light");
@@ -90,8 +117,13 @@ describe("settings page", () => {
     await user.click(screen.getByRole("checkbox", { name: "Dark mode toggle" }));
 
     await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/settings/account",
+        expect.objectContaining({
+          method: "PUT"
+        })
+      );
       expect(document.documentElement.dataset.theme).toBe("dark");
-      expect(readStoredThemeMode()).toBe("dark");
     });
   });
 
@@ -229,5 +261,14 @@ describe("settings page", () => {
       expect(screen.getByLabelText("Alert Trigger Amount (USD)")).toHaveValue(1500);
       expect(screen.getByText("Webhook History")).toBeInTheDocument();
     });
+  });
+
+  it("does not render Teams settings controls when signed out", async () => {
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={false} />);
+
+    expect(screen.queryByRole("button", { name: "Save Teams Alerts" })).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Sign in to manage your account-backed Teams alert settings.")
+    ).toBeInTheDocument();
   });
 });

@@ -28,5 +28,5 @@ npm run test:e2e
 
 - The settings page is reachable from the main navigation.
 - Dark mode changes are visible without a full restart.
-- The saved preference survives reloads on the same browser/device.
+- The saved preference survives reloads and follows the authenticated account across web and iOS.
 - The settings toggle and persistence behavior pass the targeted unit and integration tests.

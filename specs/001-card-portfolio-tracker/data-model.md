@@ -1,8 +1,8 @@
-# Data Model: Pokemon Card Portfolio Tracker
+# Data Model: Pokémon Card Portfolio Tracker
 
 ## CardCategory
 
-Represents an upstream category record. For the first release, only the Pokemon
+Represents an upstream category record. For the first release, only the Pokémon
 category is expected to be active.
 
 ### Fields

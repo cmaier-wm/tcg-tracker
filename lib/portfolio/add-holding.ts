@@ -4,30 +4,7 @@ import { withDatabaseFallback } from "@/lib/db/runtime";
 import { requireAuthenticatedUser } from "@/lib/auth/auth-session";
 import { getDemoCards, getDemoUserState } from "@/lib/db/demo-store";
 import { saveValuationSnapshot } from "@/lib/portfolio/save-valuation-snapshot";
-import type { PortfolioHolding } from "@prisma/client";
-
-function toDemoPortfolioHolding(
-  holding: {
-    id: string;
-    cardVariationId: string;
-    quantity: number;
-    createdAt?: string;
-  },
-  userId: string
-): PortfolioHolding {
-  const createdAt = holding.createdAt ? new Date(holding.createdAt) : new Date();
-
-  return {
-    id: holding.id,
-    userId,
-    cardVariationId: holding.cardVariationId,
-    quantity: holding.quantity,
-    notes: null,
-    acquiredAt: null,
-    createdAt,
-    updatedAt: createdAt
-  };
-}
+import { valuePortfolio } from "@/lib/portfolio/value-portfolio";
 
 export async function addHolding(cardVariationId: string, quantity: number) {
   if (quantity < 1) {
@@ -65,7 +42,46 @@ export async function addHolding(cardVariationId: string, quantity: number) {
       });
 
       await saveValuationSnapshot(user.userId);
-      return holding;
+      const hydratedHolding = await prisma.portfolioHolding.findUniqueOrThrow({
+        where: {
+          id: holding.id
+        },
+        include: {
+          variation: {
+            include: {
+              card: {
+                include: {
+                  set: {
+                    include: {
+                      category: true
+                    }
+                  }
+                }
+              },
+              priceSnapshots: {
+                orderBy: {
+                  capturedAt: "desc"
+                },
+                take: 1
+              }
+            }
+          }
+        }
+      });
+
+      return {
+        id: hydratedHolding.id,
+        cardVariationId: hydratedHolding.cardVariationId,
+        cardName: hydratedHolding.variation.card.name,
+        variationLabel: hydratedHolding.variation.variantLabel,
+        quantity: hydratedHolding.quantity,
+        estimatedValue:
+          (hydratedHolding.variation.priceSnapshots[0]?.marketPrice ?? 0) *
+          hydratedHolding.quantity,
+        cardId: hydratedHolding.variation.card.id,
+        category: hydratedHolding.variation.card.set.category.slug,
+        imageUrl: hydratedHolding.variation.card.imageUrl
+      };
     },
     async () => {
       const user = await requireAuthenticatedUser();
@@ -92,10 +108,24 @@ export async function addHolding(cardVariationId: string, quantity: number) {
       }
 
       await saveValuationSnapshot(user.userId);
-      return toDemoPortfolioHolding(
-        store.holdings.find((holding) => holding.cardVariationId === cardVariationId)!,
-        user.userId
+      const valuation = valuePortfolio(store.holdings);
+      const addedHolding = valuation.holdings.find(
+        (holding) => holding.cardVariationId === cardVariationId
       );
+      const card = getDemoCards().find((candidate) =>
+        candidate.variations.some((variation) => variation.id === cardVariationId)
+      );
+
+      if (!addedHolding || !card) {
+        throw notFound("Card variation not found");
+      }
+
+      return {
+        ...addedHolding,
+        cardId: card.id,
+        category: card.category,
+        imageUrl: card.imageUrl
+      };
     }
   );
 }

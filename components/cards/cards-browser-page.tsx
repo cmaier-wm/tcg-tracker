@@ -36,9 +36,9 @@ export function CardsBrowserPage({
     <div className="page-grid">
       <section className="page-intro stack">
         <div className="stack">
-          <h1>Pokemon Card Browser</h1>
+          <h1>Pokémon Card Browser</h1>
           <p className="hero-copy">
-            Search and explore English Pokemon cards with current pricing and portfolio tracking.
+            Search and explore English Pokémon cards with current pricing and portfolio tracking.
           </p>
         </div>
       </section>
