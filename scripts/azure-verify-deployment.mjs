@@ -12,12 +12,13 @@ if (!url) {
 }
 
 const targets = [
-  { label: "home page", url },
+  { label: "health API", url: `${url.replace(/\/$/, "")}/api/health` },
   { label: "cards API", url: `${url.replace(/\/$/, "")}/api/cards?offset=0&limit=1` }
 ];
 
 const VERIFY_ATTEMPTS = 5;
 const VERIFY_RETRY_DELAY_MS = 5000;
+const VERIFY_REQUEST_TIMEOUT_MS = 60000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,7 +30,7 @@ for (const target of targets) {
   for (let attempt = 1; attempt <= VERIFY_ATTEMPTS; attempt += 1) {
     try {
       const response = await fetch(target.url, {
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(VERIFY_REQUEST_TIMEOUT_MS),
         redirect: "follow",
         headers: {
           "user-agent": "tcg-tracker-deploy-check"
