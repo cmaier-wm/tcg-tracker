@@ -101,8 +101,8 @@ describe("cards browse pages", () => {
     const page = await HomePage({ searchParams: Promise.resolve({}) });
     render(page);
 
-    expect(screen.getByText("Pokémon Card Browser")).toBeInTheDocument();
-    expect(screen.getByLabelText("Search cards")).toBeInTheDocument();
+    expect(screen.getByText("Card Browser")).toBeInTheDocument();
+    expect(screen.getByLabelText("Search")).toBeInTheDocument();
     expect(screen.getByLabelText("Set")).toBeInTheDocument();
     expect(screen.getByLabelText("Sort")).toHaveValue("price-desc");
     expect(screen.getByLabelText("Type")).toHaveValue("card");
@@ -119,7 +119,7 @@ describe("cards browse pages", () => {
     });
     render(page);
 
-    expect(screen.getByLabelText("Search cards")).toHaveValue("bulbasaur");
+    expect(screen.getByLabelText("Search")).toHaveValue("bulbasaur");
     expect(screen.getByLabelText("Set")).toHaveValue("151");
     expect(screen.getByLabelText("Sort")).toHaveValue("set-desc");
     expect(screen.getByLabelText("Type")).toHaveValue("sealed-product");

@@ -50,7 +50,7 @@ describe("cards browser page", () => {
       />
     );
 
-    expect(screen.getByLabelText("Search cards")).toHaveValue("charizard");
+    expect(screen.getByLabelText("Search")).toHaveValue("charizard");
     expect(screen.getByLabelText("Set")).toHaveValue("151");
     expect(screen.getByLabelText("Sort")).toHaveValue("name-asc");
     expect(screen.getByLabelText("Type")).toHaveValue("sealed-product");
@@ -77,7 +77,7 @@ describe("cards browser page", () => {
       />
     );
 
-    expect(screen.getByLabelText("Search cards")).toHaveValue("");
+    expect(screen.getByLabelText("Search")).toHaveValue("");
     expect(screen.getByLabelText("Set")).toHaveValue("");
     expect(screen.getByLabelText("Sort")).toHaveValue("price-desc");
     expect(screen.getByLabelText("Type")).toHaveValue("card");
