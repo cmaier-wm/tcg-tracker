@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export function SignOutButton() {
         })
       }
     >
-      {isPending ? "Signing Out..." : "Sign Out"}
+      <LoadingLabel isLoading={isPending} label="Sign Out" loadingLabel="Signing out" />
     </button>
   );
 }

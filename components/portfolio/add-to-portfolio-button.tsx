@@ -4,6 +4,7 @@ import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 export function AddToPortfolioButton({
   variationId
@@ -53,7 +54,7 @@ export function AddToPortfolioButton({
         />
       </label>
       <button className="button" type="submit" disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save Holding"}
+        <LoadingLabel isLoading={isSaving} label="Save Holding" loadingLabel="Saving holding" />
       </button>
     </form>
   );

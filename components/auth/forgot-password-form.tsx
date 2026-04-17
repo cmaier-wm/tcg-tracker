@@ -7,6 +7,7 @@ import {
   passwordResetRequestAcceptedSchema,
   passwordResetRequestSchema
 } from "@/lib/auth/schemas";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 const DEFAULT_SUCCESS_MESSAGE =
   "If an account exists for that email, a password reset link has been sent.";
@@ -79,7 +80,11 @@ export function ForgotPasswordForm() {
         />
       </label>
       <button className="button" type="submit" disabled={isPending}>
-        {isPending ? "Sending Reset Link..." : "Send Reset Link"}
+        <LoadingLabel
+          isLoading={isPending}
+          label="Send Reset Link"
+          loadingLabel="Sending reset link"
+        />
       </button>
       <Link href="/login" className="button secondary">
         Back to Sign In

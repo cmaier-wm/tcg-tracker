@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 export function LoginForm({ returnTo }: { returnTo: string | null }) {
   const router = useRouter();
@@ -70,7 +71,7 @@ export function LoginForm({ returnTo }: { returnTo: string | null }) {
         Forgot Password?
       </Link>
       <button className="button" type="submit" disabled={isPending}>
-        {isPending ? "Signing In..." : "Sign In"}
+        <LoadingLabel isLoading={isPending} label="Sign In" loadingLabel="Signing in" />
       </button>
     </form>
   );

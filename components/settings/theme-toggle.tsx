@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { applyThemeMode, toggleThemeMode, type ThemeMode } from "@/lib/settings/theme-preference";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 type ThemeToggleProps = {
   initialThemeMode: ThemeMode;
@@ -74,7 +75,17 @@ export function ThemeToggle({ initialThemeMode, isAuthenticated }: ThemeTogglePr
         <span className="theme-toggle-switch-copy">
           <span className="theme-toggle-switch-label">Dark mode</span>
           <span className="theme-toggle-switch-state">
-            {isSaving ? "Saving..." : isDarkMode ? "Enabled" : "Disabled"}
+            {isSaving ? (
+              <LoadingLabel
+                isLoading={true}
+                label={isDarkMode ? "Enabled" : "Disabled"}
+                loadingLabel="Saving theme"
+              />
+            ) : isDarkMode ? (
+              "Enabled"
+            ) : (
+              "Disabled"
+            )}
           </span>
         </span>
       </label>

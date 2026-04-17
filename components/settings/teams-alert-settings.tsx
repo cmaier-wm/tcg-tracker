@@ -12,6 +12,7 @@ import type {
   TeamsAlertHistoryResponse,
   TeamsAlertSettingsResponse
 } from "@/lib/teams/schemas";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 const initialState: TeamsAlertSettingsResponse = {
   enabled: false,
@@ -226,7 +227,11 @@ export function TeamsAlertSettings() {
 
       <div className="button-row">
         <button className="button" type="submit" disabled={!canSubmit || isLoading}>
-          {isSaving ? "Saving..." : "Save Teams Alerts"}
+          <LoadingLabel
+            isLoading={isSaving}
+            label="Save Teams Alerts"
+            loadingLabel="Saving Teams alerts"
+          />
         </button>
       </div>
 

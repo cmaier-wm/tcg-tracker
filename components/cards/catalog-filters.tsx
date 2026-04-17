@@ -2,7 +2,7 @@
 
 import React, { useRef, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
 import {
@@ -143,7 +143,7 @@ export function CatalogFilters({
       }}
     >
       <div className="field search-field">
-        <label htmlFor="card-search">Search cards</label>
+        <label htmlFor="card-search">Search</label>
         <div className="search-input-row">
           <input
             id="card-search"
@@ -153,8 +153,30 @@ export function CatalogFilters({
             placeholder={searchPlaceholder}
             title={searchPlaceholder}
           />
-          <button className="button" type="submit" disabled={isNavigating}>
-            Search
+          <button
+            className="icon-button"
+            type="submit"
+            disabled={isNavigating}
+            aria-label="Search cards"
+            title="Search cards"
+          >
+            {isNavigating ? (
+              <div className="catalog-spinner pokeball-spinner" aria-hidden="true">
+                <span className="pokeball-spinner-button" />
+              </div>
+            ) : (
+              <Search aria-hidden="true" className="icon-button-glyph" strokeWidth={2} />
+            )}
+          </button>
+          <button
+            className="icon-button"
+            type="button"
+            onClick={resetFilters}
+            disabled={isNavigating}
+            aria-label="Reset filters"
+            title="Reset filters"
+          >
+            <RotateCcw aria-hidden="true" className="inline-action-icon" strokeWidth={2} />
           </button>
         </div>
       </div>
@@ -190,7 +212,7 @@ export function CatalogFilters({
         </select>
       </div>
       {showProductTypeFilter ? (
-        <div className="field">
+        <div className="field filter-type-field">
           <label htmlFor="product-type-filter">Type</label>
           <select
             id="product-type-filter"
@@ -207,20 +229,6 @@ export function CatalogFilters({
         </div>
       ) : null}
       <div className="button-row filter-actions">
-        <div className="filter-tooltip">
-          <button
-            className="icon-button"
-            type="button"
-            onClick={resetFilters}
-            disabled={isNavigating}
-            aria-label="Reset filters"
-          >
-            <RotateCcw aria-hidden="true" className="icon-button-glyph" strokeWidth={2} />
-          </button>
-          <span className="filter-tooltip-bubble" role="tooltip">
-            Reset all search, set, sort, and type filters
-          </span>
-        </div>
         {isNavigating ? (
           <div className="catalog-filter-loading" role="status" aria-label="Applying filters">
             <div className="catalog-spinner pokeball-spinner" aria-hidden="true">

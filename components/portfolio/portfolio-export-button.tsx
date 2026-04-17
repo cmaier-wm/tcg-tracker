@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { Download } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 function getDownloadFilename(headerValue: string | null) {
   if (!headerValue) {
@@ -88,12 +89,18 @@ export function PortfolioExportButton({ disabled }: { disabled: boolean }) {
           })
         }
       >
-        <Download
-          aria-hidden="true"
-          className="portfolio-export-button-icon"
-          strokeWidth={2}
+        {isPending ? null : (
+          <Download
+            aria-hidden="true"
+            className="portfolio-export-button-icon"
+            strokeWidth={2}
+          />
+        )}
+        <LoadingLabel
+          isLoading={isPending}
+          label="Export Portfolio"
+          loadingLabel="Exporting portfolio"
         />
-        {isPending ? "Exporting..." : "Export Portfolio"}
       </button>
       {helperText ? <p className="muted portfolio-export-note">{helperText}</p> : null}
     </div>

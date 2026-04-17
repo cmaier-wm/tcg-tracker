@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { registerRequestSchema } from "@/lib/auth/schemas";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 export function RegisterForm({ returnTo }: { returnTo: string | null }) {
   const router = useRouter();
@@ -77,7 +78,11 @@ export function RegisterForm({ returnTo }: { returnTo: string | null }) {
         />
       </label>
       <button className="button" type="submit" disabled={isPending}>
-        {isPending ? "Creating Account..." : "Create Account"}
+        <LoadingLabel
+          isLoading={isPending}
+          label="Create Account"
+          loadingLabel="Creating account"
+        />
       </button>
     </form>
   );

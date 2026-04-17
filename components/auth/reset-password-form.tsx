@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { passwordResetConfirmSchema } from "@/lib/auth/schemas";
+import { LoadingLabel } from "@/components/ui/loading-label";
 
 type ResetPasswordFormProps = {
   token: string;
@@ -101,7 +102,11 @@ export function ResetPasswordForm({
         />
       </label>
       <button className="button" type="submit" disabled={isPending}>
-        {isPending ? "Updating Password..." : "Update Password"}
+        <LoadingLabel
+          isLoading={isPending}
+          label="Update Password"
+          loadingLabel="Updating password"
+        />
       </button>
       <Link href="/login" className="button secondary">
         Back to Sign In

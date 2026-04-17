@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { CardDetail } from "@/components/cards/card-detail";
 import { CardPriceEmptyState } from "@/components/cards/card-price-empty-state";
 import { CardPriceSummary } from "@/components/cards/card-price-summary";
@@ -36,6 +37,7 @@ export default async function CardDetailPage({
     <div className="page-grid">
       <section className="detail-back-row">
         <Link href="/cards" className="inline-link">
+          <ArrowLeft aria-hidden="true" className="inline-link-icon" strokeWidth={2} />
           Back to Browse
         </Link>
       </section>
