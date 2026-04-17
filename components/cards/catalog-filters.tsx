@@ -153,31 +153,41 @@ export function CatalogFilters({
             placeholder={searchPlaceholder}
             title={searchPlaceholder}
           />
-          <button
-            className="icon-button"
-            type="submit"
-            disabled={isNavigating}
-            aria-label="Search cards"
-            title="Search cards"
-          >
-            {isNavigating ? (
-              <div className="catalog-spinner pokeball-spinner" aria-hidden="true">
-                <span className="pokeball-spinner-button" />
-              </div>
-            ) : (
-              <Search aria-hidden="true" className="icon-button-glyph" strokeWidth={2} />
-            )}
-          </button>
-          <button
-            className="icon-button"
-            type="button"
-            onClick={resetFilters}
-            disabled={isNavigating}
-            aria-label="Reset filters"
-            title="Reset filters"
-          >
-            <RotateCcw aria-hidden="true" className="inline-action-icon" strokeWidth={2} />
-          </button>
+          <div className="filter-tooltip filter-icon-tooltip">
+            <button
+              className="icon-button"
+              type="submit"
+              disabled={isNavigating}
+              aria-label="Search cards"
+              title="Search cards"
+            >
+              {isNavigating ? (
+                <div className="catalog-spinner pokeball-spinner" aria-hidden="true">
+                  <span className="pokeball-spinner-button" />
+                </div>
+              ) : (
+                <Search aria-hidden="true" className="icon-button-glyph" strokeWidth={2} />
+              )}
+            </button>
+            <span className="filter-tooltip-bubble filter-tooltip-bubble-compact" aria-hidden="true">
+              Search cards
+            </span>
+          </div>
+          <div className="filter-tooltip filter-icon-tooltip">
+            <button
+              className="icon-button"
+              type="button"
+              onClick={resetFilters}
+              disabled={isNavigating}
+              aria-label="Reset filters"
+              title="Reset filters"
+            >
+              <RotateCcw aria-hidden="true" className="inline-action-icon" strokeWidth={2} />
+            </button>
+            <span className="filter-tooltip-bubble filter-tooltip-bubble-compact" aria-hidden="true">
+              Reset filters
+            </span>
+          </div>
         </div>
       </div>
       <div className="field">

@@ -580,6 +580,10 @@ textarea:focus {
   display: inline-flex;
 }
 
+.filter-icon-tooltip {
+  align-self: center;
+}
+
 .filter-tooltip-bubble {
   position: absolute;
   right: 0;
@@ -601,10 +605,26 @@ textarea:focus {
   transition: opacity 120ms ease, transform 120ms ease;
 }
 
+.filter-tooltip-bubble-compact {
+  right: 50%;
+  bottom: calc(100% + 8px);
+  min-width: max-content;
+  max-width: none;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  transform: translate(50%, 4px);
+  white-space: nowrap;
+}
+
 .filter-tooltip:hover .filter-tooltip-bubble,
 .filter-tooltip:focus-within .filter-tooltip-bubble {
   opacity: 1;
   transform: translateY(0);
+}
+
+.filter-tooltip:hover .filter-tooltip-bubble-compact,
+.filter-tooltip:focus-within .filter-tooltip-bubble-compact {
+  transform: translate(50%, 0);
 }
 
 .card-grid {
