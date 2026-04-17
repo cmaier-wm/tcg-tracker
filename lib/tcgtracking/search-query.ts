@@ -2,6 +2,7 @@ import type { CardListItem } from "@/lib/tcgtracking/mappers";
 
 type CatalogSortField = "price" | "name" | "number" | "set" | "rarity";
 type CatalogSortDirection = "asc" | "desc";
+export type CatalogProductTypeValue = "card" | "sealed-product";
 
 export type CatalogSortValue =
   | "price-asc"
@@ -98,6 +99,11 @@ const catalogSortOptions: CatalogSortOption[] = [
 
 const defaultCatalogSort: CatalogSortValue = "price-desc";
 const catalogSortValueSet = new Set(catalogSortOptions.map((option) => option.value));
+const defaultCatalogProductType: CatalogProductTypeValue = "card";
+const catalogProductTypeValueSet = new Set<CatalogProductTypeValue>([
+  "card",
+  "sealed-product"
+]);
 const naturalTextCollator = new Intl.Collator("en", {
   numeric: true,
   sensitivity: "base"
@@ -141,12 +147,41 @@ export function getCatalogSortOptions() {
   return catalogSortOptions;
 }
 
+export function getCatalogProductTypeOptions() {
+  return [
+    {
+      value: "card" as const,
+      label: "Cards",
+      defaultOnHome: true
+    },
+    {
+      value: "sealed-product" as const,
+      label: "Sealed Product",
+      defaultOnHome: false
+    }
+  ];
+}
+
 export function normalizeCatalogSort(value?: string | null): CatalogSortValue {
   if (value && catalogSortValueSet.has(value as CatalogSortValue)) {
     return value as CatalogSortValue;
   }
 
   return defaultCatalogSort;
+}
+
+export function normalizeCatalogProductType(
+  value?: string | null
+): CatalogProductTypeValue {
+  if (value && catalogProductTypeValueSet.has(value as CatalogProductTypeValue)) {
+    return value as CatalogProductTypeValue;
+  }
+
+  return defaultCatalogProductType;
+}
+
+export function getDefaultCatalogProductType(): CatalogProductTypeValue {
+  return defaultCatalogProductType;
 }
 
 function compareOptionalText(

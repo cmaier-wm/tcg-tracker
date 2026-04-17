@@ -28,7 +28,7 @@ protocol APIClientProtocol: Sendable {
     func fetchHome() async throws -> MobileHome
     func requestPasswordReset(email: String) async throws -> PasswordResetMessageResponse
     func confirmPasswordReset(token: String, password: String) async throws -> PasswordResetMessageResponse
-    func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem]
+    func browseCards(query: String, sort: CardSortOption, productType: CatalogProductTypeOption) async throws -> [CardListItem]
     func fetchCardDetail(category: String, cardId: String) async throws -> CardDetail
     func fetchPriceHistory(category: String, cardId: String, variationId: String) async throws -> PriceHistory
     func fetchPortfolio(page: Int?) async throws -> PortfolioResponse
@@ -132,12 +132,13 @@ actor APIClient: APIClientProtocol {
         )
     }
 
-    func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem] {
+    func browseCards(query: String, sort: CardSortOption, productType: CatalogProductTypeOption) async throws -> [CardListItem] {
         let items = try await request(
             path: "/api/cards",
             queryItems: [
                 query.isEmpty ? nil : URLQueryItem(name: "q", value: query),
-                URLQueryItem(name: "sort", value: sort.rawValue)
+                URLQueryItem(name: "sort", value: sort.rawValue),
+                productType == .card ? nil : URLQueryItem(name: "productType", value: productType.rawValue)
             ].compactMap { $0 },
             expecting: CardListResponse.self
         )

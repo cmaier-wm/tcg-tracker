@@ -5,7 +5,10 @@ import { InfiniteCardList } from "@/components/cards/infinite-card-list";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
 import type { CardListItem } from "@/lib/tcgtracking/mappers";
-import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
+import type {
+  CatalogProductTypeValue,
+  CatalogSortValue
+} from "@/lib/tcgtracking/search-query";
 
 const PAGE_SIZE = 20;
 
@@ -14,10 +17,12 @@ type CardsBrowserPageProps = {
   selectedCategory?: string;
   selectedSet?: string;
   selectedSort: CatalogSortValue;
+  selectedProductType?: CatalogProductTypeValue;
   items: CardListItem[];
   categories: CatalogCategory[];
   sets: CatalogSet[];
   resetHref: string;
+  showProductTypeFilter?: boolean;
 };
 
 export function CardsBrowserPage({
@@ -25,12 +30,22 @@ export function CardsBrowserPage({
   selectedCategory,
   selectedSet,
   selectedSort,
+  selectedProductType = "card",
   items,
   categories,
   sets,
-  resetHref
+  resetHref,
+  showProductTypeFilter = false
 }: CardsBrowserPageProps) {
-  const stateKey = [query ?? "", selectedCategory ?? "", selectedSet ?? "", selectedSort].join(":");
+  const stateKey = [
+    query ?? "",
+    selectedCategory ?? "",
+    selectedSet ?? "",
+    selectedSort,
+    selectedProductType
+  ].join(":");
+  const emptyTypeLabel =
+    selectedProductType === "card" ? "cards" : "sealed products";
 
   return (
     <div className="page-grid">
@@ -47,9 +62,11 @@ export function CardsBrowserPage({
         query={query}
         selectedSet={selectedSet}
         selectedSort={selectedSort}
+        selectedProductType={selectedProductType}
         categories={categories}
         sets={sets}
         resetHref={resetHref}
+        showProductTypeFilter={showProductTypeFilter}
       />
       {items.length ? (
         <InfiniteCardList
@@ -59,12 +76,13 @@ export function CardsBrowserPage({
           selectedCategory={selectedCategory}
           selectedSet={selectedSet}
           selectedSort={selectedSort}
+          selectedProductType={selectedProductType}
           pageSize={PAGE_SIZE}
         />
       ) : (
         <CardEmptyState
-          title="No cards found"
-          body="Try a different search term or adjust the category and set filters."
+          title={`No ${emptyTypeLabel} found`}
+          body={`Try a different search term or adjust the set, sort, or type filters for ${emptyTypeLabel}.`}
         />
       )}
     </div>

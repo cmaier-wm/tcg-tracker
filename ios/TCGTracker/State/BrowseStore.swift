@@ -8,6 +8,7 @@ final class BrowseStore {
 
     var query = ""
     var selectedSort: CardSortOption = .priceDesc
+    var selectedProductType: CatalogProductTypeOption = .card
     var cards: [CardListItem] = []
     var selectedCard: CardDetail?
     var selectedVariation: CardVariation?
@@ -27,7 +28,8 @@ final class BrowseStore {
         do {
             cards = try await apiClient.browseCards(
                 query: query.trimmingCharacters(in: .whitespacesAndNewlines),
-                sort: selectedSort
+                sort: selectedSort,
+                productType: selectedProductType
             )
         } catch {
             errorMessage = error.localizedDescription

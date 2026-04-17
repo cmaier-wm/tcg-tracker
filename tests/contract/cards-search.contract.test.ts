@@ -8,6 +8,7 @@ describe("cards search contract", () => {
 
     expect(items[0]).toMatchObject({
       id: expect.any(String),
+      productType: expect.any(String),
       category: expect.any(String),
       setName: expect.any(String),
       name: expect.any(String)
@@ -53,6 +54,36 @@ describe("cards search contract", () => {
 
     expect(withoutSort.map((item) => item.id)).toEqual(explicitDefault.map((item) => item.id));
     expect(invalidSort.map((item) => item.id)).toEqual(explicitDefault.map((item) => item.id));
+  });
+
+  it("defaults missing or invalid product types to card filtering", async () => {
+    const [withoutType, invalidType, explicitDefault] = await Promise.all([
+      getCardCatalog(),
+      getCardCatalog({ productType: "cards" }),
+      getCardCatalog({ productType: "card" })
+    ]);
+
+    expect(withoutType.map((item) => item.id)).toEqual(explicitDefault.map((item) => item.id));
+    expect(invalidType.map((item) => item.id)).toEqual(explicitDefault.map((item) => item.id));
+    expect(explicitDefault.every((item) => item.productType === "card")).toBe(true);
+  });
+
+  it("filters to sealed products when requested", async () => {
+    const items = await getCardCatalog({ productType: "sealed-product" });
+
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.every((item) => item.productType === "sealed-product")).toBe(true);
+  });
+
+  it("preserves combined query, sort, and productType requests", async () => {
+    const items = await getCardCatalog({
+      q: "booster",
+      sort: "price-desc",
+      productType: "sealed-product"
+    });
+
+    expect(items.map((item) => item.name)).toContain("Scarlet & Violet Booster Box");
+    expect(items.every((item) => item.productType === "sealed-product")).toBe(true);
   });
 
   it("orders cards by the requested field and direction", async () => {
