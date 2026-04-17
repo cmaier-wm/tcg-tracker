@@ -91,6 +91,8 @@
 - PostgreSQL 17 for authenticated portfolio holdings and latest price snapshots, with the existing in-memory demo-store fallback when the database is unavailable in non-production or test fallback paths (008-portfolio-spreadsheet-export)
 - TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, Zod, `bcryptjs`, native Node `crypto`, existing app-owned auth/session helpers, and a transactional email delivery integration for production reset emails (009-password-reset)
 - PostgreSQL 17 for users, credentials, sessions, audit events, and new password reset token records (009-password-reset)
+- TypeScript 5.9 on Node.js 22 LTS for web/backend and Swift 6 for iOS + Next.js 16, React 19, Prisma ORM, PostgreSQL 17, Vitest, React Testing Library, Playwright, SwiftUI, Observation, Foundation networking (010-product-type-filter)
+- Existing PostgreSQL catalog plus demo-store fallback; no new persisted user preference storage required (010-product-type-filter)
 
 ## Recent Changes
 - 001-card-portfolio-tracker: Added TypeScript 5.9 on Node.js 22 LTS + Next.js 16, React 19, Prisma ORM, PostgreSQL, Docker Compose, TanStack Query, Recharts, Zod

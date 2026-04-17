@@ -47,8 +47,23 @@ struct CardListResponse: Codable, Equatable, Sendable {
     let items: [CardListItem]
 }
 
+enum CatalogProductTypeOption: String, CaseIterable, Identifiable, Codable, Sendable {
+    case card
+    case sealedProduct = "sealed-product"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .card: "Cards"
+        case .sealedProduct: "Sealed Product"
+        }
+    }
+}
+
 struct CardListItem: Codable, Equatable, Hashable, Identifiable, Sendable {
     let id: String
+    let productType: CatalogProductTypeOption
     let category: String
     let categoryName: String?
     let setName: String
@@ -58,6 +73,10 @@ struct CardListItem: Codable, Equatable, Hashable, Identifiable, Sendable {
     let imageUrl: String?
     let currentPrice: Double?
     let variationCount: Int
+
+    var supportsDetailNavigation: Bool {
+        productType == .card
+    }
 }
 
 enum CardSortOption: String, CaseIterable, Identifiable, Codable, Sendable {
@@ -180,6 +199,7 @@ extension PortfolioHolding {
 
         return CardListItem(
             id: cardId,
+            productType: .card,
             category: category,
             categoryName: nil,
             setName: variationLabel ?? "Saved card",

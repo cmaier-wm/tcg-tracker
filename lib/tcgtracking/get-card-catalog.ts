@@ -4,7 +4,9 @@ import { getDemoCards } from "@/lib/db/demo-store";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
 import { toCardListItem } from "@/lib/tcgtracking/mappers";
 import {
+  type CatalogProductTypeValue,
   type CatalogSortValue,
+  normalizeCatalogProductType,
   matchesSearchTokens,
   normalizeCatalogSort,
   sortCardListItems,
@@ -16,12 +18,14 @@ type CatalogOptions = {
   category?: string | null;
   set?: string | null;
   sort?: string | null;
+  productType?: string | null;
   limit?: number;
   offset?: number;
 };
 
-type DatabaseCatalogOptions = Omit<CatalogOptions, "sort"> & {
+type DatabaseCatalogOptions = Omit<CatalogOptions, "sort" | "productType"> & {
   sort: CatalogSortValue;
+  productType: CatalogProductTypeValue;
 };
 
 const getCachedDatabaseCardCatalog = unstable_cache(
@@ -40,6 +44,7 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
   const category = normalizeFilter(options.category);
   const set = normalizeFilter(options.set);
   const sort = normalizeCatalogSort(options.sort);
+  const productType = normalizeCatalogProductType(options.productType);
   const limit = options.limit;
   const offset = options.offset ?? 0;
 
@@ -50,6 +55,7 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
         category,
         set,
         sort,
+        productType,
         limit,
         offset
       });
@@ -66,6 +72,13 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
       sortCardListItems(
         getDemoCards()
           .filter((card) => {
+            if (
+              productType &&
+              (card.productType ?? "card") !== productType
+            ) {
+              return false;
+            }
+
             if (
               searchTokens.length &&
               !matchesSearchTokens(

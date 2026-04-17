@@ -13,6 +13,33 @@ final class BrowseStoreTests: XCTestCase {
 
         XCTAssertEqual(store.cards.first?.name, "Charizard ex")
         XCTAssertEqual(apiClient.lastBrowseSort, .rarityDesc)
+        XCTAssertEqual(apiClient.lastBrowseProductType, .card)
+    }
+
+    func testSearchLoadsSealedProductResultsWhenSelected() async {
+        let apiClient = MockAPIClient()
+        apiClient.cardsResult = .success([
+            CardListItem(
+                id: "sealed-1",
+                productType: .sealedProduct,
+                category: "pokemon",
+                categoryName: "Pokemon",
+                setName: "Scarlet & Violet",
+                name: "Scarlet & Violet Booster Box",
+                collectorNumber: nil,
+                rarity: nil,
+                imageUrl: nil,
+                currentPrice: 119.99,
+                variationCount: 1
+            )
+        ])
+        let store = BrowseStore(apiClient: apiClient)
+        store.selectedProductType = .sealedProduct
+
+        await store.search()
+
+        XCTAssertEqual(apiClient.lastBrowseProductType, .sealedProduct)
+        XCTAssertEqual(store.cards.first?.productType, .sealedProduct)
     }
 
     func testSelectLoadsDetailAndHistory() async {
@@ -22,6 +49,7 @@ final class BrowseStoreTests: XCTestCase {
         await store.select(
             card: CardListItem(
                 id: "card-1",
+                productType: .card,
                 category: "pokemon",
                 categoryName: "Pokemon",
                 setName: "151",
@@ -89,6 +117,7 @@ final class BrowseStoreTests: XCTestCase {
         await store.select(
             card: CardListItem(
                 id: "card-1",
+                productType: .card,
                 category: "pokemon",
                 categoryName: "Pokemon",
                 setName: "151",
@@ -104,5 +133,23 @@ final class BrowseStoreTests: XCTestCase {
         XCTAssertEqual(store.selectedVariation?.id, "variation-priced")
         XCTAssertEqual(store.selectedVariation?.currentPrice, 145)
         XCTAssertEqual(store.selectedHistory?.variationId, "variation-priced")
+    }
+
+    func testSealedProductsDoNotSupportDetailNavigation() {
+        let sealedProduct = CardListItem(
+            id: "sealed-1",
+            productType: .sealedProduct,
+            category: "pokemon",
+            categoryName: "Pokemon",
+            setName: "Scarlet & Violet",
+            name: "Scarlet & Violet Elite Trainer Box",
+            collectorNumber: nil,
+            rarity: nil,
+            imageUrl: nil,
+            currentPrice: 54.99,
+            variationCount: 1
+        )
+
+        XCTAssertFalse(sealedProduct.supportsDetailNavigation)
     }
 }

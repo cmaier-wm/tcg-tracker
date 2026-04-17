@@ -2,28 +2,41 @@
 
 import React, { useRef, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { RotateCcw } from "lucide-react";
 import type { CatalogCategory } from "@/lib/tcgtracking/get-categories";
 import type { CatalogSet } from "@/lib/tcgtracking/get-sets";
-import { getCatalogSortOptions, type CatalogSortValue } from "@/lib/tcgtracking/search-query";
+import {
+  getCatalogProductTypeOptions,
+  getCatalogSortOptions,
+  getDefaultCatalogProductType,
+  type CatalogProductTypeValue,
+  type CatalogSortValue
+} from "@/lib/tcgtracking/search-query";
 
 type CatalogFiltersProps = {
   query?: string;
   selectedSet?: string;
   selectedSort: CatalogSortValue;
+  selectedProductType?: CatalogProductTypeValue;
   categories: CatalogCategory[];
   sets: CatalogSet[];
   resetHref: string;
+  showProductTypeFilter?: boolean;
 };
 
 const defaultCatalogSortValue: CatalogSortValue = "price-desc";
+const defaultCatalogProductTypeValue = getDefaultCatalogProductType();
+const searchPlaceholder = "Search by card name, set, or collector number";
 
 export function CatalogFilters({
   query,
   selectedSet,
   selectedSort,
+  selectedProductType = defaultCatalogProductTypeValue,
   categories: _categories,
   sets,
-  resetHref
+  resetHref,
+  showProductTypeFilter = false
 }: CatalogFiltersProps) {
   const formRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
@@ -44,6 +57,7 @@ export function CatalogFilters({
     const nextQuery = formData.get("q")?.toString().trim();
     const nextSet = formData.get("set")?.toString().trim();
     const nextSort = formData.get("sort")?.toString().trim();
+    const nextProductType = formData.get("productType")?.toString().trim();
 
     if (nextQuery) {
       params.set("q", nextQuery);
@@ -55,6 +69,14 @@ export function CatalogFilters({
 
     if (nextSort) {
       params.set("sort", nextSort);
+    }
+
+    if (
+      showProductTypeFilter &&
+      nextProductType &&
+      nextProductType !== defaultCatalogProductTypeValue
+    ) {
+      params.set("productType", nextProductType);
     }
 
     const nextUrl = params.size ? `${pathname}?${params.toString()}` : pathname;
@@ -80,6 +102,7 @@ export function CatalogFilters({
       const queryInput = form.elements.namedItem("q");
       const setSelect = form.elements.namedItem("set");
       const sortSelect = form.elements.namedItem("sort");
+      const productTypeSelect = form.elements.namedItem("productType");
 
       if (queryInput instanceof HTMLInputElement) {
         queryInput.value = "";
@@ -91,6 +114,10 @@ export function CatalogFilters({
 
       if (sortSelect instanceof HTMLSelectElement) {
         sortSelect.value = defaultCatalogSortValue;
+      }
+
+      if (productTypeSelect instanceof HTMLSelectElement) {
+        productTypeSelect.value = defaultCatalogProductTypeValue;
       }
     }
 
@@ -108,7 +135,7 @@ export function CatalogFilters({
   return (
     <form
       ref={formRef}
-      className="surface-card filter-grid"
+      className={`surface-card filter-grid${showProductTypeFilter ? " filter-grid-with-type" : ""}`}
       method="GET"
       onSubmit={(event) => {
         event.preventDefault();
@@ -123,7 +150,8 @@ export function CatalogFilters({
             name="q"
             type="search"
             defaultValue={query}
-            placeholder="Search by card name, set, or collector number"
+            placeholder={searchPlaceholder}
+            title={searchPlaceholder}
           />
           <button className="button" type="submit" disabled={isNavigating}>
             Search
@@ -161,15 +189,38 @@ export function CatalogFilters({
           ))}
         </select>
       </div>
+      {showProductTypeFilter ? (
+        <div className="field">
+          <label htmlFor="product-type-filter">Type</label>
+          <select
+            id="product-type-filter"
+            name="productType"
+            defaultValue={selectedProductType}
+            onChange={submitFilters}
+          >
+            {getCatalogProductTypeOptions().map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
       <div className="button-row filter-actions">
-        <button
-          className="button secondary"
-          type="button"
-          onClick={resetFilters}
-          disabled={isNavigating}
-        >
-          Reset
-        </button>
+        <div className="filter-tooltip">
+          <button
+            className="icon-button"
+            type="button"
+            onClick={resetFilters}
+            disabled={isNavigating}
+            aria-label="Reset filters"
+          >
+            <RotateCcw aria-hidden="true" className="icon-button-glyph" strokeWidth={2} />
+          </button>
+          <span className="filter-tooltip-bubble" role="tooltip">
+            Reset all search, set, sort, and type filters
+          </span>
+        </div>
         {isNavigating ? (
           <div className="catalog-filter-loading" role="status" aria-label="Applying filters">
             <div className="catalog-spinner pokeball-spinner" aria-hidden="true">

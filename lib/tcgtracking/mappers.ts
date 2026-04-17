@@ -1,8 +1,10 @@
 import type { DemoCard } from "@/lib/db/demo-data";
 import { selectPreferredVariation } from "@/lib/tcgtracking/select-preferred-variation";
+import type { CatalogProductTypeValue } from "@/lib/tcgtracking/search-query";
 
 export type CardListItem = {
   id: string;
+  productType: CatalogProductTypeValue;
   category: string;
   categoryName: string;
   setName: string;
@@ -19,6 +21,7 @@ export function toCardListItem(card: DemoCard): CardListItem {
 
   return {
     id: card.id,
+    productType: card.productType ?? "card",
     category: card.category,
     categoryName: card.categoryName,
     setName: card.setName,

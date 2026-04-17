@@ -17,6 +17,7 @@ export type DemoVariation = {
 
 export type DemoCard = {
   id: string;
+  productType?: "card" | "sealed-product";
   category: string;
   categoryName: string;
   setName: string;
@@ -30,6 +31,7 @@ export type DemoCard = {
 export const demoCards: DemoCard[] = [
   {
     id: "sv1-charizard-ex",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "Scarlet & Violet",
@@ -74,6 +76,7 @@ export const demoCards: DemoCard[] = [
   },
   {
     id: "lorcana-belle-strange",
+    productType: "card",
     category: "lorcana",
     categoryName: "Disney Lorcana",
     setName: "Rise of the Floodborn",
@@ -101,6 +104,7 @@ export const demoCards: DemoCard[] = [
   },
   {
     id: "onepiece-luffy-altart",
+    productType: "card",
     category: "one-piece",
     categoryName: "One Piece",
     setName: "Romance Dawn",
@@ -121,6 +125,50 @@ export const demoCards: DemoCard[] = [
           { capturedAt: "2026-03-29T08:00:00.000Z", marketPrice: 142.75 },
           { capturedAt: "2026-03-31T08:00:00.000Z", marketPrice: 143.5 },
           { capturedAt: "2026-04-02T08:00:00.000Z", marketPrice: 145.0 }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sv-base-booster-box",
+    productType: "sealed-product",
+    category: "pokemon",
+    categoryName: "Pokemon",
+    setName: "Scarlet & Violet",
+    name: "Scarlet & Violet Booster Box",
+    imageUrl: "https://tcgtracking.com/wp-content/uploads/woocommerce-placeholder.png",
+    variations: [
+      {
+        id: "sv-base-booster-box-default",
+        label: "Sealed",
+        currentPrice: 119.99,
+        lastUpdatedAt: "2026-04-02T08:00:00.000Z",
+        history: [
+          { capturedAt: "2026-03-28T08:00:00.000Z", marketPrice: 114.5 },
+          { capturedAt: "2026-03-31T08:00:00.000Z", marketPrice: 117.0 },
+          { capturedAt: "2026-04-02T08:00:00.000Z", marketPrice: 119.99 }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sv-base-elite-trainer-box",
+    productType: "sealed-product",
+    category: "pokemon",
+    categoryName: "Pokemon",
+    setName: "Scarlet & Violet",
+    name: "Scarlet & Violet Elite Trainer Box",
+    imageUrl: "https://tcgtracking.com/wp-content/uploads/woocommerce-placeholder.png",
+    variations: [
+      {
+        id: "sv-base-elite-trainer-box-default",
+        label: "Sealed",
+        currentPrice: 54.99,
+        lastUpdatedAt: "2026-04-02T08:00:00.000Z",
+        history: [
+          { capturedAt: "2026-03-28T08:00:00.000Z", marketPrice: 49.5 },
+          { capturedAt: "2026-03-31T08:00:00.000Z", marketPrice: 52.25 },
+          { capturedAt: "2026-04-02T08:00:00.000Z", marketPrice: 54.99 }
         ]
       }
     ]
