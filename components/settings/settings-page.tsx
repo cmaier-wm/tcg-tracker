@@ -25,23 +25,26 @@ export function SettingsPage({ initialThemeMode, isAuthenticated }: SettingsPage
         <div className="section-heading">
           <div>
             <h2>Appearance</h2>
-            <p className="muted">Control how the app looks across your account.</p>
+            <p className="muted">
+              {isAuthenticated
+                ? "Control how the app looks across your account."
+                : "Control how the app looks on this device, or sign in to sync it across devices."}
+            </p>
           </div>
         </div>
-        {isAuthenticated ? (
-          <ThemeToggle initialThemeMode={initialThemeMode} />
-        ) : (
+        <ThemeToggle initialThemeMode={initialThemeMode} isAuthenticated={isAuthenticated} />
+        {!isAuthenticated ? (
           <div className="stack">
             <p className="muted">
-              Sign in to manage your account-backed appearance preferences.
+              Sign in if you want your theme preference saved across devices.
             </p>
             <div className="button-row">
               <Link href="/login" className="button secondary">
-                Sign In To Manage Appearance
+                Sign In To Sync Appearance
               </Link>
             </div>
           </div>
-        )}
+        ) : null}
       </section>
       <section className="surface-card stack">
         <div className="section-heading">

@@ -4,7 +4,12 @@ import Observation
 @MainActor
 @Observable
 final class SettingsStore {
+    private enum StorageKey {
+        static let themeMode = "settings.theme-mode"
+    }
+
     private let apiClient: APIClientProtocol
+    private let userDefaults: UserDefaults
 
     var accountSettings: AccountSettings?
     var settings: TeamsAlertSettings?
@@ -13,13 +18,18 @@ final class SettingsStore {
     var isSaving = false
     var errorMessage: String?
     var previewThemeMode: ThemeMode?
+    private(set) var localThemeMode: ThemeMode
 
-    init(apiClient: APIClientProtocol) {
+    init(apiClient: APIClientProtocol, userDefaults: UserDefaults = .standard) {
         self.apiClient = apiClient
+        self.userDefaults = userDefaults
+        self.localThemeMode = ThemeMode(
+            rawValue: userDefaults.string(forKey: StorageKey.themeMode) ?? ""
+        ) ?? .dark
     }
 
     var currentThemeMode: ThemeMode {
-        previewThemeMode ?? accountSettings?.themeMode ?? .dark
+        previewThemeMode ?? accountSettings?.themeMode ?? localThemeMode
     }
 
     func load() async {
@@ -35,6 +45,7 @@ final class SettingsStore {
             let fetchedSettings = try await settingsRequest
             let fetchedHistory = try await historyRequest
             accountSettings = fetchedAccountSettings
+            persistThemeMode(fetchedAccountSettings.themeMode)
             settings = fetchedSettings
             history = fetchedHistory.items
         } catch {
@@ -43,6 +54,7 @@ final class SettingsStore {
     }
 
     func save(
+        isAuthenticated: Bool,
         themeMode: ThemeMode? = nil,
         destinationLabel: String? = nil,
         triggerAmountUsd: Int? = nil,
@@ -54,11 +66,15 @@ final class SettingsStore {
         defer { isSaving = false }
 
         do {
-            if let themeMode, themeMode != accountSettings?.themeMode {
-                accountSettings = try await apiClient.updateAccountSettings(themeMode: themeMode)
+            if let themeMode {
+                persistThemeMode(themeMode)
+
+                if isAuthenticated, themeMode != accountSettings?.themeMode {
+                    accountSettings = try await apiClient.updateAccountSettings(themeMode: themeMode)
+                }
             }
 
-            if shouldUpdateTeamsSettings(
+            if isAuthenticated, shouldUpdateTeamsSettings(
                 destinationLabel: destinationLabel,
                 triggerAmountUsd: triggerAmountUsd,
                 webhookURL: webhookURL,
@@ -84,6 +100,11 @@ final class SettingsStore {
 
     func clearThemePreview() {
         previewThemeMode = nil
+    }
+
+    private func persistThemeMode(_ themeMode: ThemeMode) {
+        localThemeMode = themeMode
+        userDefaults.set(themeMode.rawValue, forKey: StorageKey.themeMode)
     }
 
     private func shouldUpdateTeamsSettings(

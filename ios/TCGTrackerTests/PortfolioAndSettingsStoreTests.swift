@@ -142,7 +142,9 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
 
     func testSettingsLoadAndSaveRoundTrip() async {
         let apiClient = MockAPIClient()
-        let store = SettingsStore(apiClient: apiClient)
+        let (userDefaults, suiteName) = makeIsolatedUserDefaults()
+        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let store = SettingsStore(apiClient: apiClient, userDefaults: userDefaults)
 
         await store.load()
         XCTAssertEqual(store.settings?.triggerAmountUsd, 1500)
@@ -151,6 +153,7 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.history.count, 1)
 
         await store.save(
+            isAuthenticated: true,
             themeMode: .dark,
             destinationLabel: "Trading alerts",
             triggerAmountUsd: 2000,
@@ -161,8 +164,34 @@ final class PortfolioAndSettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.settings?.triggerAmountUsd, 2000)
         XCTAssertEqual(store.accountSettings?.themeMode, .dark)
         XCTAssertEqual(store.currentThemeMode, .dark)
+        XCTAssertEqual(store.localThemeMode, .dark)
         XCTAssertEqual(store.settings?.webhookUrl, "https://example.com/new-hook")
+        XCTAssertEqual(apiClient.updatedAccountThemeMode, .dark)
         XCTAssertEqual(apiClient.settingsHistoryLoadCount, 2)
+    }
+
+    func testSignedOutThemeSavePersistsLocallyWithoutCallingAccountAPI() async {
+        let apiClient = MockAPIClient()
+        let (userDefaults, suiteName) = makeIsolatedUserDefaults()
+        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let store = SettingsStore(apiClient: apiClient, userDefaults: userDefaults)
+
+        await store.save(isAuthenticated: false, themeMode: .light)
+
+        XCTAssertEqual(store.currentThemeMode, .light)
+        XCTAssertEqual(store.localThemeMode, .light)
+        XCTAssertNil(store.accountSettings)
+        XCTAssertNil(apiClient.updatedAccountThemeMode)
+
+        let reloadedStore = SettingsStore(apiClient: apiClient, userDefaults: userDefaults)
+        XCTAssertEqual(reloadedStore.currentThemeMode, .light)
+    }
+
+    private func makeIsolatedUserDefaults() -> (UserDefaults, String) {
+        let suiteName = "PortfolioAndSettingsStoreTests.\(UUID().uuidString)"
+        let userDefaults = UserDefaults(suiteName: suiteName)!
+        userDefaults.removePersistentDomain(forName: suiteName)
+        return (userDefaults, suiteName)
     }
 
     func testPortfolioHoldingMapsToDetailCardItem() throws {

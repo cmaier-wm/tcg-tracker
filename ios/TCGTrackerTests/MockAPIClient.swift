@@ -150,6 +150,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var addedHoldingVariationID: String?
     var updatedHoldingQuantity: Int?
     var removedHoldingID: String?
+    var updatedAccountThemeMode: ThemeMode?
     var portfolioFetchPages: [Int?] = []
     var portfolioPageResults: [Int: Result<PortfolioResponse, Error>] = [:]
     var addHoldingResult: Result<PortfolioHolding, Error>?
@@ -272,6 +273,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     }
 
     func updateAccountSettings(themeMode: ThemeMode) async throws -> AccountSettings {
+        updatedAccountThemeMode = themeMode
         accountSettingsResult = .success(AccountSettings(themeMode: themeMode))
         return try accountSettingsResult.get()
     }

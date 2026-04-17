@@ -70,17 +70,11 @@ struct SignedInShellView: View {
             .tag(AppTab.portfolio)
 
             NavigationStack {
-                Group {
-                    if appModel.sessionStore.isAuthenticated {
-                        SettingsView(settingsStore: appModel.settingsStore)
-                    } else {
-                        SignInRequiredView(
-                            title: "Sign in to manage settings",
-                            detail: "Theme and alert settings are account-backed and available after you sign in."
-                        ) {
-                            showingSignIn = true
-                        }
-                    }
+                SettingsView(
+                    settingsStore: appModel.settingsStore,
+                    isAuthenticated: appModel.sessionStore.isAuthenticated
+                ) {
+                    showingSignIn = true
                 }
                 .toolbar {
                     ToolbarItem {

@@ -7,9 +7,10 @@ import { applyThemeMode, toggleThemeMode, type ThemeMode } from "@/lib/settings/
 
 type ThemeToggleProps = {
   initialThemeMode: ThemeMode;
+  isAuthenticated: boolean;
 };
 
-export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
+export function ThemeToggle({ initialThemeMode, isAuthenticated }: ThemeToggleProps) {
   const router = useRouter();
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialThemeMode);
   const [isSaving, setIsSaving] = useState(false);
@@ -52,8 +53,9 @@ export function ThemeToggle({ initialThemeMode }: ThemeToggleProps) {
         <p className="eyebrow">Theme</p>
         <h3>Dark mode</h3>
         <p className="muted">
-          Switch to a deeper low-light palette with brighter accent color and stronger
-          contrast across the app.
+          {isAuthenticated
+            ? "Switch to a deeper low-light palette with brighter accent color and stronger contrast across the app."
+            : "Choose a theme for this browser now. When you sign in, theme changes save to your account across devices."}
         </p>
       </div>
       <label className={isDarkMode ? "theme-toggle-switch active" : "theme-toggle-switch"}>

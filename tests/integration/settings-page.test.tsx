@@ -76,11 +76,41 @@ describe("settings page", () => {
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Appearance" })).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox", { name: "Dark mode toggle" })).not.toBeInTheDocument();
-    expect(screen.getByText("Sign in to manage your account-backed appearance preferences.")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
+    expect(screen.getByText("Sign in if you want your theme preference saved across devices.")).toBeInTheDocument();
     expect(screen.getByText("Sign in to manage your account-backed Teams alert settings.")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Sign In To Manage Appearance" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sign In To Sync Appearance" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Sign In To Manage Alerts" })).toBeInTheDocument();
+  });
+
+  it("saves signed-out dark mode through the shared settings endpoint", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ themeMode: "dark" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<SettingsPage initialThemeMode="light" isAuthenticated={false} />);
+
+    await waitFor(() => {
+      expect(document.documentElement.dataset.theme).toBe("light");
+    });
+
+    await user.click(screen.getByRole("checkbox", { name: "Dark mode toggle" }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/settings/account",
+        expect.objectContaining({
+          method: "PUT"
+        })
+      );
+      expect(document.documentElement.dataset.theme).toBe("dark");
+    });
   });
 
   it("saves dark mode through the backend", async () => {

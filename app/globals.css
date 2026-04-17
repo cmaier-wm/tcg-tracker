@@ -667,6 +667,10 @@ html[data-theme="dark"] .pokeball-spinner-button {
   border-radius: 0;
 }
 
+.catalog-card-media .image-box img {
+  object-position: top center;
+}
+
 .portfolio-media .image-box {
   width: 92px;
   height: 128px;

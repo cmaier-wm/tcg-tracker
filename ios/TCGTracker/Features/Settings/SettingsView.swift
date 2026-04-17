@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var settingsStore: SettingsStore
+    let isAuthenticated: Bool
+    let onSignIn: () -> Void
 
     @State private var destinationLabel = ""
     @State private var triggerAmountUsd = "1000"
@@ -21,47 +23,56 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Teams Alerts") {
-                Toggle("Enable alerts", isOn: $enabled)
-                TextField("Destination Label", text: $destinationLabel)
-                TextField("Trigger Amount (USD)", text: $triggerAmountUsd)
-                TextField("Webhook URL", text: $webhookURL)
-            }
-
-            if let settings = settingsStore.settings {
-                Section("Status") {
-                    LabeledContent("Delivery", value: settings.deliveryStatus.capitalized)
-                    LabeledContent(
-                        "Baseline",
-                        value: settings.baselineValue?.formatted(.currency(code: "USD")) ?? "Not set"
-                    )
+            if isAuthenticated {
+                Section("Teams Alerts") {
+                    Toggle("Enable alerts", isOn: $enabled)
+                    TextField("Destination Label", text: $destinationLabel)
+                    TextField("Trigger Amount (USD)", text: $triggerAmountUsd)
+                    TextField("Webhook URL", text: $webhookURL)
                 }
-            }
 
-            if !settingsStore.history.isEmpty {
-                Section("Recent Deliveries") {
-                    ForEach(settingsStore.history) { entry in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(entry.status.capitalized)
-                                    .font(.subheadline.weight(.semibold))
-                                Spacer()
-                                Text(entry.gainAmount, format: .currency(code: "USD"))
-                                    .foregroundStyle(AppTheme.accent)
-                            }
-
-                            Text(formattedTimestamp(entry.capturedAt))
-                                .font(.caption)
-                                .foregroundStyle(AppTheme.textSecondary)
-
-                            if let failureMessage = entry.failureMessage, !failureMessage.isEmpty {
-                                Text(failureMessage)
-                                    .font(.caption)
-                                    .foregroundStyle(AppTheme.negative)
-                            }
-                        }
-                        .padding(.vertical, 4)
+                if let settings = settingsStore.settings {
+                    Section("Status") {
+                        LabeledContent("Delivery", value: settings.deliveryStatus.capitalized)
+                        LabeledContent(
+                            "Baseline",
+                            value: settings.baselineValue?.formatted(.currency(code: "USD")) ?? "Not set"
+                        )
                     }
+                }
+
+                if !settingsStore.history.isEmpty {
+                    Section("Recent Deliveries") {
+                        ForEach(settingsStore.history) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(entry.status.capitalized)
+                                        .font(.subheadline.weight(.semibold))
+                                    Spacer()
+                                    Text(entry.gainAmount, format: .currency(code: "USD"))
+                                        .foregroundStyle(AppTheme.accent)
+                                }
+
+                                Text(formattedTimestamp(entry.capturedAt))
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.textSecondary)
+
+                                if let failureMessage = entry.failureMessage, !failureMessage.isEmpty {
+                                    Text(failureMessage)
+                                        .font(.caption)
+                                        .foregroundStyle(AppTheme.negative)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+            } else {
+                Section("Sign In to Sync") {
+                    Text("Theme changes save on this device now. Sign in to sync your theme across devices and manage Teams alerts.")
+                        .foregroundStyle(AppTheme.textSecondary)
+
+                    Button("Sign In", action: onSignIn)
                 }
             }
 
@@ -83,7 +94,10 @@ struct SettingsView: View {
                         let trimmedDestinationLabel = destinationLabel.trimmingCharacters(in: .whitespacesAndNewlines)
                         let trimmedWebhookURL = webhookURL.trimmingCharacters(in: .whitespacesAndNewlines)
                         let currentTeamsSettings = settingsStore.settings
-                        let didChangeTheme = themeMode != settingsStore.accountSettings?.themeMode
+                        let baselineThemeMode = isAuthenticated
+                            ? settingsStore.accountSettings?.themeMode ?? settingsStore.localThemeMode
+                            : settingsStore.localThemeMode
+                        let didChangeTheme = themeMode != baselineThemeMode
                         let didChangeTeamsSettings =
                             trimmedDestinationLabel != (currentTeamsSettings?.destinationLabel ?? "") ||
                             (Int(triggerAmountUsd) ?? 1000) != (currentTeamsSettings?.triggerAmountUsd ?? 1000) ||
@@ -91,6 +105,7 @@ struct SettingsView: View {
                             enabled != (currentTeamsSettings?.enabled ?? false)
 
                         await settingsStore.save(
+                            isAuthenticated: isAuthenticated,
                             themeMode: themeMode,
                             destinationLabel: destinationLabel,
                             triggerAmountUsd: Int(triggerAmountUsd) ?? 1000,
@@ -110,10 +125,12 @@ struct SettingsView: View {
             }
         }
         .task {
-            if settingsStore.settings == nil || settingsStore.accountSettings == nil {
+            if isAuthenticated, settingsStore.settings == nil || settingsStore.accountSettings == nil {
                 await settingsStore.load()
+                syncForm()
+            } else {
+                syncThemeMode()
             }
-            syncForm()
         }
         .onChange(of: settingsStore.settings?.triggerAmountUsd) { _, _ in
             syncForm()
@@ -137,7 +154,10 @@ struct SettingsView: View {
     }
 
     private func syncForm() {
-        guard let settings = settingsStore.settings else { return }
+        guard let settings = settingsStore.settings else {
+            syncThemeMode()
+            return
+        }
 
         destinationLabel = settings.destinationLabel ?? ""
         triggerAmountUsd = String(settings.triggerAmountUsd)
@@ -147,13 +167,19 @@ struct SettingsView: View {
     }
 
     private func syncThemeMode() {
-        themeMode = settingsStore.accountSettings?.themeMode ?? .dark
+        themeMode = settingsStore.currentThemeMode
     }
 
     private func makeSaveConfirmationMessage(
         changedTheme: Bool,
         changedTeamsSettings: Bool
     ) -> String {
+        if !isAuthenticated {
+            return changedTheme
+                ? "Your theme preference was saved on this device."
+                : "Your theme preference was already up to date on this device."
+        }
+
         switch (changedTheme, changedTeamsSettings) {
         case (true, true):
             return "Your theme and Teams alert settings were saved."

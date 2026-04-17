@@ -56,11 +56,11 @@ describe("settings page contract", () => {
 
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Appearance" })).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox", { name: "Dark mode toggle" })).not.toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Dark mode toggle" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Alerts" })).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByRole("link", { name: "Sign In To Manage Appearance" })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Sign In To Sync Appearance" })).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Sign In To Manage Alerts" })).toBeInTheDocument();
     });
   });

@@ -19,6 +19,28 @@ describe("account settings route", () => {
     });
   });
 
+  it("accepts signed-out theme updates for local persistence", async () => {
+    setTestAuthenticatedUser(null);
+
+    const response = await PUT(
+      new Request("http://localhost/api/settings/account", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          themeMode: "light"
+        })
+      })
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload).toEqual({
+      themeMode: "light"
+    });
+  });
+
   it("persists account theme updates independently from Teams settings", async () => {
     const response = await PUT(
       new Request("http://localhost/api/settings/account", {
@@ -44,23 +66,4 @@ describe("account settings route", () => {
     });
   });
 
-  it("rejects account settings writes when the current session is missing", async () => {
-    setTestAuthenticatedUser(null);
-
-    const response = await PUT(
-      new Request("http://localhost/api/settings/account", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          themeMode: "light"
-        })
-      })
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(401);
-    expect(payload.error).toBe("Authentication is required.");
-  });
 });
