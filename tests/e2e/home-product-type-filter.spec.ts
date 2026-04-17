@@ -39,3 +39,17 @@ test("home page supports product type switching without console errors", async (
 
   expect(consoleErrors).toEqual([]);
 });
+
+test("home page hides code cards from browse results", async ({ page }) => {
+  await page.goto("/");
+
+  await page
+    .getByLabel("Search cards")
+    .fill("perfect order pokemon center elite trainer box");
+  await page.getByRole("button", { name: "Search" }).click();
+
+  await expect(page).toHaveURL(/q=perfect\+order\+pokemon\+center\+elite\+trainer\+box/);
+  await expect(
+    page.locator("article.catalog-card").filter({ hasText: /^Code Card\b/i })
+  ).toHaveCount(0);
+});

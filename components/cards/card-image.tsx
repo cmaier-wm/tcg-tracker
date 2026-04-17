@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 
 type CardImageProps = {
   name: string;
@@ -6,7 +8,9 @@ type CardImageProps = {
 };
 
 export function CardImage({ name, imageUrl }: CardImageProps) {
-  if (!imageUrl) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (!imageUrl || imageFailed) {
     return (
       <div className="image-box" aria-label={`${name} image unavailable`}>
         <div className="image-placeholder">
@@ -19,7 +23,7 @@ export function CardImage({ name, imageUrl }: CardImageProps) {
   return (
     <div className="image-box">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={imageUrl} alt={name} />
+      <img src={imageUrl} alt={name} onError={() => setImageFailed(true)} />
     </div>
   );
 }

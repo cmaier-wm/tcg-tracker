@@ -66,6 +66,12 @@ export AUTH_RESET_EMAIL_ENDPOINT='https://your-reset-delivery-endpoint'
 npm run dev
 ```
 
+`npm run db:seed` now creates stable local demo accounts for smoke and live-demo
+validation:
+
+- `demo.primary@local.tcg` / `DemoPass123!`
+- `demo.empty@local.tcg` / `DemoPass123!`
+
 `npm run dev` automatically applies checked-in Prisma migrations with
 `prisma migrate deploy` and refreshes the generated Prisma client before the
 server starts on port `3000`. Keep `npm run db:migrate` for the separate case
@@ -251,9 +257,13 @@ Manual smoke check:
 Automated checks:
 
 ```bash
+npm run test:smoke
+npm run test:smoke:web
+npm run test:smoke:ios
 npm run test:unit
 npm run test:integration
 npm run test:e2e
+npm run test:ios
 npm run test:e2e -- tests/e2e/auth.spec.ts
 npm run test:e2e -- tests/e2e/teams-alerts.spec.ts
 npm run catalog:sync -- 3

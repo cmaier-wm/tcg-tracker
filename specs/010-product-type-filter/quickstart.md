@@ -26,6 +26,7 @@
 4. Switch back to Cards and confirm the result set updates again.
 5. Open the browser console during those flows and confirm no errors are logged.
 6. Confirm sealed-product rows do not link into `/cards/[category]/[id]`.
+7. Search for `code card` and confirm the browse UI shows no results instead of rendering code-card rows.
 
 ## iOS Manual Smoke Check
 
@@ -37,6 +38,7 @@
    selected mode clearly.
 5. Confirm card rows still open card detail and sealed-product rows remain
    browse-only in this increment.
+6. Search for `code card` and confirm the Browse tab does not render code-card rows.
 
 ## Expected Outcomes
 
@@ -48,3 +50,4 @@
    browse-only treatment on iOS.
 4. Switching back to `Cards` keeps the active sort and removes the
    `productType=sealed-product` query parameter.
+5. Code-card catalog entries remain hidden from the browse UI across product-type selections.

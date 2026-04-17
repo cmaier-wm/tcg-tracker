@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoCards } from "@/lib/db/demo-store";
+import { isCodeCard } from "@/lib/tcgtracking/code-card";
 import { getDatabaseCardCatalog } from "@/lib/tcgtracking/db-catalog";
 import { toCardListItem } from "@/lib/tcgtracking/mappers";
 import {
@@ -72,6 +73,10 @@ export async function getCardCatalog(options: CatalogOptions = {}) {
       sortCardListItems(
         getDemoCards()
           .filter((card) => {
+            if (isCodeCard(card)) {
+              return false;
+            }
+
             if (
               productType &&
               (card.productType ?? "card") !== productType

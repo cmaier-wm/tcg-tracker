@@ -6,6 +6,8 @@ import type {
 } from "@/lib/tcgtracking/search-query";
 import { tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
 
+const codeCardNameLikePattern = "code card%";
+
 const rarityRankSql = Prisma.sql`
   CASE
     WHEN c.rarity IS NULL OR BTRIM(c.rarity) = '' THEN NULL
@@ -116,6 +118,14 @@ export async function getDatabaseCardCatalog(options: {
     whereClauses.push(Prisma.sql`cc.slug = ${options.category}`);
   }
 
+  whereClauses.push(
+    Prisma.sql`NOT (
+      LOWER(BTRIM(COALESCE(c.rarity, ''))) = 'code card'
+      OR LOWER(c.name) LIKE ${codeCardNameLikePattern}
+      OR LOWER(c."cleanName") LIKE ${codeCardNameLikePattern}
+    )`
+  );
+
   if (options.productType === "card") {
     whereClauses.push(
       Prisma.sql`(c."collectorNumber" IS NOT NULL OR (c.rarity IS NOT NULL AND BTRIM(c.rarity) <> ''))`
@@ -214,6 +224,7 @@ export async function getDatabaseCardDetail(category: string, cardId: string) {
     select: {
       id: true,
       name: true,
+      cleanName: true,
       collectorNumber: true,
       rarity: true,
       imageUrl: true,

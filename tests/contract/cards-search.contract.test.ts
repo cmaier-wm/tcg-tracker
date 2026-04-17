@@ -25,6 +25,25 @@ describe("cards search contract", () => {
     });
   });
 
+  it("hides code cards from catalog responses", async () => {
+    const [defaultItems, cardItems, sealedItems, searchItems] = await Promise.all([
+      getCardCatalog(),
+      getCardCatalog({ productType: "card" }),
+      getCardCatalog({ productType: "sealed-product" }),
+      getCardCatalog({ q: "code card" })
+    ]);
+
+    for (const items of [defaultItems, cardItems, sealedItems, searchItems]) {
+      expect(
+        items.some(
+          (item) =>
+            item.rarity?.trim().toLowerCase() === "code card" ||
+            item.name.trim().toLowerCase().startsWith("code card")
+        )
+      ).toBe(false);
+    }
+  });
+
   it("matches card names and collector numbers together", async () => {
     const items = await getCardCatalog({ q: "charizard 125" });
 

@@ -1,6 +1,7 @@
 import { notFound } from "@/lib/api/http-errors";
 import { withDatabaseFallback } from "@/lib/db/runtime";
 import { getDemoCards } from "@/lib/db/demo-store";
+import { isCodeCard } from "@/lib/tcgtracking/code-card";
 import { getDatabaseCardDetail } from "@/lib/tcgtracking/db-catalog";
 
 export async function getCardDetail(category: string, cardId: string) {
@@ -9,6 +10,10 @@ export async function getCardDetail(category: string, cardId: string) {
       const card = await getDatabaseCardDetail(category, cardId);
 
       if (!card) {
+        throw notFound("Card not found");
+      }
+
+      if (isCodeCard(card)) {
         throw notFound("Card not found");
       }
 
@@ -39,6 +44,10 @@ export async function getCardDetail(category: string, cardId: string) {
       );
 
       if (!card) {
+        throw notFound("Card not found");
+      }
+
+      if (isCodeCard(card)) {
         throw notFound("Card not found");
       }
 

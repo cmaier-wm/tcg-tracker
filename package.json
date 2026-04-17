@@ -24,6 +24,10 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration tests/contract",
     "test:e2e": "playwright test",
+    "test:ios": "cd ios && swift test",
+    "test:smoke:web": "node scripts/run-smoke-tests.mjs web",
+    "test:smoke:ios": "node scripts/run-smoke-tests.mjs ios",
+    "test:smoke": "node scripts/run-smoke-tests.mjs all",
     "snapshots:run": "node scripts/run-snapshots.mjs"
   },
   "dependencies": {

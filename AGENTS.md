@@ -53,6 +53,10 @@
 - `npm run test:unit`
 - `npm run test:integration`
 - `npm run test:e2e`
+- `npm run test:ios`
+- `npm run test:smoke`
+- `npm run test:smoke:web`
+- `npm run test:smoke:ios`
 - `npm run snapshots:run`
 - `npm run db:down`
 - `cd ios && swift test`
@@ -66,6 +70,9 @@
   needed.
 - `npm run dev` automatically runs `prisma migrate deploy` and `prisma generate`
   before starting the local server on port `3000`.
+- `npm run db:seed` provisions stable demo login fixtures for smoke and demo
+  validation, including `demo.primary@local.tcg` and `demo.empty@local.tcg`
+  with password `DemoPass123!`.
 - `npm run codex:sync-worktrees` backfills the tracked Codex Desktop Run action
   into older `tcg-tracker` worktrees under `$CODEX_HOME/worktrees` or
   `~/.codex/worktrees`.

@@ -25,7 +25,14 @@ type CardDetailProps = {
 };
 
 export function CardDetail({ card, selectedVariationId, sideContent }: CardDetailProps) {
-  void selectedVariationId;
+  const selectedVariation = card.variations.find(
+    (variation) => variation.id === selectedVariationId
+  );
+  const variationBadges = [
+    toLanguageLabel(selectedVariation?.languageCode),
+    selectedVariation?.finish ?? null,
+    selectedVariation?.conditionCode ?? null
+  ].filter((value): value is string => Boolean(value));
 
   return (
     <div className="detail-grid">
@@ -43,10 +50,26 @@ export function CardDetail({ card, selectedVariationId, sideContent }: CardDetai
           </div>
           <div className="badge-row">
             {card.rarity ? <span className="badge">{card.rarity}</span> : null}
+            {variationBadges.map((badge) => (
+              <span key={badge} className="badge">
+                {badge}
+              </span>
+            ))}
           </div>
         </div>
         {sideContent}
       </div>
     </div>
   );
+}
+
+function toLanguageLabel(languageCode?: string | null) {
+  switch (languageCode?.toLowerCase()) {
+    case "en":
+      return "English";
+    case "jp":
+      return "Japanese";
+    default:
+      return languageCode ?? null;
+  }
 }
