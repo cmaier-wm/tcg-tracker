@@ -1,6 +1,9 @@
 import { withRouteHandler } from "@/lib/api/route-handler";
 import { getCardCatalog } from "@/lib/tcgtracking/get-card-catalog";
-import { normalizeCatalogSort } from "@/lib/tcgtracking/search-query";
+import {
+  normalizeCatalogProductType,
+  normalizeCatalogSort
+} from "@/lib/tcgtracking/search-query";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +20,7 @@ export async function GET(request: Request) {
       category: POKEMON_CATEGORY,
       set: searchParams.get("set"),
       sort: normalizeCatalogSort(searchParams.get("sort")),
+      productType: normalizeCatalogProductType(searchParams.get("productType")),
       offset: Number.isNaN(offset) ? 0 : Math.max(0, offset),
       limit: Number.isNaN(limit) ? 20 : Math.max(1, limit)
     })

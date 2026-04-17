@@ -3,7 +3,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CardList } from "@/components/cards/card-list";
 import type { CardListItem } from "@/lib/tcgtracking/mappers";
-import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
+import type {
+  CatalogProductTypeValue,
+  CatalogSortValue
+} from "@/lib/tcgtracking/search-query";
 
 type InfiniteCardListProps = {
   initialItems: CardListItem[];
@@ -11,6 +14,7 @@ type InfiniteCardListProps = {
   selectedCategory?: string;
   selectedSet?: string;
   selectedSort: CatalogSortValue;
+  selectedProductType?: CatalogProductTypeValue;
   pageSize: number;
 };
 
@@ -20,6 +24,7 @@ export function InfiniteCardList({
   selectedCategory,
   selectedSet,
   selectedSort,
+  selectedProductType = "card",
   pageSize
 }: InfiniteCardListProps) {
   const [items, setItems] = useState(initialItems);
@@ -50,6 +55,10 @@ export function InfiniteCardList({
           limit: String(pageSize),
           sort: selectedSort
         });
+
+        if (selectedProductType !== "card") {
+          params.set("productType", selectedProductType);
+        }
 
         if (query) {
           params.set("q", query);
@@ -93,7 +102,16 @@ export function InfiniteCardList({
     return () => {
       observer.disconnect();
     };
-  }, [hasMore, items.length, pageSize, query, selectedCategory, selectedSet, selectedSort]);
+  }, [
+    hasMore,
+    items.length,
+    pageSize,
+    query,
+    selectedCategory,
+    selectedProductType,
+    selectedSet,
+    selectedSort
+  ]);
 
   return (
     <>

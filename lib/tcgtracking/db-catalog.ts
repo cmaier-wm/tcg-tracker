@@ -1,6 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
-import type { CatalogSortValue } from "@/lib/tcgtracking/search-query";
+import type {
+  CatalogProductTypeValue,
+  CatalogSortValue
+} from "@/lib/tcgtracking/search-query";
 import { tokenizeSearchQuery } from "@/lib/tcgtracking/search-query";
 
 const rarityRankSql = Prisma.sql`
@@ -102,6 +105,7 @@ export async function getDatabaseCardCatalog(options: {
   category?: string | null;
   set?: string | null;
   sort: CatalogSortValue;
+  productType: CatalogProductTypeValue;
   limit?: number;
   offset?: number;
 }) {
@@ -110,6 +114,18 @@ export async function getDatabaseCardCatalog(options: {
 
   if (options.category) {
     whereClauses.push(Prisma.sql`cc.slug = ${options.category}`);
+  }
+
+  if (options.productType === "card") {
+    whereClauses.push(
+      Prisma.sql`(c."collectorNumber" IS NOT NULL OR (c.rarity IS NOT NULL AND BTRIM(c.rarity) <> ''))`
+    );
+  }
+
+  if (options.productType === "sealed-product") {
+    whereClauses.push(
+      Prisma.sql`(c."collectorNumber" IS NULL AND (c.rarity IS NULL OR BTRIM(c.rarity) = ''))`
+    );
   }
 
   if (options.set) {
@@ -148,6 +164,7 @@ export async function getDatabaseCardCatalog(options: {
   return prisma.$queryRaw<
     Array<{
       id: string;
+      productType: CatalogProductTypeValue;
       category: string;
       categoryName: string;
       setName: string;
@@ -161,6 +178,10 @@ export async function getDatabaseCardCatalog(options: {
   >(Prisma.sql`
     SELECT
       c.id,
+      CASE
+        WHEN c."collectorNumber" IS NULL AND (c.rarity IS NULL OR BTRIM(c.rarity) = '') THEN 'sealed-product'
+        ELSE 'card'
+      END AS "productType",
       cc.slug AS category,
       cc.name AS "categoryName",
       s.name AS "setName",

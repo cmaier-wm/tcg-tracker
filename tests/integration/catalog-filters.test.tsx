@@ -39,6 +39,7 @@ describe("catalog filters", () => {
         query="charizard"
         selectedSet=""
         selectedSort="price-desc"
+        selectedProductType="sealed-product"
         categories={[]}
         sets={[
           {
@@ -49,15 +50,18 @@ describe("catalog filters", () => {
           }
         ]}
         resetHref="/cards"
+        showProductTypeFilter
       />
     );
 
     await user.selectOptions(screen.getByLabelText("Set"), "scarlet-violet");
-    expect(mockReplace).toHaveBeenCalledWith("/cards?q=charizard&set=scarlet-violet&sort=price-desc");
+    expect(mockReplace).toHaveBeenCalledWith(
+      "/cards?q=charizard&set=scarlet-violet&sort=price-desc&productType=sealed-product"
+    );
     await user.selectOptions(screen.getByLabelText("Sort"), "name-asc");
 
     expect(mockReplace).toHaveBeenLastCalledWith(
-      "/cards?q=charizard&set=scarlet-violet&sort=name-asc"
+      "/cards?q=charizard&set=scarlet-violet&sort=name-asc&productType=sealed-product"
     );
   });
 
@@ -72,6 +76,7 @@ describe("catalog filters", () => {
         query="charizard"
         selectedSet="scarlet-violet"
         selectedSort="name-asc"
+        selectedProductType="sealed-product"
         categories={[]}
         sets={[
           {
@@ -82,14 +87,16 @@ describe("catalog filters", () => {
           }
         ]}
         resetHref="/cards"
+        showProductTypeFilter
       />
     );
 
-    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Reset filters" }));
 
     expect(screen.getByLabelText("Search cards")).toHaveValue("");
     expect(screen.getByLabelText("Set")).toHaveValue("");
     expect(screen.getByLabelText("Sort")).toHaveValue("price-desc");
+    expect(screen.getByLabelText("Type")).toHaveValue("card");
     expect(mockReplace).toHaveBeenLastCalledWith("/cards");
   });
 
@@ -104,15 +111,40 @@ describe("catalog filters", () => {
         query=""
         selectedSet=""
         selectedSort="price-desc"
+        selectedProductType="card"
         categories={[]}
         sets={[]}
         resetHref="/cards"
+        showProductTypeFilter
       />
     );
 
-    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Reset filters" }));
 
     expect(mockReplace).not.toHaveBeenCalled();
     expect(screen.queryByRole("status", { name: "Applying filters" })).not.toBeInTheDocument();
+  });
+
+  it("omits the productType query parameter when switching back to the default card value", async () => {
+    const user = userEvent.setup();
+    mockPathname.mockReturnValue("/");
+    mockSearchParams.mockReturnValue(new URLSearchParams("productType=sealed-product&sort=price-desc"));
+
+    render(
+      <CatalogFilters
+        query=""
+        selectedSet=""
+        selectedSort="price-desc"
+        selectedProductType="sealed-product"
+        categories={[]}
+        sets={[]}
+        resetHref="/"
+        showProductTypeFilter
+      />
+    );
+
+    await user.selectOptions(screen.getByLabelText("Type"), "card");
+
+    expect(mockReplace).toHaveBeenLastCalledWith("/?sort=price-desc");
   });
 });

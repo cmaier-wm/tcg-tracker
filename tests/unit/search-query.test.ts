@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { CardListItem } from "@/lib/tcgtracking/mappers";
 import {
+  getDefaultCatalogProductType,
+  getCatalogProductTypeOptions,
   getCatalogSortOptions,
   matchesSearchTokens,
+  normalizeCatalogProductType,
   normalizeCatalogSort,
   sortCardListItems,
   tokenizeSearchQuery
@@ -11,6 +14,7 @@ import {
 const sampleItems: CardListItem[] = [
   {
     id: "card-1",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "Base Set",
@@ -22,6 +26,7 @@ const sampleItems: CardListItem[] = [
   },
   {
     id: "card-2",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "Jungle",
@@ -33,6 +38,7 @@ const sampleItems: CardListItem[] = [
   },
   {
     id: "card-3",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "Team Rocket",
@@ -43,6 +49,7 @@ const sampleItems: CardListItem[] = [
   },
   {
     id: "card-4",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "Aquapolis",
@@ -54,6 +61,7 @@ const sampleItems: CardListItem[] = [
   },
   {
     id: "card-5",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "Neo Genesis",
@@ -91,6 +99,17 @@ describe("search query helpers", () => {
       "rarity-asc",
       "rarity-desc"
     ]);
+  });
+
+  it("lists and normalizes the supported product type options", () => {
+    expect(getCatalogProductTypeOptions().map((option) => option.value)).toEqual([
+      "card",
+      "sealed-product"
+    ]);
+    expect(getDefaultCatalogProductType()).toBe("card");
+    expect(normalizeCatalogProductType(undefined)).toBe("card");
+    expect(normalizeCatalogProductType("sealed-product")).toBe("sealed-product");
+    expect(normalizeCatalogProductType("cards")).toBe("card");
   });
 
   it("normalizes unsupported sorts to the default option", () => {

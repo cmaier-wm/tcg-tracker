@@ -23,6 +23,7 @@ export default async function CardsPage({
       category: selectedCategory,
       set: selectedSet,
       sort: selectedSort,
+      productType: "card",
       limit: INITIAL_PAGE_SIZE
     }),
     getCatalogCategories(),
@@ -35,6 +36,7 @@ export default async function CardsPage({
       selectedCategory={selectedCategory}
       selectedSet={selectedSet}
       selectedSort={selectedSort}
+      selectedProductType="card"
       items={items}
       categories={categories.filter((category) => category.slug === POKEMON_CATEGORY)}
       sets={sets}

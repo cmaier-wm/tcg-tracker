@@ -46,6 +46,7 @@ import CardsPage from "@/app/cards/page";
 const mockItems: CardListItem[] = [
   {
     id: "pokemon-2",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "151",
@@ -57,6 +58,7 @@ const mockItems: CardListItem[] = [
   },
   {
     id: "pokemon-1",
+    productType: "card",
     category: "pokemon",
     categoryName: "Pokemon",
     setName: "151",
@@ -96,21 +98,23 @@ beforeEach(() => {
 
 describe("cards browse pages", () => {
   it("renders the catalog heading and sort control", async () => {
-    const page = await CardsPage({ searchParams: Promise.resolve({}) });
+    const page = await HomePage({ searchParams: Promise.resolve({}) });
     render(page);
 
     expect(screen.getByText("Pokémon Card Browser")).toBeInTheDocument();
     expect(screen.getByLabelText("Search cards")).toBeInTheDocument();
     expect(screen.getByLabelText("Set")).toBeInTheDocument();
     expect(screen.getByLabelText("Sort")).toHaveValue("price-desc");
+    expect(screen.getByLabelText("Type")).toHaveValue("card");
   });
 
   it("preserves the selected search, set, and sort values in the browse filters", async () => {
-    const page = await CardsPage({
+    const page = await HomePage({
       searchParams: Promise.resolve({
         q: "bulbasaur",
         set: "151",
-        sort: "set-desc"
+        sort: "set-desc",
+        productType: "sealed-product"
       })
     });
     render(page);
@@ -118,11 +122,13 @@ describe("cards browse pages", () => {
     expect(screen.getByLabelText("Search cards")).toHaveValue("bulbasaur");
     expect(screen.getByLabelText("Set")).toHaveValue("151");
     expect(screen.getByLabelText("Sort")).toHaveValue("set-desc");
+    expect(screen.getByLabelText("Type")).toHaveValue("sealed-product");
     expect(mockGetCardCatalog).toHaveBeenCalledWith(
       expect.objectContaining({
         q: "bulbasaur",
         set: "151",
-        sort: "set-desc"
+        sort: "set-desc",
+        productType: "sealed-product"
       })
     );
   });
@@ -135,7 +141,20 @@ describe("cards browse pages", () => {
     expect(mockGetCardCatalog).toHaveBeenCalledWith(
       expect.objectContaining({
         category: "pokemon",
+        productType: "card",
         sort: "price-desc"
+      })
+    );
+  });
+
+  it("keeps the /cards page locked to card results without showing the type control", async () => {
+    const page = await CardsPage({ searchParams: Promise.resolve({}) });
+    render(page);
+
+    expect(screen.queryByLabelText("Type")).not.toBeInTheDocument();
+    expect(mockGetCardCatalog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        productType: "card"
       })
     );
   });
@@ -167,5 +186,18 @@ describe("cards browse pages", () => {
     render(page);
 
     expect(screen.getByText("No cards found")).toBeInTheDocument();
+  });
+
+  it("shows sealed-product empty-state copy when the home filter is set to sealed products", async () => {
+    mockGetCardCatalog.mockResolvedValueOnce([]);
+
+    const page = await HomePage({
+      searchParams: Promise.resolve({
+        productType: "sealed-product"
+      })
+    });
+    render(page);
+
+    expect(screen.getByText("No sealed products found")).toBeInTheDocument();
   });
 });

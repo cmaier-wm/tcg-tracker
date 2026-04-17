@@ -8,6 +8,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var settingsHistoryLoadCount = 0
     var accountSettingsLoadCount = 0
     var lastBrowseSort: CardSortOption?
+    var lastBrowseProductType: CatalogProductTypeOption?
     var sessionResult: Result<MobileSession, Error> = .success(
         MobileSession(
             status: "authenticated",
@@ -35,6 +36,7 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
     var cardsResult: Result<[CardListItem], Error> = .success([
         CardListItem(
             id: "card-1",
+            productType: .card,
             category: "pokemon",
             categoryName: "Pokemon",
             setName: "151",
@@ -182,9 +184,10 @@ final class MockAPIClient: APIClientProtocol, @unchecked Sendable {
         try passwordResetResult.get()
     }
 
-    func browseCards(query: String, sort: CardSortOption) async throws -> [CardListItem] {
+    func browseCards(query: String, sort: CardSortOption, productType: CatalogProductTypeOption) async throws -> [CardListItem] {
         browseCallCount += 1
         lastBrowseSort = sort
+        lastBrowseProductType = productType
         return try cardsResult.get()
     }
 
