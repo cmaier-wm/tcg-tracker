@@ -161,6 +161,8 @@ The repository now includes an `azd` + Bicep deployment path for a production
 environment in Azure App Service with Azure Database for PostgreSQL Flexible
 Server and Azure Key Vault.
 
+Deployed site: <https://azappjzn32vflxpfjy.azurewebsites.net>
+
 Core commands:
 
 ```bash
